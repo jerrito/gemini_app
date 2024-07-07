@@ -6,17 +6,23 @@ import 'package:gemini/features/authentication/data/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 abstract class AuthenticationRemoteDatasource {
-  //s
+  //signup
   Future<SignupResponseModel> signupUser(Map<String, dynamic> params);
 
+// signin
   Future<SigninResponseModel> signinUser(Map<String, dynamic> params);
 
   // get user
   Future<UserModel> getUser(Map<String, dynamic> params);
 
+  // logout
   Future<String> logout(Map<String, dynamic> params);
 
+// refresh token
   Future<String> refreshToken(String refreshToken);
+
+  //change password
+  Future<String> changepassword(Map<String, dynamic> params);
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -140,6 +146,34 @@ class AuthenticationRemoteDatasourceImpl
     } else {
       throw Exception(
         ErrorModel.fromJson(data).toMap(),
+      );
+    }
+  }
+
+  @override
+  Future<String> changepassword(Map<String, dynamic> params) async {
+    Map<String, String>? headers = {};
+
+    headers.addAll({
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": params["token"]
+    });
+    final body = {
+      "old_password": params["oldPassword"],
+      "new_password": params["newPassword"],
+      "confirm_password": params["confirmPassword"]
+    };
+    final response = await client.put(
+      getUri(endpoint: Url.changepasswordUrl.endpoint),
+      headers: headers,
+      body: body,
+    );
+    final decodedResponse = jsonDecode(response.body);
+    if (response.statusCode == HttpStatus.ok) {
+      return decodedResponse["message"];
+    } else {
+      throw Exception(
+        ErrorModel.fromJson(decodedResponse).toMap(),
       );
     }
   }

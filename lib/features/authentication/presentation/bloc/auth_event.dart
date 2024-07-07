@@ -56,3 +56,9 @@ class RefreshTokenEvent extends AuthenticationEvent{
   RefreshTokenEvent({required this.refreshToken});
 
 }
+
+class ChangePasswordEvent extends AuthenticationEvent{
+final  Map<String, dynamic> params;
+
+  ChangePasswordEvent({required this.params});
+}

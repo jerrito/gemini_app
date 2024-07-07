@@ -12,6 +12,7 @@ enum Url {
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
   updateUser(endpoint: "/api/user/update-profile"),
+  changepasswordUrl(endpoint: "/api/user/profile/password"),
   fUrl(endpoint: "/verify_otp");
 
   final String endpoint;

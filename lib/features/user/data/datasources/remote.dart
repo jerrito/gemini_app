@@ -10,6 +10,7 @@ abstract class UserRemoteDatasource {
 
   // update profile
   Future<String> updateProfile(Map<String, dynamic> params);
+
 }
 
 class UserRemoteDatasourceImpl implements UserRemoteDatasource {

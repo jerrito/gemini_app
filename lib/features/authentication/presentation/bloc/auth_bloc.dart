@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_token.dart';
+import 'package:gemini/features/authentication/domain/usecases/change_password.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
@@ -21,12 +22,13 @@ class AuthenticationBloc
   final GetUserData getUserData;
   final CacheToken cacheToken;
   final GetToken getToken;
-   final GetCacheUser getCacheUser;
-   final LogOut logout;
-   final RefreshToken refreshToken;
-
-  AuthenticationBloc( {
+  final GetCacheUser getCacheUser;
+  final LogOut logout;
+  final RefreshToken refreshToken;
+  final ChangePassword changePassword;
+  AuthenticationBloc({
     required this.getCacheUser,
+    required this.changePassword,
     required this.refreshToken,
     required this.signup,
     required this.signin,
@@ -42,10 +44,13 @@ class AuthenticationBloc
         final response = await signup.call(event.params);
 
         emit(response.fold(
-            (error) {
-            return   SignupError(errorMessage: error);
-            }, 
-            (response) => SignupLoaded(response: response)));
+          (error) {
+            return SignupError(errorMessage: error);
+          },
+          (response) => SignupLoaded(
+            response: response,
+          ),
+        ));
       },
     );
 
@@ -67,8 +72,6 @@ class AuthenticationBloc
       },
     );
 
-    
-
     //! CACHE DATA
     on<CacheUserDataEvent>((event, emit) async {
       //  emit(CacheUserDataLoading());
@@ -82,7 +85,7 @@ class AuthenticationBloc
       );
     });
 
-   // ! GET CACHED DATA
+    // ! GET CACHED DATA
     on<GetUserCacheDataEvent>(
       (event, emit) async {
         //emit(GetUserDataLoading());
@@ -96,6 +99,8 @@ class AuthenticationBloc
         );
       },
     );
+
+    //! GET USER
     on<GetUserEvent>((event, emit) async {
       emit(GetUserDataLoading());
       final response = await getUserData.call(event.params);
@@ -110,6 +115,8 @@ class AuthenticationBloc
         ),
       );
     });
+
+    //! CACHE TOKEN
     on<CacheTokenEvent>((event, emit) async {
       final response = await cacheToken.call(event.authorization);
       emit(
@@ -120,6 +127,7 @@ class AuthenticationBloc
       );
     });
 
+    //!  GET TOKEN
     on<GetTokenEvent>((event, emit) async {
       final response = await getToken.call(NoParams());
       emit(
@@ -132,25 +140,48 @@ class AuthenticationBloc
       );
     });
 
-    on<LogoutEvent>((event, emit) async{
-      
-      emit(LogoutLoading());
-      final response=await logout.call(event.params);
-      emit(
-        response.fold((e)=>LogoutError(errorMessage: e),
-         (response)=>LogoutLoaded(successMessage: response))
-      );
-    },);
+    //! LOG OUT
+    on<LogoutEvent>(
+      (event, emit) async {
+        emit(LogoutLoading());
+        final response = await logout.call(event.params);
+        emit(response.fold(
+          (e) => LogoutError(errorMessage: e),
+          (response) => LogoutLoaded(
+            successMessage: response,
+          ),
+        ));
+      },
+    );
+
+    //! REFRESH TOKEN
+    on<RefreshTokenEvent>(
+      (event, emit) async {
+        final response = await refreshToken.call(event.refreshToken);
+        emit(response.fold(
+          (e) => RefreshTokenError(errorMessage: e),
+          (response) => RefreshTokenLoaded(
+            token: response,
+          ),
+        ));
+      },
+    );
 
 
-    on<RefreshTokenEvent>((event, emit) async{
-      
-      // emit(RefreshTokenLoading());
-      final response=await refreshToken.call(event.refreshToken);
-      emit(
-        response.fold((e)=>RefreshTokenError(errorMessage: e),
-         (response)=>RefreshTokenLoaded(token: response))
+    //! CHANGE PASSWORD
+    on<ChangePasswordEvent>((event, emit) async {
+      emit(ChangePasswordLoading());
+      final response = await changePassword.call(event.params);
+      response.fold(
+        (error) => emit(
+          ChangePasswordError(errorMessage: error),
+        ),
+        (response) => emit(
+          ChangePasswordLoaded(
+            data: response,
+          ),
+        ),
       );
-    },);
+    });
   }
 }

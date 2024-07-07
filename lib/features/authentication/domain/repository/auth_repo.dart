@@ -28,4 +28,7 @@ abstract class AuthenticationRepository {
 
   // refresh toen
   Future<Either<String,String>> refreshToken(String refreshToken);
-}
+
+  // change password
+  Future<Either<String, String>> changePassword(Map<String,dynamic>params);
+ }
