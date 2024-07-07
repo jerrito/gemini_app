@@ -40,7 +40,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "token": params["token"]
     };
-    final body = {"userName": params["userName"]};
+    final body = {"data": params["data"]};
     final response = await client.patch(getUri(endpoint: "endpoint"),
         body: jsonEncode(body), headers: headers);
 
