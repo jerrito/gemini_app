@@ -13,7 +13,6 @@ class UserLocalDatasourceImpl implements UserLocalDatasource {
     try {
       final image = await ImagePicker().pickImage(source: params["source"]);
       final byte = await image?.readAsBytes();
-      print(byte);
       return byte;
     } catch (e) {
       throw Exception("Error uploading the file");

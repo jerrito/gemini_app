@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/core/mixin/dialog_mixin.dart';
@@ -43,18 +44,27 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
         child: MultiBlocListener(
           listeners: [
             BlocListener(
-              bloc:userBloc,
-              listener: (context,state){
-              
-            }),            
+                bloc: userBloc,
+                listener: (context, state) {
+                  if (state is UpdateProfileLoaded) {
+                    profile = state.profile;
+                    setState(() {});
+                  }
+                  if (state is UpdateProfileError) {
+                    print(state.errorMessage);
+                    showSnackbar(context: context, message: state.errorMessage);
+                  }
+                }),
             BlocListener(
               bloc: authBloc,
               listener: (context, state) {
                 if (state is GetUserCachedDataLoaded) {
                   final data = state.data;
-                  listUserData.add(data["userName"]);
-                  listUserData.add(data["email"]);
-                  listUserData.add(data["password"]);
+                  listUserData.insert(0, data["userName"]);
+                  listUserData.insert(1, data["email"]);
+                  listUserData.insert(2, data["password"]);
+                  print(listUserData);
+                  setState(() {});
 
                   authBloc.add(GetTokenEvent());
                 }
@@ -111,28 +121,24 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                 alignment: Alignment.bottomRight,
                 children: [
                   CircleAvatar(
-                    backgroundImage: Image.network(
-                      fit: BoxFit.cover,
-                      "https://tbcdn.talentbrew.com/company/22348/cms/images/pages/cabin-crew/20230907_ba_england_womens_rugby_ba_group_tail_0330_em2.jpg",
-                    ).image,
+                    backgroundImage: (profile != null)
+                        ? Image.network(fit: BoxFit.cover, profile!).image
+                        : Image.asset(defaultImage).image,
                     radius: Sizes().height(context, 0.06),
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.blueGrey,
                     child: IconButton(
                       onPressed: () async {
-                        final imageData = await buildPickImage(
+                        final imageBuffer = await buildPickImage(
                           context: context,
                         );
-                        if (imageData != null) {
-                          print(imageData.toString()); 
-                          final params = {
-                            "data": imageData,
-                          };
-                         // userBloc.add(PickImageEvent(params: params));
+                        if (imageBuffer != null) {
+                          final params = {"data": imageBuffer, "token": token};
+                          userBloc.add(UpdateProfileEvent(params: params));
                         }
                       },
-                      icon:const Icon(Icons.image),
+                      icon: const Icon(Icons.image),
                     ),
                   )
                 ],
@@ -145,12 +151,12 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                     onTap: () async {
                       await buildDialog(
                           context: context,
-                          label: "userName",
+                          label: listUserData[index] ?? "",
                           token: token,
                           authBloc: authBloc);
                       authBloc.add(GetUserCacheDataEvent());
                     },
-                    label: "",
+                    label: listUserData[index] ?? "",
                   ),
                 ),
               ),
