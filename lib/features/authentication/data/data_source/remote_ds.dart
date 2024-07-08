@@ -164,7 +164,7 @@ class AuthenticationRemoteDatasourceImpl
       "confirm_password": params["confirmPassword"]
     };
     final response = await client.put(
-      getUri(endpoint: Url.changepasswordUrl.endpoint),
+      getUri(endpoint: Url.changePasswordUrl.endpoint),
       headers: headers,
       body: body,
     );

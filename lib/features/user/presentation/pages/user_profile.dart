@@ -60,9 +60,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
               listener: (context, state) {
                 if (state is GetUserCachedDataLoaded) {
                   final data = state.data;
-                  listUserData.insert(0, data["userName"]);
-                  listUserData.insert(1, data["email"]);
-                  listUserData.insert(2, data["password"]);
+                  listUserData.setAll(0, [data["userName"],data["email"],"Change Password"]);
                   print(listUserData);
                   setState(() {});
 
@@ -151,7 +149,8 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                     onTap: () async {
                       await buildDialog(
                           context: context,
-                          label: listUserData[index] ?? "",
+                          data: listUserData[index] ?? "",
+                          label: listProfileData[index].name,
                           token: token,
                           authBloc: authBloc);
                       authBloc.add(GetUserCacheDataEvent());
@@ -175,7 +174,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
     );
   }
 
-  List<String?> listUserData = [];
+  List<String?> listUserData = ["","",""];
   List<UserProfileData> listProfileData = [
     UserProfileData.userName,
     UserProfileData.email,

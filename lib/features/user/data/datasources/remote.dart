@@ -10,7 +10,6 @@ abstract class UserRemoteDatasource {
 
   // update profile
   Future<String> updateProfile(Map<String, dynamic> params);
-
 }
 
 class UserRemoteDatasourceImpl implements UserRemoteDatasource {
@@ -21,13 +20,19 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   Future<UserModel> updateUser(Map<String, dynamic> params) async {
     final Map<String, String> headers = {
       "Content-Type": "application/json; charset=UTF-8",
-      "token": params["token"]
+      "Authorization": params["token"]
     };
     final body = {"userName": params["userName"]};
-    final response = await client.patch(getUri(endpoint: "endpoint"),
-        body: jsonEncode(body), headers: headers);
+    final response = await client.patch(
+      getUri(
+        endpoint: Url.updateUser.endpoint,
+      ),
+      body: jsonEncode(body),
+      headers: headers,
+    );
 
     final decodedResponse = jsonDecode(response.body);
+    print(response.body);
     if (response.statusCode == 200) {
       return UserModel.fromJson(decodedResponse);
     } else {
@@ -39,11 +44,13 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   Future<String> updateProfile(Map<String, dynamic> params) async {
     final Map<String, String> headers = {
       "Content-Type": "application/json; charset=UTF-8",
-      "token": params["token"]
+      "Authorization": params["token"]
     };
     final body = {"data": params["data"]};
-    final response = await client.patch(getUri(endpoint: "endpoint"),
-        body: jsonEncode(body), headers: headers);
+    final response = await client.patch(
+        getUri(endpoint: Url.updateProfile.endpoint),
+        body: jsonEncode(body),
+        headers: headers);
 
     final decodedResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
