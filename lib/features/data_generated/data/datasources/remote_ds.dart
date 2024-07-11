@@ -139,7 +139,6 @@ class DataGeneratedRemoteDatasourceImpl
         headers: headers,
         body: jsonEncode(body));
     final decodedResponse = jsonDecode(response.body);
-    print(jsonEncode(body.containsKey("list")));
     if (response.statusCode == 200) {
       return decodedResponse["success"];
     } else {

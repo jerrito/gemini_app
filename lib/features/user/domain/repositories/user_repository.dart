@@ -13,4 +13,7 @@ abstract class UserRepository {
   //
   Future<Either<String,Uint8List?>> pickImage(Map<String, dynamic> params);
 
+  // change password
+  Future<Either<String, String>> changePassword(Map<String,dynamic>params);
+
 }

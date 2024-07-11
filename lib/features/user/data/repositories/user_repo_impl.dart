@@ -59,4 +59,21 @@ class UserRepositoryImpl implements UserRepository {
       return Left(e.toString());
     }
   }
+
+ 
+  @override
+  Future<Either<String, String>> changePassword(Map<String, dynamic> params) async{
+    if (await networkInfo.isConnected) {
+      try {
+        final response = await remoteDatasource.changepassword(params);
+
+        return Right(response);
+      } catch (e) {
+        return Left(e.toString());
+      }
+    } else {
+      return Left(networkInfo.noNetworkMessage);
+    }
+  }
+
 }

@@ -11,24 +11,22 @@ abstract class AuthenticationRepository {
   //cache user
   Future<Either<String, dynamic>> cacheUserData(Map<String, dynamic> params);
 
-  //get User 
+  //get User
   Future<Either<String, User>> getUser(Map<String, dynamic> params);
 
   //cache token
-  Future<Either<String, dynamic>> cacheToken(Map<String,dynamic>  authorization);
+  Future<Either<String, dynamic>> cacheToken(
+      Map<String, dynamic> authorization);
 
   //get token
-  Future<Either<String, Map<String,dynamic> >> getToken();
- 
-  // get cached User 
+  Future<Either<String, Map<String, dynamic>>> getToken();
+
+  // get cached User
   Future<Either<String, Map<String, dynamic>>> getCachedUser();
 
   //log out
-   Future<Either<String,String>> logout(Map<String, dynamic> params);
+  Future<Either<String, String>> logout(Map<String, dynamic> params);
 
   // refresh toen
-  Future<Either<String,String>> refreshToken(String refreshToken);
-
-  // change password
-  Future<Either<String, String>> changePassword(Map<String,dynamic>params);
- }
+  Future<Either<String, String>> refreshToken(String refreshToken);
+}

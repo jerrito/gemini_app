@@ -11,8 +11,8 @@ enum Url {
   getDataByIdUrl(endpoint: "/api/data/"),
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
-  updateUser(endpoint: "/api/user/update-profile"),
-  updateProfile(endpoint: "/api/user/profile"),
+  updateUser(endpoint: "/api/user/profile"),
+  updateProfile(endpoint: "/api/user/profile/picture"),
   changePasswordUrl(endpoint: "/api/user/profile/password"),
   fUrl(endpoint: "/verify_otp");
 

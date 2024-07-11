@@ -24,3 +24,12 @@ class PickImageEvent extends UserEvent {
 
   const PickImageEvent({required this.params});
 }
+
+
+
+class ChangePasswordEvent extends UserEvent{
+final  Map<String, dynamic> params;
+
+ const  ChangePasswordEvent({required this.params});
+}
+

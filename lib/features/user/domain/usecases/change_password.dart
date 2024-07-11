@@ -1,10 +1,9 @@
- 
- import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart';
 import 'package:gemini/core/usecase/usecase.dart';
-import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
+import 'package:gemini/features/user/domain/repositories/user_repository.dart';
 
 class ChangePassword extends UseCases<String,Map<String,dynamic>>{
-  final AuthenticationRepository repository;
+  final UserRepository repository;
 
   ChangePassword({required this.repository});
   @override

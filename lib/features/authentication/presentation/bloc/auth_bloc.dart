@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_token.dart';
-import 'package:gemini/features/authentication/domain/usecases/change_password.dart';
+import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
@@ -25,10 +25,8 @@ class AuthenticationBloc
   final GetCacheUser getCacheUser;
   final LogOut logout;
   final RefreshToken refreshToken;
-  final ChangePassword changePassword;
   AuthenticationBloc({
     required this.getCacheUser,
-    required this.changePassword,
     required this.refreshToken,
     required this.signup,
     required this.signin,
@@ -166,22 +164,5 @@ class AuthenticationBloc
         ));
       },
     );
-
-
-    //! CHANGE PASSWORD
-    on<ChangePasswordEvent>((event, emit) async {
-      emit(ChangePasswordLoading());
-      final response = await changePassword.call(event.params);
-      response.fold(
-        (error) => emit(
-          ChangePasswordError(errorMessage: error),
-        ),
-        (response) => emit(
-          ChangePasswordLoaded(
-            data: response,
-          ),
-        ),
-      );
-    });
   }
 }

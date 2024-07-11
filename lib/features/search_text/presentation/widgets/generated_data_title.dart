@@ -66,12 +66,14 @@ class _GeneratedDataTitleState extends State<GeneratedDataTitle> {
                           style:
                               const TextStyle(fontSize: 16, letterSpacing: 1.2),
                           (widget.title!.length >= 30)
-                              ? widget.title!.substring(30)
+                              ? "${widget.title!.substring(0, 30)}..."
                               : (widget.title ?? "")),
                     )
                   : Text(
                       style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
-                      widget.title ?? "")),
+                      (widget.title!.length >= 50)
+                          ? "${widget.title!.substring(0, 50)}..."
+                          : (widget.title ?? ""))),
         ));
   }
 }

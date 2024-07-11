@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,9 @@ abstract class UserRemoteDatasource {
 
   // update profile
   Future<String> updateProfile(Map<String, dynamic> params);
+
+  //change password
+  Future<String> changepassword(Map<String, dynamic> params);
 }
 
 class UserRemoteDatasourceImpl implements UserRemoteDatasource {
@@ -18,12 +22,13 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   UserRemoteDatasourceImpl({required this.client});
   @override
   Future<UserModel> updateUser(Map<String, dynamic> params) async {
-    final Map<String, String> headers = {
+    Map<String, String>? headers = {};
+    headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
-    };
-    final body = {"userName": params["userName"]};
-    final response = await client.patch(
+    });
+    final Map<String, dynamic> body = {"userName": params["userName"]};
+    final response = await client.put(
       getUri(
         endpoint: Url.updateUser.endpoint,
       ),
@@ -32,7 +37,6 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
     );
 
     final decodedResponse = jsonDecode(response.body);
-    print(response.body);
     if (response.statusCode == 200) {
       return UserModel.fromJson(decodedResponse);
     } else {
@@ -47,6 +51,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Authorization": params["token"]
     };
     final body = {"data": params["data"]};
+
     final response = await client.patch(
         getUri(endpoint: Url.updateProfile.endpoint),
         body: jsonEncode(body),
@@ -57,6 +62,34 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       return decodedResponse;
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse));
+    }
+  }
+
+  @override
+  Future<String> changepassword(Map<String, dynamic> params) async {
+    Map<String, String>? headers = {};
+    print("dd");
+    headers.addAll({
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": params["token"]
+    });
+    final Map<String, dynamic> body = {
+      "old_password": params["oldPassword"],
+      "new_password": params["newPassword"],
+      "confirm_password": params["confirmPassword"]
+    };
+    final response = await client.put(
+      getUri(endpoint: Url.changePasswordUrl.endpoint),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+    final decodedResponse = jsonDecode(response.body);
+    if (response.statusCode == HttpStatus.ok) {
+      return decodedResponse["message"];
+    } else {
+      throw Exception(
+        ErrorModel.fromJson(decodedResponse).toMap(),
+      );
     }
   }
 }

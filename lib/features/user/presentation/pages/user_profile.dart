@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
+import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/core/mixin/dialog_mixin.dart';
 import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
@@ -41,27 +44,16 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
-        child: MultiBlocListener(
-          listeners: [
-            BlocListener(
-                bloc: userBloc,
-                listener: (context, state) {
-                  if (state is UpdateProfileLoaded) {
-                    profile = state.profile;
-                    setState(() {});
-                  }
-                  if (state is UpdateProfileError) {
-                    print(state.errorMessage);
-                    showSnackbar(context: context, message: state.errorMessage);
-                  }
-                }),
+        child: 
             BlocListener(
               bloc: authBloc,
               listener: (context, state) {
                 if (state is GetUserCachedDataLoaded) {
                   final data = state.data;
-                  listUserData.setAll(0, [data["userName"],data["email"],"Change Password"]);
-                  print(listUserData);
+                  listUserData.setAll(
+                    0,
+                    [data["userName"], data["email"], "Change Password"],
+                  );
                   setState(() {});
 
                   authBloc.add(GetTokenEvent());
@@ -110,71 +102,94 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                   showSnackbar(context: context, message: state.errorMessage);
                 }
               },
-            ),
-          ],
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: (profile != null)
-                        ? Image.network(fit: BoxFit.cover, profile!).image
-                        : Image.asset(defaultImage).image,
-                    radius: Sizes().height(context, 0.06),
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.blueGrey,
-                    child: IconButton(
-                      onPressed: () async {
-                        final imageBuffer = await buildPickImage(
-                          context: context,
-                        );
-                        if (imageBuffer != null) {
-                          final params = {"data": imageBuffer, "token": token};
-                          userBloc.add(UpdateProfileEvent(params: params));
-                        }
-                      },
-                      icon: const Icon(Icons.image),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: (profile != null)
+                          ? Image.network(fit: BoxFit.cover, profile!).image
+                          : Image.asset(defaultImage).image,
+                      radius: Sizes().height(context, 0.06),
                     ),
-                  )
-                ],
-              ),
-              Column(
-                children: List.generate(
-                  listProfileData.length,
-                  (int index) => UserProfileWidget(
-                    userProfileData: listProfileData[index],
-                    onTap: () async {
-                      await buildDialog(
-                          context: context,
-                          data: listUserData[index] ?? "",
-                          label: listProfileData[index].name,
-                          token: token,
-                          authBloc: authBloc);
-                      authBloc.add(GetUserCacheDataEvent());
-                    },
-                    label: listUserData[index] ?? "",
+                    BlocConsumer(
+                        listener: (context, state) {
+                        if (state is UpdateProfileLoaded) {
+                      profile = state.profile;
+                      setState(() {});
+                    }
+                    if (state is UpdateProfileError) {
+                      print(state.errorMessage);
+                      showSnackbar(context: context, message: state.errorMessage);
+                    }
+                        },
+                        bloc: userBloc,
+                        builder: (context, state) {
+                          if(state  is  UpdateProfileLoading){
+                            return const CircularProgressIndicator();
+                          }
+                          return CircleAvatar(
+                            backgroundColor: Colors.blueGrey,
+                            child: IconButton(
+                              onPressed: () async {
+                                final Uint8List? imageBuffer = await buildPickImage(
+                                  context: context,
+                                );
+                                if (imageBuffer != null) {
+                                  final params = {
+                                    "data": imageBuffer,
+                                    "token": token
+                                  };
+                                  userBloc
+                                      .add(UpdateProfileEvent(params: params));
+                                }
+                              },
+                              icon: const Icon(Icons.image),
+                            ),
+                          );
+                        })
+                  ],
+                ),
+
+                Space().height(context, 0.05),
+                
+                Column(
+                  children: List.generate(
+                    listProfileData.length,
+                    (int index) => UserProfileWidget(
+                      userProfileData: listProfileData[index],
+                      onTap: () async {
+                        await buildDialog(
+                            context: context,
+                            data: listUserData[index] ?? "",
+                            label: listProfileData[index].name,
+                            token: token,
+                            authBloc: authBloc);
+                        authBloc.add(GetUserCacheDataEvent());
+                      },
+                      label: listUserData[index] ?? "",
+                    ),
                   ),
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  print(token);
-                  final Map<String, dynamic> params = {"token": token};
-                  authBloc.add(LogoutEvent(params: params));
-                },
-                child: const Text("Logout"),
-              ),
-            ],
+                GestureDetector(
+                  onTap: () {
+                    print(token);
+                    final Map<String, dynamic> params = {"token": token};
+                    authBloc.add(LogoutEvent(params: params));
+                  },
+                  child: const Text("Logout"),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  List<String?> listUserData = ["","",""];
+  List<String?> listUserData = ["", "", ""];
   List<UserProfileData> listProfileData = [
     UserProfileData.userName,
     UserProfileData.email,

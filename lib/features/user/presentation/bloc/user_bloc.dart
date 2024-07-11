@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
+import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/user/domain/usecases/add_image.dart';
 import 'package:gemini/features/user/domain/usecases/update_profile.dart';
 import 'package:gemini/features/user/domain/usecases/update_user.dart';
@@ -14,10 +15,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   final PickImage pickImage;
   final UpdateUser updateUser;
   final UpdateProfile updateProfile;
+  final ChangePassword changePassword;
   UserBloc({
     required this.pickImage,
     required this.updateProfile,
     required this.updateUser,
+    required this.changePassword,
   }) : super(UserInitial()) {
     on<UserEvent>((event, emit) {
       // TODO: implement event handler
@@ -66,6 +69,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           ),
         ),
       );
+
     });
+      //! CHANGE PASSWORD
+      on<ChangePasswordEvent>((event, emit) async {
+        emit(
+          ChangePasswordLoading(),
+        );
+        final response = await changePassword.call(
+          event.params,
+        );
+        emit(
+          response.fold(
+            (error) => ChangePasswordError(
+              errorMessage: error,
+            ),
+            (response) => ChangePasswordLoaded(
+              data: response,
+            ),
+          ),
+        );
+      });
   }
 }

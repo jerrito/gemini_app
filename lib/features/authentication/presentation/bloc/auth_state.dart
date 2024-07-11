@@ -107,14 +107,4 @@ class RefreshTokenError extends AuthenticationState {
 
 
 
-class ChangePasswordLoaded extends AuthenticationState {
-  final  String data;
-  ChangePasswordLoaded({required this.data});
-}
 
-class ChangePasswordLoading extends AuthenticationState {}
-
-class ChangePasswordError extends AuthenticationState {
-  final String errorMessage;
-  ChangePasswordError({required this.errorMessage});
-}

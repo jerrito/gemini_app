@@ -307,11 +307,7 @@ class _SearchTextPage extends State<SearchTextPage> {
             BlocListener(
               bloc: dataGeneratedBloc,
               listener: (context, state) {
-                if (state is DataGeneratedLoaded) {
-                  print("dd");
-                }
                 if (state is DataGeneratedError) {
-                  print("ss${state.errorMessage}");
                   if (!context.mounted) return;
                   showSnackbar(context: context, message: state.errorMessage);
                 }
@@ -325,9 +321,6 @@ class _SearchTextPage extends State<SearchTextPage> {
             bloc: searchBloc,
             listener: (context, state) async {
               if (state is ReadDataLoaded) {
-                print("load");
-
-                // searchBloc.add(ReadAllEvent());
                 _scrollDown();
               }
               // if (state is DeleteDataLoaded) {
@@ -868,12 +861,9 @@ class _SearchTextPage extends State<SearchTextPage> {
                                     child: GeneratedDataTitle(
                                         onChanged: canDeleteData
                                             ? (value) {
-                                                print(ids);
-                                                print(datas.id);
                                                 ids.contains(datas.id)
                                                     ? ids.remove(datas.id)
                                                     : ids.add(datas.id);
-                                                print(ids);
                                                 setState(() {});
                                               }
                                             : (value) {
@@ -889,7 +879,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                                         onLongPress: () {
                                           if (!canDeleteData) {
                                             canDeleteData = !canDeleteData;
-                                            print(ids);
                                             ids.contains(datas.id)
                                                 ? ids.remove(datas.id)
                                                 : ids.add(datas.id);

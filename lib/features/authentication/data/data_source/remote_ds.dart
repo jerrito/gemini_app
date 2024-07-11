@@ -21,8 +21,7 @@ abstract class AuthenticationRemoteDatasource {
 // refresh token
   Future<String> refreshToken(String refreshToken);
 
-  //change password
-  Future<String> changepassword(Map<String, dynamic> params);
+ 
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -42,6 +41,7 @@ class AuthenticationRemoteDatasourceImpl
       "password": params["password"],
       "profile": ""
     };
+
     final response = await client.post(
       getUri(
         endpoint: Url.signupUrl.endpoint,
@@ -150,31 +150,6 @@ class AuthenticationRemoteDatasourceImpl
     }
   }
 
-  @override
-  Future<String> changepassword(Map<String, dynamic> params) async {
-    Map<String, String>? headers = {};
-
-    headers.addAll({
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
-    });
-    final body = {
-      "old_password": params["oldPassword"],
-      "new_password": params["newPassword"],
-      "confirm_password": params["confirmPassword"]
-    };
-    final response = await client.put(
-      getUri(endpoint: Url.changePasswordUrl.endpoint),
-      headers: headers,
-      body: body,
-    );
-    final decodedResponse = jsonDecode(response.body);
-    if (response.statusCode == HttpStatus.ok) {
-      return decodedResponse["message"];
-    } else {
-      throw Exception(
-        ErrorModel.fromJson(decodedResponse).toMap(),
-      );
-    }
-  }
+ 
+  
 }

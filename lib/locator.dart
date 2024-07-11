@@ -6,7 +6,7 @@ import 'package:gemini/features/authentication/data/repository/auth_repo_impl.da
 import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
-import 'package:gemini/features/authentication/domain/usecases/change_password.dart';
+import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_user.dart';
@@ -95,11 +95,19 @@ void user() {
     () => UserBloc(
       updateUser: sl(),
       updateProfile: sl(),
+      changePassword: sl(),
       pickImage: sl(),
     ),
   );
 
 // usecases
+
+sl.registerLazySingleton(
+    () => ChangePassword(
+      repository: sl(),
+    ),
+  );
+
   sl.registerLazySingleton(
     () => UpdateUser(
       repository: sl(),
@@ -303,16 +311,12 @@ void initAuthentication() {
         getCacheUser: sl(),
         logout: sl(),
         refreshToken: sl(),
-        changePassword:sl(),),
+),
   );
 
   //usecases
   
-  sl.registerLazySingleton(
-()=>ChangePassword(
-  repository:sl()
-)
-  );
+
   sl.registerLazySingleton(
     () => RefreshToken(
       repository: sl(),

@@ -47,3 +47,15 @@ class PickImageError extends UserState {
   final String errorMessage;
   const PickImageError({required this.errorMessage});
 }
+
+class ChangePasswordLoaded extends UserState {
+  final  String data;
+  const ChangePasswordLoaded({required this.data});
+}
+
+class ChangePasswordLoading extends UserState {}
+
+class ChangePasswordError extends UserState {
+  final String errorMessage;
+  const ChangePasswordError({required this.errorMessage});
+}
