@@ -72,6 +72,7 @@ class DataGeneratedRemoteDatasourceImpl
       getUri(endpoint: Url.listDataUrl.endpoint),
       headers: headers,
     );
+
     final decodedResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
       return List<DataModel>.from(
@@ -90,14 +91,11 @@ class DataGeneratedRemoteDatasourceImpl
     });
 
     int path = params["path"];
-
-    print(getUri(path: path.toString(), endpoint: Url.deleteDataUrl.endpoint));
     final response = await client.delete(
       getUri(path: path.toString(), endpoint: Url.deleteDataUrl.endpoint),
       headers: headers,
     );
     final decodedResponse = jsonDecode(response.body);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return (decodedResponse["success"]);
     } else {

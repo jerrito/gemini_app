@@ -37,7 +37,6 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp.router(
         routerConfig: goRouter,
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
         darkTheme: ThemeData(
             brightness: Brightness.dark,
             primaryColorDark: Colors.white,

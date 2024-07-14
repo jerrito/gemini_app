@@ -2,12 +2,14 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
+import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/core/mixin/dialog_mixin.dart';
+import 'package:gemini/features/authentication/presentation/provders/token.dart';
+import 'package:gemini/features/authentication/presentation/provider/user_provider.dart';
 import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/features/user/presentation/bloc/user_bloc.dart';
 import 'package:gemini/features/user/presentation/widgets/show_image_pick.dart';
@@ -27,84 +29,63 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> with Dialogs {
   final authBloc = sl<AuthenticationBloc>();
   final userBloc = sl<UserBloc>();
+  late UserProvider userProvider;
+  late TokenProvider tokenProvider;
+  late User user;
   String? token, email, userName, successMessage, profile;
   @override
   void initState() {
     super.initState();
-    authBloc.add(GetUserCacheDataEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    final data = {
-      "userName": UserProfileData.userName,
-      "email": UserProfileData.email,
-      "password": UserProfileData.password,
-    };
+    user = context.watch<UserProvider>().user!;
+    token = context.watch<TokenProvider>().token!;
+    listUserData.setAll(
+      0,
+      [user.userName, user.email, "Change Password"],
+    );
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
-        child: 
-            BlocListener(
-              bloc: authBloc,
-              listener: (context, state) {
-                if (state is GetUserCachedDataLoaded) {
-                  final data = state.data;
-                  listUserData.setAll(
-                    0,
-                    [data["userName"], data["email"], "Change Password"],
-                  );
-                  setState(() {});
+        child: BlocListener(
+          bloc: authBloc,
+          listener: (context, state) {
+            if (state is LogoutLoaded) {
+              final data = state.successMessage;
+              successMessage = data;
 
-                  authBloc.add(GetTokenEvent());
-                }
-                if (state is LogoutLoaded) {
-                  final data = state.successMessage;
-                  successMessage = data;
-                  setState(() {});
-                  final Map<String, dynamic> params = {
-                    "token": null,
-                    "refreshToken": null
-                  };
-                  authBloc.add(
-                    CacheTokenEvent(
-                      authorization: params,
-                    ),
-                  );
-                }
-                if (state is CacheTokenError) {
-                  if (!context.mounted) return;
-                  showSnackbar(context: context, message: state.errorMessage);
-                }
-                if (state is CacheTokenLoaded) {
-                  if (!context.mounted) return;
-                  showSnackbar(
-                      isSuccessMessage: true,
-                      context: context,
-                      message: successMessage!);
+              setState(() {});
+              final Map<String, dynamic> params = {"refreshToken": null};
+              authBloc.add(
+                CacheTokenEvent(
+                  authorization: params,
+                ),
+              );
+            }
+            if (state is CacheTokenError) {
+              if (!context.mounted) return;
+              showSnackbar(context: context, message: state.errorMessage);
+            }
+            if (state is CacheTokenLoaded) {
+              if (!context.mounted) return;
+              showSnackbar(
+                  isSuccessMessage: true,
+                  context: context,
+                  message: successMessage!);
 
-                  context.goNamed("landing");
-                }
-                if (state is GetUserCacheDataError) {
-                  if (!context.mounted) return;
-                  showSnackbar(context: context, message: state.errorMessage);
-                }
-                if (state is GetTokenLoaded) {
-                  token = state.authorization["token"];
-                  setState(() {});
-                }
-                if (state is GetTokenError) {
-                  if (!context.mounted) return;
-                  showSnackbar(context: context, message: state.errorMessage);
-                }
-                if (state is LogoutError) {
-                  if (!context.mounted) return;
-                  showSnackbar(context: context, message: state.errorMessage);
-                }
-              },
+              context.goNamed("landing");
+            }
+            if (state is LogoutError) {
+              if (!context.mounted) return;
+              showSnackbar(context: context, message: state.errorMessage);
+            }
+          },
           child: SafeArea(
             child: Column(
               children: [
+                Space().height(context, 0.05),
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
@@ -116,45 +97,45 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                     ),
                     BlocConsumer(
                         listener: (context, state) {
-                        if (state is UpdateProfileLoaded) {
-                      profile = state.profile;
-                      setState(() {});
-                    }
-                    if (state is UpdateProfileError) {
-                      print(state.errorMessage);
-                      showSnackbar(context: context, message: state.errorMessage);
-                    }
+                          if (state is UpdateProfileLoaded) {
+                            profile = state.profile;
+                            setState(() {});
+                          }
+                          if (state is UpdateProfileError) {
+                            print(state.errorMessage);
+                            showSnackbar(
+                                context: context, message: state.errorMessage);
+                          }
                         },
                         bloc: userBloc,
                         builder: (context, state) {
-                          if(state  is  UpdateProfileLoading){
+                          if (state is UpdateProfileLoading) {
                             return const CircularProgressIndicator();
                           }
                           return CircleAvatar(
                             backgroundColor: Colors.blueGrey,
                             child: IconButton(
                               onPressed: () async {
-                                final Uint8List? imageBuffer = await buildPickImage(
+                                final Uint8List? imageBuffer =
+                                    await buildPickImage(
                                   context: context,
                                 );
                                 if (imageBuffer != null) {
                                   final params = {
-                                    "data": imageBuffer,
+                                    "queryParams": {"data": imageBuffer},
                                     "token": token
                                   };
                                   userBloc
                                       .add(UpdateProfileEvent(params: params));
                                 }
                               },
-                              icon: const Icon(Icons.image),
+                              icon: const Icon(Icons.camera_alt),
                             ),
                           );
                         })
                   ],
                 ),
-
                 Space().height(context, 0.05),
-                
                 Column(
                   children: List.generate(
                     listProfileData.length,
@@ -167,7 +148,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                             label: listProfileData[index].name,
                             token: token,
                             authBloc: authBloc);
-                        authBloc.add(GetUserCacheDataEvent());
+                        // authBloc.add(GetUserCacheDataEvent());
                       },
                       label: listUserData[index] ?? "",
                     ),
@@ -175,7 +156,6 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                 ),
                 GestureDetector(
                   onTap: () {
-                    print(token);
                     final Map<String, dynamic> params = {"token": token};
                     authBloc.add(LogoutEvent(params: params));
                   },
@@ -195,6 +175,4 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
     UserProfileData.email,
     UserProfileData.password
   ];
-
-  List<void Function()> onTaps = [() {}, () {}, () {}];
 }

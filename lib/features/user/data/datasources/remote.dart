@@ -27,16 +27,14 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     });
-    final Map<String, dynamic> body = {"userName": params["userName"]};
+    final Map<String, dynamic> queryParams = params["queryParams"];
     final response = await client.put(
-      getUri(
-        endpoint: Url.updateUser.endpoint,
-      ),
-      body: jsonEncode(body),
+      getUri(endpoint: Url.updateUser.endpoint, queryParams: queryParams),
       headers: headers,
     );
 
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return UserModel.fromJson(decodedResponse);
     } else {
@@ -50,14 +48,14 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     };
-    final body = {"data": params["data"]};
-
-    final response = await client.patch(
-        getUri(endpoint: Url.updateProfile.endpoint),
-        body: jsonEncode(body),
+    final Map<String, dynamic> queryParams = params["queryParams"];
+    final response = await client.put(
+        getUri(endpoint: Url.updateProfile.endpoint, queryParams: queryParams),
         headers: headers);
 
     final decodedResponse = jsonDecode(response.body);
+    print(queryParams);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return decodedResponse;
     } else {
@@ -68,7 +66,6 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   @override
   Future<String> changepassword(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-    print("dd");
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]

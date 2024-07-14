@@ -37,12 +37,9 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<String, String>> updateProfile(
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
-      try {
-        final response = await remoteDatasource.updateProfile(params);
-        return Right(response);
-      } catch (e) {
-        return Left(e.toString());
-      }
+      // try {
+      final response = await remoteDatasource.updateProfile(params);
+      return Right(response);
     } else {
       return Left(
         networkInfo.noNetworkMessage,
@@ -51,18 +48,19 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<Either<String, Uint8List?>> pickImage(Map<String, dynamic> params) async{
+  Future<Either<String, Uint8List?>> pickImage(
+      Map<String, dynamic> params) async {
     try {
-      final response=await localDatasource.addFileImage(params);
+      final response = await localDatasource.addFileImage(params);
       return Right(response);
     } catch (e) {
       return Left(e.toString());
     }
   }
 
- 
   @override
-  Future<Either<String, String>> changePassword(Map<String, dynamic> params) async{
+  Future<Either<String, String>> changePassword(
+      Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await remoteDatasource.changepassword(params);
@@ -75,5 +73,4 @@ class UserRepositoryImpl implements UserRepository {
       return Left(networkInfo.noNetworkMessage);
     }
   }
-
 }

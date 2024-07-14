@@ -4,14 +4,18 @@ import 'package:flutter/foundation.dart';
 
 class TokenProvider extends ChangeNotifier{
 
-  String? _token;
+  String? _token, _refreshToken;
 
   String? get token => _token;
+  String? get refreshToken => _refreshToken;
 
  set setToken(String token){
-    print(token);
     _token = token;
-    print(_token);
     notifyListeners();
   }
+  set setRefreshToken(String refreshToken){
+    _refreshToken = refreshToken;
+    notifyListeners();
+    }
+
 }

@@ -5,6 +5,7 @@ import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/widgets/default_button.dart';
 import 'package:gemini/core/widgets/default_textfield.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:gemini/features/authentication/presentation/provider/user_provider.dart';
 import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/features/user/presentation/bloc/user_bloc.dart';
 import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
@@ -21,6 +22,7 @@ mixin Dialogs {
     required AuthenticationBloc authBloc,
   }) {
     final userBloc = sl<UserBloc>();
+    final userProvider=context.read<UserProvider>();
     final controller = TextEditingController();
     final newPasswordController = TextEditingController();
     final oldPasswordController = TextEditingController();
@@ -46,7 +48,15 @@ mixin Dialogs {
                     child: FormField<String>(
                         initialValue: data,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: validateString,
+                        validator: (value) {
+                          validateString.call(value);
+                          if (label == "email") {
+                            if (!isEmail(value!)) {
+                              return "Not a valid email";
+                            }
+                          }
+                          return null;
+                        },
                         builder: (field) {
                           return DefaultTextForm(
                             onChanged: (value) {
@@ -76,7 +86,19 @@ mixin Dialogs {
                           }),
                       FormField<String>(
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: validatePassword,
+                          validator: (value) {
+                            if (value?.isEmpty ?? false) {
+                              return "Field is required";
+                            }
+                            if (!value!.isLength(6)) {
+                              return "Password must be 6 or more characters";
+                            }
+                            if (value != confirmPasswordController.text) {
+                              return "confirm password don't match";
+                            }
+
+                            return null;
+                          },
                           builder: (field) {
                             return DefaultTextForm(
                               onChanged: (value) {
@@ -89,7 +111,18 @@ mixin Dialogs {
                           }),
                       FormField<String>(
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: validatePassword,
+                          validator: (value) {
+                            if (value?.isEmpty ?? false) {
+                              return "Field is required";
+                            }
+                            if (!value!.isLength(6)) {
+                              return "Password must be 6 or more characters";
+                            }
+                            if (value != newPasswordController.text) {
+                              return "new password doesn't match";
+                            }
+                            return null;
+                          },
                           builder: (field) {
                             return DefaultTextForm(
                               onChanged: (value) {
@@ -111,7 +144,7 @@ mixin Dialogs {
                   showSnackbar(
                       isSuccessMessage: true,
                       context: context,
-                      message: "Username updated");
+                      message: "$label updated");
                 }
                 if (state is CacheUserDataError) {
                   showSnackbar(context: context, message: state.errorMessage);
@@ -134,16 +167,8 @@ mixin Dialogs {
                     }
                     if (state is UpdateUserLoaded) {
                       final data = state.user;
-                      final Map<String, dynamic> params = {
-                        "userName": data.userName,
-                        "email": data.email,
-                        "profile": data.profile
-                      };
-                      authBloc.add(
-                        CacheUserDataEvent(
-                          params: params,
-                        ),
-                      );
+                      userProvider.user=data;
+                      context.pop();
                     }
                     if (state is UpdateUserError) {
                       context.pop();
@@ -177,7 +202,7 @@ mixin Dialogs {
                           : () async {
                               if (formKey.currentState!.validate()) {
                                 final params = {
-                                  "userName": controller.text,
+                                  "queryParams": {label: controller.text},
                                   "token": token
                                 };
                                 userBloc.add(UpdateUserEvent(

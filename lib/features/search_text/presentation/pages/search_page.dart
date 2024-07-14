@@ -8,7 +8,9 @@ import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/core/widgets/bottom_sheet.dart';
+import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/provders/token.dart';
+import 'package:gemini/features/authentication/presentation/provider/user_provider.dart';
 import 'package:gemini/features/data_generated/presentation/bloc/data_generated_bloc.dart';
 import 'package:gemini/features/search_text/presentation/widgets/data_add.dart';
 import 'package:gemini/features/search_text/presentation/widgets/generated_data_title.dart';
@@ -33,37 +35,34 @@ class SearchTextPage extends StatefulWidget {
 }
 
 class _SearchTextPage extends State<SearchTextPage> {
+  final form = GlobalKey<FormState>();
   final searchBloc = sl<SearchBloc>();
   final dataGeneratedBloc = sl<DataGeneratedBloc>();
   final searchBloc2 = sl<SearchBloc>();
   final ScrollController _scrollController = ScrollController();
   final searchBloc3 = sl<SearchBloc>();
   final authBloc = sl<AuthenticationBloc>();
-
-  final form = GlobalKey<FormState>();
-  List<Uint8List> all = [];
-  List<Uint8List> newAll = [];
-  List<String> imageExtensions = [];
-  int imageLength = 0;
-
-  List<String> snapInfo = [];
-  String info = "How can I help you today?";
-  int type = RequestType.stream.value;
-  bool isTextImage = false;
-  bool isAdded = false;
-  bool canDeleteData = false;
-  String? question, refinedData, email, userName, token;
-  String repeatQuestion = "";
-  String name = "";
-  String joinedSnapInfo = "";
-  String initText = "";
-  final controller = TextEditingController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  TokenProvider? tokenProvider;
-  Uint8List? byte;
-  bool isAvailable = false;
-  bool isSpeechTextEnabled = false;
 
+  List<Uint8List> all = [], newAll = [];
+  List<String> imageExtensions = [], snapInfo = [];
+  int imageLength = 0;
+  String info = "How can I help you today?",
+      repeatQuestion = "",
+      name = "",
+      joinedSnapInfo = "",
+      initText = "";
+  int type = RequestType.stream.value;
+  bool isTextImage = false,
+      isAdded = false,
+      canDeleteData = false,
+      isAvailable = false,
+      isSpeechTextEnabled = false;
+  String? question, refinedData, token;
+  final controller = TextEditingController();
+  Uint8List? byte;
+  TokenProvider? tokenProvider;
+  late User user;
   getTime() {
     Timer.periodic(const Duration(seconds: 90), (timer) {
       // print(timer.tick);
@@ -105,6 +104,7 @@ class _SearchTextPage extends State<SearchTextPage> {
   @override
   Widget build(BuildContext context) {
     token = context.read<TokenProvider>().token;
+    user = context.watch<UserProvider>().user!;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -117,10 +117,8 @@ class _SearchTextPage extends State<SearchTextPage> {
                 // context.pushNamed("test");
                 allSelectIds.clear();
                 ids.clear();
-
+                dataGeneratedBloc.add( ListDataGeneratedEvent(params: {"token":token}));
                 scaffoldKey.currentState?.openDrawer();
-
-                authBloc.add(GetUserCacheDataEvent());
               },
               icon: const Icon(Icons.menu)),
           centerTitle: true,
@@ -339,6 +337,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                 final newId = await searchBloc.readData();
                 final data = state.data;
                 refinedData = searchBloc.replace(data);
+                print(token);
                 Map<String, dynamic> params = {
                   "token": token,
                   "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
@@ -356,12 +355,11 @@ class _SearchTextPage extends State<SearchTextPage> {
                 controller.text = "";
                 isAvailable = false;
                 final newId = await searchBloc.readData();
-                print(newId![0]);
                 final data = state.data;
                 refinedData = searchBloc.replace(data);
                 Map<String, dynamic> params = {
                   "token": token,
-                  "textId": newId.isNotEmpty ? newId.last.textId + 1 : 1,
+                  "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
                   "dateTime": DateTime.now().toString(),
@@ -376,7 +374,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                 setState(() {});
               }
               if (state is SearchTextAndImageLoaded) {
-                print(byte);
                 question = controller.text;
                 controller.text = "";
                 final newId = await searchBloc.readData();
@@ -401,8 +398,6 @@ class _SearchTextPage extends State<SearchTextPage> {
 
               if (state is ReadAll) {
                 final textEntity = data!.last;
-                // data=state.data;
-                // setState(() {});
                 final params = {
                   "token": token,
                   "data": textEntity.data?.replaceAll("\n", ""),
@@ -577,44 +572,26 @@ class _SearchTextPage extends State<SearchTextPage> {
             children: [
               BlocListener(
                 bloc: authBloc,
-                listener: (context, state) async {
-                  if (state is GetUserCachedDataLoaded) {
-                    final data = state.data;
-                    email = data["email"];
-                    userName = data["userName"];
-                    canDeleteData = false;
-                    setState(() {});
-                    dataGeneratedBloc.add(
-                      ListDataGeneratedEvent(
-                        params: {"token": token},
-                      ),
-                    );
-                  }
-                  if (state is GetUserCacheDataError) {
-                    canDeleteData = false;
-                    setState(() {});
-                    showSnackbar(context: context, message: state.errorMessage);
-                  }
-                },
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          await context.pushNamed("user");
-                        },
-                        child: CircleAvatar(
+                listener: (context, state) async {},
+                child: GestureDetector(
+                  onTap: () async {
+                    await context.pushNamed("user");
+                  },
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        CircleAvatar(
                           child: Text(
-                            userName?.substring(0, 1).toUpperCase() ??
-                                email?.substring(0, 1).toUpperCase() ??
-                                "",
+                            (user.profile!.isNotEmpty && user.profile != null)
+                                ? user.profile!
+                                : user.userName?.substring(0, 2) ?? "NA",
                           ),
                         ),
-                      ),
-                      Text(
-                        userName ?? email ?? "",
-                      ),
-                    ]),
+                        Text(
+                          user.userName ?? user.email ?? "",
+                        ),
+                      ]),
+                ),
               ),
               SearchTypeWidget(
                 value: type,
@@ -698,7 +675,8 @@ class _SearchTextPage extends State<SearchTextPage> {
                             print(ids);
                             setState(() {});
                           },
-                          child: const Icon(Icons.check_box_outline_blank_rounded),
+                          child:
+                              const Icon(Icons.check_box_outline_blank_rounded),
                         )
                       ],
                     )
@@ -742,7 +720,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                     ids.clear();
                     final data = state.errorMessage;
                     context.pop();
-                    print(data);
                     showSnackbar(context: context, message: data);
                   }
                   if (state is ListDataGeneratedLoaded) {
@@ -753,9 +730,12 @@ class _SearchTextPage extends State<SearchTextPage> {
                     print(allSelectIds);
                   }
                   if (state is ListDataGeneratedError) {
-                    context.pop();
-                    showSnackbar(context: context, message: state.errorMessage);
-                    print(state.errorMessage);
+                    if (state.errorMessage !=
+                        "Exception: {message: No data found, error: null, errorCode: 102}") {
+                      showSnackbar(
+                          context: context, message: state.errorMessage);
+                      print(state.errorMessage);
+                    }
                   }
                   if (state is DeleteDataGeneratedLoaded) {
                     context.pop();
@@ -777,6 +757,25 @@ class _SearchTextPage extends State<SearchTextPage> {
                       state is DeleteListDataGeneratedLoading) {
                     //  print("dd");
                     return const HistoryShimmer();
+                  }
+                  if (state is ListDataGeneratedError) {
+                    print(state.errorMessage);
+                    if (state.errorMessage ==
+                        "Exception: {message: No data found, error: null, errorCode: 102}") {
+                      return Lottie.asset(historyJson);
+                    } else {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                              onTap: () {
+                                dataGeneratedBloc.add(ListDataGeneratedEvent(
+                                    params: {"token": token}));
+                              },
+                              child: const Text("Retry")),
+                        ],
+                      );
+                    }
                   }
 
                   if (state is ListDataGeneratedLoaded) {

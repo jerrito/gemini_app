@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/widgets/default_button.dart';
@@ -16,37 +17,41 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: Padding(
-        padding:  EdgeInsets.symmetric(
-          horizontal: Sizes().width(context, 0.04)
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            DefaultButton(
-              onTap: (){
-                Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SigninPage()),
-            );
-              },
-              label: "Signin",
-            ),
-            
-            Space().height(context,0.02),
-
-            DefaultButton(
-              onTap: (){
-                Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SignupPage()),
-            );
-              },
-              label: "Signup",
-            ),
-          ],
+      body: Image.asset(
+        defaultImage,
+        fit: BoxFit.cover,
+        height: double.infinity,
+        width: double.infinity,
+      ),
+      bottomSheet: SizedBox(
+        height: Sizes().height(context, 0.2),
+        child: Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DefaultButton(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SigninPage()),
+                  );
+                },
+                label: "Signin",
+              ),
+              Space().height(context, 0.02),
+              DefaultButton(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SignupPage()),
+                  );
+                },
+                label: "Signup",
+              ),
+            ],
+          ),
         ),
       ),
     );
