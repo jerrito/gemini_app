@@ -122,7 +122,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                                 );
                                 if (imageBuffer != null) {
                                   final params = {
-                                    "queryParams": {"data": imageBuffer},
+                                    "body": {"data": imageBuffer},
                                     "token": token
                                   };
                                   userBloc

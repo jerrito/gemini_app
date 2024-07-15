@@ -13,7 +13,7 @@ abstract class UserRemoteDatasource {
   Future<String> updateProfile(Map<String, dynamic> params);
 
   //change password
-  Future<String> changepassword(Map<String, dynamic> params);
+  Future<String> changePassword(Map<String, dynamic> params);
 }
 
 class UserRemoteDatasourceImpl implements UserRemoteDatasource {
@@ -32,9 +32,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       getUri(endpoint: Url.updateUser.endpoint, queryParams: queryParams),
       headers: headers,
     );
-
     final decodedResponse = jsonDecode(response.body);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return UserModel.fromJson(decodedResponse);
     } else {
@@ -48,14 +46,12 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     };
-    final Map<String, dynamic> queryParams = params["queryParams"];
+    final Map<String, dynamic> body = params["body"];
     final response = await client.put(
-        getUri(endpoint: Url.updateProfile.endpoint, queryParams: queryParams),
+        getUri(endpoint: Url.updateProfile.endpoint),
+        body: body,
         headers: headers);
-
     final decodedResponse = jsonDecode(response.body);
-    print(queryParams);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return decodedResponse;
     } else {
@@ -64,7 +60,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   }
 
   @override
-  Future<String> changepassword(Map<String, dynamic> params) async {
+  Future<String> changePassword(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",

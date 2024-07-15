@@ -63,7 +63,7 @@ class UserRepositoryImpl implements UserRepository {
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
-        final response = await remoteDatasource.changepassword(params);
+        final response = await remoteDatasource.changePassword(params);
 
         return Right(response);
       } catch (e) {
