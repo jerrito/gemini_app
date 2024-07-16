@@ -14,8 +14,8 @@ class DefaultTextfield extends StatefulWidget {
   final TextEditingController? controller;
   final String? hintText, initialValue, errorText;
   final double? height;
-  final Uint8List? byte; 
-  final bool? enabled,  isAdded;
+  final Uint8List? byte;
+  final bool? enabled, isAdded;
   final bool isTextAndImage;
   final TextInputType? textInputType;
   const DefaultTextfield({
@@ -32,8 +32,8 @@ class DefaultTextfield extends StatefulWidget {
     required this.isTextAndImage,
     this.onTap,
     this.onPressed,
-    this.validator, 
-     this.byte,
+    this.validator,
+    this.byte,
   });
 
   @override
@@ -43,78 +43,99 @@ class DefaultTextfield extends StatefulWidget {
 class _DefaultTextfieldState extends State<DefaultTextfield> {
   @override
   Widget build(BuildContext context) {
-    final theme=Theme.of(context);
+    final theme = Theme.of(context);
     return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: widget.validator,
-      initialValue: widget.initialValue,
-      keyboardType: widget.textInputType,
-      controller: widget.controller,
-      onChanged: widget.onChanged,
-      decoration: InputDecoration(
-        prefixIcon:widget.isTextAndImage? GestureDetector(
-          onTap:widget.onTap,
-          child:  Icon(Icons.file_upload,size: Sizes().height(context,0.03))):(widget.isAdded ?? false) ? 
-         Padding(
-           padding:  EdgeInsets.symmetric(
-            horizontal:Sizes().width(context, 0.01),
-            vertical:Sizes().height(context, 0.007)),
-           child: Container(
-            width: Sizes().width(context,0.09),
-            height: Sizes().height(context,0.045),
-            padding: EdgeInsets.symmetric(
-              horizontal: Sizes().width(context, 0.005),
-              vertical: Sizes().height(context, 0.05),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: widget.validator,
+        initialValue: widget.initialValue,
+        keyboardType: widget.textInputType,
+        controller: widget.controller,
+        onChanged: widget.onChanged,
+        decoration: InputDecoration(
+          prefixIcon: widget.isTextAndImage
+              ? GestureDetector(
+                  onTap: widget.onTap,
+                  child: Icon(Icons.file_upload,
+                      size: Sizes().height(context, 0.03)))
+              : (widget.isAdded ?? false)
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: Sizes().width(context, 0.01),
+                          vertical: Sizes().height(context, 0.007)),
+                      child: Container(
+                        width: Sizes().width(context, 0.09),
+                        height: Sizes().height(context, 0.045),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Sizes().width(context, 0.005),
+                          vertical: Sizes().height(context, 0.05),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          image: DecorationImage(
+                              image: Image.memory(widget.byte!).image,
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Sizes().width(context, 0.015),
+                        vertical: Sizes().height(context, 0.015),
+                      ),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    ),
+          suffixIcon: GestureDetector(
+              onTap: widget.onPressed,
+              child: (widget.enabled ?? true)
+                  ? Icon(Icons.send, size: Sizes().height(context, 0.03))
+                  : const SizedBox()),
+          isDense: true,
+          errorText: widget.errorText,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          hintText: widget.hintText,
+          hintStyle: const TextStyle(color: Colors.grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
+            borderSide: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 233, 225, 225)
+                  : const Color.fromARGB(255, 18, 17, 17),
             ),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              image: DecorationImage(image:Image.memory(widget.byte!).image,fit: BoxFit.cover ),
-           
-              borderRadius: BorderRadius.circular(10),
-              ),
-           ),
-         ) :const SizedBox() ,
-        suffixIcon:GestureDetector(
-          onTap:widget.onPressed,
-          child: (widget.enabled ?? true) ?  Icon(Icons.send,size: Sizes().height(context,0.03)):const SizedBox()),
-        isDense: true,
-        errorText: widget.errorText,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        hintText: widget.hintText,
-        hintStyle: const TextStyle(color: Colors.grey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
-          borderSide: BorderSide(
-            color: Theme.of(context).brightness == Brightness.dark
-                ?const Color.fromARGB(255, 233, 225, 225)
-                :const Color.fromARGB(255, 18, 17, 17),
           ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
-          borderSide: BorderSide(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
+            borderSide: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+            ),
           ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
-          borderSide:  BorderSide(color:theme.brightness==Brightness.dark?Colors.white: Colors.black),
-        ),
-      focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
-          borderSide:  BorderSide(color:theme.brightness==Brightness.dark?Colors.white: Colors.black),
-        ),
-      ));
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
+            borderSide: BorderSide(
+                color: theme.brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.04)),
+            borderSide: BorderSide(
+                color: theme.brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black),
+          ),
+        ));
   }
 }
 
 class DefaultTextForm extends StatelessWidget {
   final void Function(String?)? onChanged;
   final void Function(PointerDownEvent)? onTapOutSide;
-  final String  Function(String?)? validator;
+  final String Function(String?)? validator;
   final TextEditingController? controller;
   final String? hintText, initialValue, errorText, label;
   final double? height;
@@ -141,7 +162,7 @@ class DefaultTextForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme=Theme.of(context);
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -159,24 +180,29 @@ class DefaultTextForm extends StatelessWidget {
           onChanged: onChanged,
           onTapOutside: onTapOutSide,
           decoration: InputDecoration(
-            suffixIcon: (obscureText ?? false)? suffixIcon: const SizedBox() ,
+            suffixIcon: (obscureText ?? false) ? suffixIcon : const SizedBox(),
             // isDense: true,
             errorText: errorText,
-            contentPadding:
-                 EdgeInsets.symmetric(horizontal: Sizes().height(context, 0.01),
-                  vertical: 1),
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: Sizes().height(context, 0.01), vertical: 1),
             hintText: hintText,
             hintStyle: const TextStyle(color: Colors.grey),
             //label: Text(label!),
             border: OutlineInputBorder(
               borderRadius:
                   BorderRadius.circular(Sizes().height(context, 0.04)),
-              borderSide: BorderSide(color:theme.brightness==Brightness.dark?Colors.white: Colors.black26),
+              borderSide: BorderSide(
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black26),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius:
                   BorderRadius.circular(Sizes().height(context, 0.04)),
-              borderSide:  BorderSide(color:theme.brightness==Brightness.dark?Colors.white: Colors.black26),
+              borderSide: BorderSide(
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black26),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius:

@@ -52,8 +52,8 @@ class _SearchTextPage extends State<SearchTextPage> {
       name = "",
       joinedSnapInfo = "",
       initText = "";
-  int type = RequestType.stream.value;
-  bool isTextImage = false,
+  bool isStream = true,
+      isTextImage = true,
       isAdded = false,
       canDeleteData = false,
       isAvailable = false,
@@ -117,7 +117,8 @@ class _SearchTextPage extends State<SearchTextPage> {
                 // context.pushNamed("test");
                 allSelectIds.clear();
                 ids.clear();
-                dataGeneratedBloc.add( ListDataGeneratedEvent(params: {"token":token}));
+                dataGeneratedBloc
+                    .add(ListDataGeneratedEvent(params: {"token": token}));
                 scaffoldKey.currentState?.openDrawer();
               },
               icon: const Icon(Icons.menu)),
@@ -178,11 +179,11 @@ class _SearchTextPage extends State<SearchTextPage> {
                 if (value?.isEmpty ?? true) {
                   return "";
                 }
-                if (isTextImage) {
-                  if (all.isEmpty) {
-                    return "image is required";
-                  }
-                }
+                // if (isTextImage) {
+                //   if (all.isEmpty) {
+                //     return "image is required";
+                //   }
+                // }
                 return null;
               },
               onChanged: (value) {
@@ -211,31 +212,15 @@ class _SearchTextPage extends State<SearchTextPage> {
                           "image": all,
                           "images": imageLength,
                         };
-                        switch (type) {
-                          case 4:
-                            searchBloc.add(
-                              SearchTextEvent(
-                                params: params,
-                              ),
-                            );
-                            break;
-
-                          case 3:
-                            searchBloc.add(
-                              ChatEvent(
-                                params: params,
-                              ),
-                            );
-                            break;
-
-                          case 2:
+                        switch (!isStream) {
+                          case true:
                             searchBloc.add(
                               SearchTextAndImageEvent(
                                 params: paramsWithImage,
                               ),
                             );
                             break;
-                          case 1:
+                          case false:
                             searchBloc.add(
                               GenerateStreamStopEvent(
                                 params: params,
@@ -293,7 +278,18 @@ class _SearchTextPage extends State<SearchTextPage> {
                   isAdded = true;
                   setState(() {});
                 }
-                if (state is AddMultipleImageLoading) {}
+                if (state is AddMultipleImageLoading) {
+                  isAdded = false;
+                  isTextImage = false;
+                  isStream = false;
+                  setState(() {});
+                }
+                if (state is AddMultipleImageError) {
+                  isTextImage = true;
+                  isAdded = false;
+                  isStream = true;
+                  setState(() {});
+                }
                 if (state is ReadDataLoaded) {
                   print(state.data?.length);
                   print("loaded");
@@ -321,53 +317,6 @@ class _SearchTextPage extends State<SearchTextPage> {
               if (state is ReadDataLoaded) {
                 _scrollDown();
               }
-              // if (state is DeleteDataLoaded) {
-              //   print("object");
-              // }
-              // if (state is DeleteDataError) {
-              // }
-              // if (state is ReadDataError) {
-              //   // final error = state.errorMessage;
-              // }
-
-              if (state is SearchTextLoaded) {
-                question = controller.text;
-                controller.text = "";
-                isAvailable = false;
-                final newId = await searchBloc.readData();
-                final data = state.data;
-                refinedData = searchBloc.replace(data);
-                print(token);
-                Map<String, dynamic> params = {
-                  "token": token,
-                  "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
-                  "title": (question!.isNotEmpty ? question! : repeatQuestion),
-                  "data": refinedData,
-                  "dateTime": DateTime.now().toString(),
-                  "eventType": 4,
-                  "hasImage": false
-                };
-                await searchBloc.addData(params);
-                dataGeneratedBloc.add(DataEvent(params: params));
-              }
-              if (state is ChatLoaded) {
-                question = controller.text;
-                controller.text = "";
-                isAvailable = false;
-                final newId = await searchBloc.readData();
-                final data = state.data;
-                refinedData = searchBloc.replace(data);
-                Map<String, dynamic> params = {
-                  "token": token,
-                  "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
-                  "title": (question!.isNotEmpty ? question! : repeatQuestion),
-                  "data": refinedData,
-                  "dateTime": DateTime.now().toString(),
-                  "eventType": 3,
-                };
-                await searchBloc.addData(params);
-                dataGeneratedBloc.add(DataEvent(params: params));
-              }
               if (state is GenerateStreamLoading) {
                 question = controller.text;
                 controller.text = "";
@@ -391,6 +340,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                 };
                 isAdded = false;
                 isTextImage = true;
+                isStream = true;
                 setState(() {});
                 await searchBloc.addData(params);
                 dataGeneratedBloc.add(DataEvent(params: params));
@@ -442,14 +392,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                 showSnackbar(context: context, message: state.errorMessage);
               }
               if (state is SearchTextAndImageError) {
-                if (!context.mounted) return;
-                showSnackbar(context: context, message: state.errorMessage);
-              }
-              if (state is SearchTextError) {
-                if (!context.mounted) return;
-                showSnackbar(context: context, message: state.errorMessage);
-              }
-              if (state is ChatError) {
                 if (!context.mounted) return;
                 showSnackbar(context: context, message: state.errorMessage);
               }
@@ -570,75 +512,24 @@ class _SearchTextPage extends State<SearchTextPage> {
         child: SafeArea(
           child: Column(
             children: [
-              BlocListener(
-                bloc: authBloc,
-                listener: (context, state) async {},
-                child: GestureDetector(
-                  onTap: () async {
-                    await context.pushNamed("user");
-                  },
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        CircleAvatar(
-                          child: Text(
-                            (user.profile!.isNotEmpty && user.profile != null)
-                                ? user.profile!
-                                : user.userName?.substring(0, 2) ?? "NA",
-                          ),
-                        ),
-                        Text(
-                          user.userName ?? user.email ?? "",
-                        ),
-                      ]),
-                ),
-              ),
-              SearchTypeWidget(
-                value: type,
-                type: RequestType.stream,
-                onTap: () {
-                  type = RequestType.stream.value;
-                  RequestType.stream;
-                  isTextImage = false;
-                  isAdded = false;
-                  context.pop();
-                  setState(() {});
-                },
-              ),
-              SearchTypeWidget(
-                value: type,
-                type: RequestType.textImage,
-                onTap: () {
-                  type = RequestType.textImage.value;
-                  RequestType.textImage;
-                  isTextImage = true;
-                  isAdded = false;
-                  context.pop();
-                  setState(() {});
-                },
-              ),
-              SearchTypeWidget(
-                value: type,
-                type: RequestType.chat,
+              GestureDetector(
                 onTap: () async {
-                  type = RequestType.chat.value;
-                  RequestType.chat;
-                  isTextImage = false;
-                  isAdded = false;
-                  context.pop();
-                  setState(() {});
+                  await context.pushNamed("user");
                 },
+                child: Column(children: [
+                  CircleAvatar(
+                    child: Text(
+                      (user.profile!.isNotEmpty && user.profile != null)
+                          ? user.profile!
+                          : user.userName?.substring(0, 2) ?? "NA",
+                    ),
+                  ),
+                  Space().height(context, 0.02),
+                  Text(
+                    user.userName ?? user.email ?? "",
+                  ),
+                ]),
               ),
-              SearchTypeWidget(
-                  value: type,
-                  onTap: () async {
-                    type = RequestType.future.value;
-                    isTextImage = false;
-                    isAdded = false;
-                    context.pop();
-                    setState(() {});
-                  },
-                  type: RequestType.future),
               const Divider(
                 thickness: 2,
               ),
@@ -908,34 +799,4 @@ class _SearchTextPage extends State<SearchTextPage> {
   List<DataAdd> datas = [];
   List<int> ids = [];
   List<int> allSelectIds = [];
-}
-
-enum RequestType {
-  stream(
-      label: "Stream content",
-      icon: Icons.stream,
-      color: Colors.green,
-      value: 1),
-  textImage(
-      label: "Search text with image",
-      icon: Icons.image_search_outlined,
-      color: Colors.green,
-      value: 2),
-  chat(label: "Chat with bot", icon: Icons.chat, color: Colors.green, value: 3),
-  future(
-      label: "Await content",
-      icon: Icons.text_format,
-      color: Colors.green,
-      value: 4);
-
-  final String label;
-  final IconData? icon;
-  final Color? color;
-  final int value;
-
-  const RequestType(
-      {required this.value,
-      required this.label,
-      required this.icon,
-      required this.color});
 }
