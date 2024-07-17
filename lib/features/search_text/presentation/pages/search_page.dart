@@ -623,6 +623,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                   if (state is ListDataGeneratedError) {
                     if (state.errorMessage !=
                         "Exception: {message: No data found, error: null, errorCode: 102}") {
+                      context.pop();
                       showSnackbar(
                           context: context, message: state.errorMessage);
                       print(state.errorMessage);
@@ -688,7 +689,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                                   "data": datas.data,
                                   "dataImage": datas.dataImage,
                                   "eventType": datas.id,
-                                  "dateTime": datas.id,
+                                  "dateTime": datas.dateTime,
                                   "hasImage": datas.hasImage,
                                   "path": datas.id,
                                   "id": datas.id,

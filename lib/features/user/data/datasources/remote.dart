@@ -4,6 +4,7 @@ import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:http/http.dart' as http;
 import 'package:gemini/features/authentication/data/models/user_model.dart';
+import 'package:typed_data/src/typed_buffer.dart' as buffer;
 
 abstract class UserRemoteDatasource {
   // update user
@@ -46,12 +47,18 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     };
-    final Map<String, dynamic> body = params["body"];
+    buffer.Uint8Buffer dataBuffer = buffer.Uint8Buffer();
+
+    dataBuffer.addAll(params["dataImage"]);
+    print(dataBuffer);
+
+    final Map<String, dynamic> body = {"data": params["dataImage"]};
     final response = await client.put(
         getUri(endpoint: Url.updateProfile.endpoint),
-        body: body,
+        body: jsonEncode(body),
         headers: headers);
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return decodedResponse;
     } else {

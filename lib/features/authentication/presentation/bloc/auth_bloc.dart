@@ -35,6 +35,8 @@ class AuthenticationBloc
     required this.getToken,
     required this.logout,
   }) : super(InitState()) {
+ 
+  //! SIGNUP 
     on<SignupEvent>(
       (event, emit) async {
         emit(SignupLoading());
@@ -51,6 +53,7 @@ class AuthenticationBloc
       },
     );
 
+  //! SIGN IN
     on<SigninEvent>(
       (event, emit) async {
         emit(SigninLoading());

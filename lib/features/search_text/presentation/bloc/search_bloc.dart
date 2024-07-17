@@ -62,6 +62,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       required this.remoteDatasourceImpl,
       required this.deleteAllData})
       : super(SearchInitState()) {
+
+        // SEARCH TEXT
     on<SearchTextEvent>((event, emit) async {
       emit(SearchTextLoading());
 
@@ -384,6 +386,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         hasImage: params["hasImage"],
         userId: params["userId"],
         id: params["id"],
+        dateTime: params["dateTime"],
         data: params["data"],
         title: params["title"],
         dataImage: params["dataImage"]);

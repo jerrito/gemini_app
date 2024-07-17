@@ -90,8 +90,13 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                   alignment: Alignment.bottomRight,
                   children: [
                     CircleAvatar(
-                      backgroundImage: (profile != null)
-                          ? Image.network(fit: BoxFit.cover, profile!).image
+                      backgroundImage: (profile != null &&
+                              (userProvider.user!.profile!.isNotEmpty ||
+                                  userProvider.user?.profile != null))
+                          ? Image.network(
+                                  fit: BoxFit.cover,
+                                  profile ?? userProvider.user!.profile!)
+                              .image
                           : Image.asset(defaultImage).image,
                       radius: Sizes().height(context, 0.06),
                     ),
@@ -122,7 +127,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                                 );
                                 if (imageBuffer != null) {
                                   final params = {
-                                    "body": {"data": imageBuffer},
+                                    "dataImage": imageBuffer,
                                     "token": token
                                   };
                                   userBloc

@@ -4,7 +4,7 @@ import "dart:convert";
 import "package:gemini/core/error/error_model.dart";
 import "package:gemini/core/urls/urls.dart";
 import 'package:http/http.dart' as http;
-import 'package:typed_data/typed_buffers.dart';
+import 'package:typed_data/src/typed_buffer.dart' as buffer;
 
 abstract class DataGeneratedRemoteDatasource {
   //add  searched text to database
@@ -35,7 +35,7 @@ class DataGeneratedRemoteDatasourceImpl
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     });
-    Uint8Buffer dataBuffer = Uint8Buffer();
+    buffer.Uint8Buffer dataBuffer = buffer.Uint8Buffer();
     if (params["hasImage"]) {
       dataBuffer.addAll(params["dataImage"]);
       print(dataBuffer);
@@ -74,6 +74,7 @@ class DataGeneratedRemoteDatasourceImpl
     );
 
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return List<DataModel>.from(
           decodedResponse.map((e) => DataModel.fromJson(e)));
