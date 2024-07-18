@@ -8,15 +8,15 @@ import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/core/mixin/dialog_mixin.dart';
-import 'package:gemini/features/authentication/presentation/provders/token.dart';
-import 'package:gemini/features/authentication/presentation/provider/user_provider.dart';
+import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/features/user/presentation/bloc/user_bloc.dart';
+import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/features/user/presentation/widgets/show_image_pick.dart';
 import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
 import 'package:gemini/locator.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class UserProfile extends StatefulWidget {
   const UserProfile({
     super.key,
@@ -29,7 +29,7 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> with Dialogs {
   final authBloc = sl<AuthenticationBloc>();
   final userBloc = sl<UserBloc>();
-  late UserProvider userProvider;
+  UserProvider? userProvider;
   late TokenProvider tokenProvider;
   late User user;
   String? token, email, userName, successMessage, profile;
@@ -41,7 +41,8 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
   @override
   Widget build(BuildContext context) {
     user = context.watch<UserProvider>().user!;
-    token = context.watch<TokenProvider>().token!;
+    userProvider = context.watch<UserProvider>();
+    token = context.read<TokenProvider>().token!;
     listUserData.setAll(
       0,
       [user.userName, user.email, "Change Password"],
@@ -55,7 +56,6 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
             if (state is LogoutLoaded) {
               final data = state.successMessage;
               successMessage = data;
-
               setState(() {});
               final Map<String, dynamic> params = {"refreshToken": null};
               authBloc.add(
@@ -90,13 +90,11 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                   alignment: Alignment.bottomRight,
                   children: [
                     CircleAvatar(
-                      backgroundImage: (profile != null &&
-                              (userProvider.user!.profile!.isNotEmpty ||
-                                  userProvider.user?.profile != null))
-                          ? Image.network(
-                                  fit: BoxFit.cover,
-                                  profile ?? userProvider.user!.profile!)
-                              .image
+                      backgroundImage: (userProvider?.profile != null &&
+                              (user.profile!.isNotEmpty ||
+                                  user.profile != null))
+                          ? CachedNetworkImageProvider(
+                                 userProvider?.profile ?? user.profile!)
                           : Image.asset(defaultImage).image,
                       radius: Sizes().height(context, 0.06),
                     ),
@@ -104,7 +102,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                         listener: (context, state) {
                           if (state is UpdateProfileLoaded) {
                             profile = state.profile;
-                            setState(() {});
+                          userProvider?.profileUpdate=profile!;
                           }
                           if (state is UpdateProfileError) {
                             print(state.errorMessage);

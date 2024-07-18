@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/assets/animations/animations.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
-import 'package:gemini/features/authentication/presentation/provders/token.dart';
-import 'package:gemini/features/authentication/presentation/provider/user_provider.dart';
+import 'package:gemini/features/authentication/presentation/providers/token.dart';
+import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/locator.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -79,7 +79,6 @@ class _ConnectionPageState extends State<ConnectionPage>
               );
             }
             if (state is RefreshTokenError) {
-              print("sgs${state.errorMessage}");
               if (state.errorMessage == "No internet connection") {
                 context.goNamed("noInternet");
               } else {
