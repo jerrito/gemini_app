@@ -17,6 +17,7 @@ import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
 import 'package:gemini/locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 class UserProfile extends StatefulWidget {
   const UserProfile({
     super.key,
@@ -47,6 +48,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
       0,
       [user.userName, user.email, "Change Password"],
     );
+
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
@@ -90,11 +92,11 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                   alignment: Alignment.bottomRight,
                   children: [
                     CircleAvatar(
-                      backgroundImage: (userProvider?.profile != null &&
-                              (user.profile!.isNotEmpty ||
+                      backgroundImage: (userProvider?.profile != null ||
+                              (user.profile!.isNotEmpty &&
                                   user.profile != null))
                           ? CachedNetworkImageProvider(
-                                 userProvider?.profile ?? user.profile!)
+                              userProvider?.profile ?? user.profile!)
                           : Image.asset(defaultImage).image,
                       radius: Sizes().height(context, 0.06),
                     ),
@@ -102,7 +104,7 @@ class _UserProfileState extends State<UserProfile> with Dialogs {
                         listener: (context, state) {
                           if (state is UpdateProfileLoaded) {
                             profile = state.profile;
-                          userProvider?.profileUpdate=profile!;
+                            userProvider?.profileUpdate = profile!;
                           }
                           if (state is UpdateProfileError) {
                             print(state.errorMessage);

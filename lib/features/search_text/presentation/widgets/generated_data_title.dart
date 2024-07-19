@@ -33,7 +33,6 @@ class _GeneratedDataTitleState extends State<GeneratedDataTitle> {
     final theme = Theme.of(context);
     return GestureDetector(
         onLongPress: widget.onLongPress,
-        onTap: widget.onTap,
         child: Padding(
           padding: EdgeInsets.symmetric(
             vertical: Sizes().height(context, 0.005),
@@ -69,11 +68,15 @@ class _GeneratedDataTitleState extends State<GeneratedDataTitle> {
                               ? "${widget.title!.substring(0, 30)}..."
                               : (widget.title ?? "")),
                     )
-                  : Text(
-                      style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
-                      (widget.title!.length >= 50)
-                          ? "${widget.title!.substring(0, 50)}..."
-                          : (widget.title ?? ""))),
+                  : GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                          style:
+                              const TextStyle(fontSize: 16, letterSpacing: 1.2),
+                          (widget.title!.length >= 50)
+                              ? "${widget.title!.substring(0, 50)}..."
+                              : (widget.title ?? "")),
+                    )),
         ));
   }
 }

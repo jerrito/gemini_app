@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 
 AppDatabase? database;
 
-const url = String.fromEnvironment("superbaseUrl");
-const apiKey = String.fromEnvironment("superbaseKey");
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
  

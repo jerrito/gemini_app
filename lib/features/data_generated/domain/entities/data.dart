@@ -1,11 +1,11 @@
-import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 class Data extends Equatable {
-  final String? data, title;
+  final String? data, title,imageUrl;
   final bool? hasImage;
   final int userId, id;
-  final Uint8List? dataImage;
+  final dynamic dataImage;
   final DateTime? dateTime;
 
   const Data(
@@ -13,6 +13,7 @@ class Data extends Equatable {
       required this.hasImage,
       required this.userId,
       required this.id,
+      required this.imageUrl,
       required this.data,
       required this.title,
       required this.dataImage});

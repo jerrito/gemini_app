@@ -9,6 +9,7 @@ class DataModel extends Data {
     required super.dataImage,
     required super.hasImage,
     required super.dateTime,
+    required super.imageUrl,
   });
 
   factory DataModel.fromJson(Map<String, dynamic>? json) => DataModel(
@@ -18,6 +19,8 @@ class DataModel extends Data {
         title: json?["title"],
         dataImage: json?["dataImage"],
         hasImage: json?["hasImage"],
+        imageUrl: json?["imageUrl"],
         dateTime: DateTime.parse(json?["dateTime"]),
       );
 }
+

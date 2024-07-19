@@ -110,6 +110,8 @@ final class ReadDataDetailsLoaded extends SearchState {
   const ReadDataDetailsLoaded(this.textEntity);
 }
 
+final class ReadDataDetailsLoading extends SearchState {}
+
 final class IsSpeechTextEnabledError extends SearchState {
   final String errorMessage;
   const IsSpeechTextEnabledError({required this.errorMessage});
@@ -146,8 +148,6 @@ final class OnSpeechResultLoaded extends SearchState {
 }
 
 final class OnSpeechResultLoading extends SearchState {}
-
-
 
 final class DeleteDataLoaded extends SearchState {
   const DeleteDataLoaded();

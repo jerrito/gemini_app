@@ -62,8 +62,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       required this.remoteDatasourceImpl,
       required this.deleteAllData})
       : super(SearchInitState()) {
-
-        // SEARCH TEXT
+    // SEARCH TEXT
     on<SearchTextEvent>((event, emit) async {
       emit(SearchTextLoading());
 
@@ -169,9 +168,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             ai.SafetySetting(
                 ai.HarmCategory.dangerousContent, ai.HarmBlockThreshold.none)
           ]);
-
           await for (final r in response) {
-            print("dh");
             emit(GenerateContentLoading());
             all.add(r.text!);
             emit(
@@ -219,6 +216,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     });
 
     on<ReadDataDetailsEvent>((event, emit) {
+      emit(ReadDataDetailsLoading());
       final response = readDataDetails(event.params);
       emit(
         ReadDataDetailsLoaded(
@@ -303,7 +301,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
       "title": text,
       "data": data,
-      "dateTime": DateTime.now().toString(),
+      // "dateTime": DateTime.now().toUtc(),
       "eventType": 1,
       "hasImage": false,
       "dataImage": null,
@@ -349,7 +347,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         title: params["title"],
         data: params["data"],
         dataImage: params["dataImage"],
-        dateTime: params["dateTime"],
         eventType: params["eventType"],
         hasImage: params["hasImage"] ?? false);
 
@@ -364,7 +361,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         title: params["title"],
         data: params["data"],
         dataImage: params["dataImage"],
-        dateTime: params["dateTime"],
         eventType: params["eventType"],
         hasImage: params["hasImage"] ?? false);
 
@@ -389,7 +385,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         dateTime: params["dateTime"],
         data: params["data"],
         title: params["title"],
-        dataImage: params["dataImage"]);
+        imageUrl: params["imageUrl"],
+        dataImage: params["hasImage"] ? params["dataImage"] as String : null);
     return dataDetails;
   }
 

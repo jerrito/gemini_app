@@ -31,7 +31,7 @@ class _ConnectionPageState extends State<ConnectionPage>
   void initState() {
     super.initState();
     final animatedController =
-        AnimationController(duration: Duration(seconds: 3), vsync: this);
+        AnimationController(duration: const Duration(seconds: 3), vsync: this);
 
     userBloc.add(
       GetTokenEvent(),
@@ -97,11 +97,11 @@ class _ConnectionPageState extends State<ConnectionPage>
             if (state is GetUserLoaded) {
               final user = state.user;
               userProvider?.user = user;
+              print(user.profile);
               context.goNamed("searchPage");
             }
 
             if (state is GetUserError) {
-              print(state.errorMessage);
               context.goNamed("signin");
             }
             if (state is GetTokenError) {

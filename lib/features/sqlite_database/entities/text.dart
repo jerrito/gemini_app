@@ -11,8 +11,6 @@ class TextEntity {
 
   final int? eventType;
 
-  final String? dateTime;
-
   final bool? hasImage;
 
   final Uint8List? dataImage;
@@ -23,6 +21,5 @@ class TextEntity {
       required this.title,
       required this.data,
       required this.dataImage,
-      required this.dateTime,
       required this.eventType});
 }

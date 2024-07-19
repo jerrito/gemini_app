@@ -85,7 +85,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `TextEntity` (`textId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `data` TEXT, `eventType` INTEGER, `dateTime` TEXT, `hasImage` INTEGER, `dataImage` BLOB)');
+            'CREATE TABLE IF NOT EXISTS `TextEntity` (`textId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `data` TEXT, `eventType` INTEGER, `hasImage` INTEGER, `dataImage` BLOB)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -112,7 +112,6 @@ class _$TextDao extends TextDao {
                   'title': item.title,
                   'data': item.data,
                   'eventType': item.eventType,
-                  'dateTime': item.dateTime,
                   'hasImage':
                       item.hasImage == null ? null : (item.hasImage! ? 1 : 0),
                   'dataImage': item.dataImage
@@ -126,7 +125,6 @@ class _$TextDao extends TextDao {
                   'title': item.title,
                   'data': item.data,
                   'eventType': item.eventType,
-                  'dateTime': item.dateTime,
                   'hasImage':
                       item.hasImage == null ? null : (item.hasImage! ? 1 : 0),
                   'dataImage': item.dataImage
@@ -152,7 +150,6 @@ class _$TextDao extends TextDao {
             title: row['title'] as String?,
             data: row['data'] as String?,
             dataImage: row['dataImage'] as Uint8List?,
-            dateTime: row['dateTime'] as String?,
             eventType: row['eventType'] as int?));
   }
 

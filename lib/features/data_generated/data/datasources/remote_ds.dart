@@ -1,3 +1,5 @@
+import "dart:typed_data";
+
 import 'package:gemini/features/data_generated/data/models/data_model.dart';
 import "dart:async";
 import "dart:convert";
@@ -35,15 +37,11 @@ class DataGeneratedRemoteDatasourceImpl
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     });
-    buffer.Uint8Buffer dataBuffer = buffer.Uint8Buffer();
-    if (params["hasImage"]) {
-      dataBuffer.addAll(params["dataImage"]);
-      print(dataBuffer);
-    }
+
     final Map<String, dynamic> body = {
       "data": params["data"],
       "title": params["title"],
-      "dataImage": params["hasImage"] ? dataBuffer : null,
+      "dataImage": params["hasImage"] ? params["dataImage"] as Uint8List : null,
       "hasImage": params["hasImage"]
     };
     final response = await client.post(
@@ -74,7 +72,6 @@ class DataGeneratedRemoteDatasourceImpl
     );
 
     final decodedResponse = jsonDecode(response.body);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return List<DataModel>.from(
           decodedResponse.map((e) => DataModel.fromJson(e)));

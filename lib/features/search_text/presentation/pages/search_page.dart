@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/assets/animations/animations.dart';
@@ -57,7 +58,7 @@ class _SearchTextPage extends State<SearchTextPage> {
       canDeleteData = false,
       isAvailable = false,
       isSpeechTextEnabled = false;
-  String? question, refinedData, token;
+  String? question, refinedData, token, profile;
   final controller = TextEditingController();
   Uint8List? byte;
   TokenProvider? tokenProvider;
@@ -104,6 +105,7 @@ class _SearchTextPage extends State<SearchTextPage> {
   Widget build(BuildContext context) {
     token = context.read<TokenProvider>().token;
     user = context.watch<UserProvider>().user!;
+    profile = context.watch<UserProvider>().profile;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -290,8 +292,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                   setState(() {});
                 }
                 if (state is ReadDataLoaded) {
-                  print(state.data?.length);
-                  print("loaded");
                   final data = state.data;
                   searchBloc2.add(DeleteDataEvent(params: data));
                 }
@@ -301,6 +301,7 @@ class _SearchTextPage extends State<SearchTextPage> {
               bloc: dataGeneratedBloc,
               listener: (context, state) {
                 if (state is DataGeneratedError) {
+                  print(state.errorMessage);
                   if (!context.mounted) return;
                   showSnackbar(context: context, message: state.errorMessage);
                 }
@@ -332,7 +333,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                   "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
-                  "dateTime": DateTime.now().toString(),
+                  // "dateTime": DateTime.now(),
                   "eventType": 2,
                   "hasImage": true,
                   "dataImage": byte
@@ -369,7 +370,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                   "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
-                  "dateTime": DateTime.now().toString(),
+                  // "dateTime": DateTime.now(),
                   "eventType": 1,
                   "hasImage": false,
                   "dataImage": null
@@ -380,7 +381,6 @@ class _SearchTextPage extends State<SearchTextPage> {
               if (state is GenerateContentLoaded) {
                 final data = state.data;
                 isAvailable = false;
-                print("added");
                 setState(() {});
                 snapInfo.add(data.toString());
                 _scrollDown();
@@ -517,10 +517,12 @@ class _SearchTextPage extends State<SearchTextPage> {
                 },
                 child: Column(children: [
                   CircleAvatar(
+                    backgroundImage: (profile != null ||
+                            (user.profile!.isNotEmpty && user.profile != null))
+                        ? CachedNetworkImageProvider(profile ?? user.profile!)
+                        : null,
                     child: Text(
-                      (user.profile!.isNotEmpty && user.profile != null)
-                          ? user.profile!
-                          : user.userName?.substring(0, 2) ?? "NA",
+                      user.userName?.substring(0, 2) ?? "NA",
                     ),
                   ),
                   Space().height(context, 0.02),
@@ -540,7 +542,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                           onTap: () {
                             canDeleteData = !canDeleteData;
                             ids.clear();
-                            print(ids);
                             setState(() {});
                           },
                           child: const Icon(Icons.deselect_outlined),
@@ -562,7 +563,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                           onTap: () {
                             ids.addAll(allSelectIds);
 
-                            print(ids);
                             setState(() {});
                           },
                           child:
@@ -598,6 +598,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                   if (state is DeleteListDataGeneratedLoaded) {
                     ids.clear();
                     final data = state.isSuccess;
+                    canDeleteData = !canDeleteData;
                     context.pop();
                     if (data) {
                       showSnackbar(
@@ -617,7 +618,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                     for (var i in response) {
                       allSelectIds.add(i.id);
                     }
-                    print(allSelectIds);
                   }
                   if (state is ListDataGeneratedError) {
                     if (state.errorMessage !=
@@ -625,7 +625,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                       context.pop();
                       showSnackbar(
                           context: context, message: state.errorMessage);
-                      print(state.errorMessage);
                     }
                   }
                   if (state is DeleteDataGeneratedLoaded) {
@@ -650,7 +649,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                     return const HistoryShimmer();
                   }
                   if (state is ListDataGeneratedError) {
-                    print(state.errorMessage);
                     if (state.errorMessage ==
                         "Exception: {message: No data found, error: null, errorCode: 102}") {
                       return Lottie.asset(historyJson);
@@ -690,6 +688,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                                   "eventType": datas.id,
                                   "dateTime": datas.dateTime,
                                   "hasImage": datas.hasImage,
+                                  "imageUrl": datas.imageUrl,
                                   "path": datas.id,
                                   "id": datas.id,
                                   "userId": datas.userId
@@ -741,8 +740,9 @@ class _SearchTextPage extends State<SearchTextPage> {
                                         ),
                                         SlidableActionWidget(
                                           onPressed: (context) async {
-                                            await dataGeneratedBloc
-                                                .deleteDataGenerated(params);
+                                            dataGeneratedBloc.add(
+                                                DeleteDataGeneratedEvent(
+                                                    params: params));
                                           },
                                           isDeleteButton: true,
                                         ),

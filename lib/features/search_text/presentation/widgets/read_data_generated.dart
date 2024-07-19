@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 class ReadDataGeneratedWidget extends StatelessWidget {
   final bool? isTextImage;
   final String? data, title;
-  final Uint8List? dataImage;
+  final String? dataImage;
   final SearchBloc searchBloc;
   const ReadDataGeneratedWidget(
       {super.key,
@@ -44,7 +44,7 @@ class ReadDataGeneratedWidget extends StatelessWidget {
             decoration:BoxDecoration(
               borderRadius:BorderRadius.circular(Sizes().height(context, 0.01)),
               image: DecorationImage(
-                image: Image.memory(dataImage!).image,
+                image: Image.network(dataImage!).image,
                 fit:BoxFit.cover,
              
               )
@@ -66,6 +66,7 @@ class ReadDataGeneratedWidget extends StatelessWidget {
                 await Share.share(
                     ((title ?? "" ) + (data  ?? "")));
               }),
+              Space().height(context, 0.1)
         ],
       ),
     );
