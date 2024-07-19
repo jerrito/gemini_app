@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
 
-class DefaultTextfield extends StatefulWidget {
+class SearchTextfield extends StatefulWidget {
   final void Function(String?)? onChanged;
   final String? Function(String?)? validator;
   final void Function()? onTap;
@@ -18,7 +18,7 @@ class DefaultTextfield extends StatefulWidget {
   final bool? enabled, isAdded;
   final bool isTextAndImage;
   final TextInputType? textInputType;
-  const DefaultTextfield({
+  const SearchTextfield({
     super.key,
     this.onChanged,
     this.controller,
@@ -37,10 +37,10 @@ class DefaultTextfield extends StatefulWidget {
   });
 
   @override
-  State<DefaultTextfield> createState() => _DefaultTextfieldState();
+  State<SearchTextfield> createState() => _SearchTextfieldState();
 }
 
-class _DefaultTextfieldState extends State<DefaultTextfield> {
+class _SearchTextfieldState extends State<SearchTextfield> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -132,23 +132,24 @@ class _DefaultTextfieldState extends State<DefaultTextfield> {
   }
 }
 
-class DefaultTextForm extends StatelessWidget {
+class DefaultTextFieldForm extends StatefulWidget {
   final void Function(String?)? onChanged;
   final void Function(PointerDownEvent)? onTapOutSide;
   final String Function(String?)? validator;
   final TextEditingController? controller;
   final String? hintText, initialValue, errorText, label;
   final double? height;
-  final bool? obscureText;
+  final bool? obscureText, isPassword;
   final Widget? suffixIcon;
   final TextInputType? textInputType;
   final FocusNode? focusNode;
-  const DefaultTextForm({
+  const DefaultTextFieldForm({
     super.key,
     this.onChanged,
     this.controller,
     this.hintText,
     this.obscureText,
+    this.isPassword,
     this.suffixIcon,
     this.errorText,
     this.label,
@@ -161,31 +162,37 @@ class DefaultTextForm extends StatelessWidget {
   });
 
   @override
+  State<DefaultTextFieldForm> createState() => _DefaultTextFieldFormState();
+}
+
+class _DefaultTextFieldFormState extends State<DefaultTextFieldForm> {
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label ?? ""),
+        Text(widget.label ?? ""),
         Space().height(context, 0.006),
         TextFormField(
-          validator: validator,
+          validator: widget.validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          obscureText: obscureText ?? false,
-          // obscuringCharacter: "•",
-          focusNode: focusNode,
-          initialValue: initialValue,
-          keyboardType: textInputType,
-          controller: controller,
-          onChanged: onChanged,
-          onTapOutside: onTapOutSide,
+          obscureText: widget.obscureText ?? false,
+          focusNode: widget.focusNode,
+          initialValue: widget.initialValue,
+          keyboardType: widget.textInputType,
+          controller: widget.controller,
+          onChanged: widget.onChanged,
+          // onTapOutside: FocusManager().primaryFocus?.parent!.unfocus(disposition: ),
           decoration: InputDecoration(
-            suffixIcon: (obscureText ?? false) ? suffixIcon : const SizedBox(),
+            suffixIcon: (widget.isPassword ?? false)
+                ? widget.suffixIcon
+                : const SizedBox(),
             // isDense: true,
-            errorText: errorText,
+            errorText: widget.errorText,
             contentPadding: EdgeInsets.symmetric(
                 horizontal: Sizes().height(context, 0.01), vertical: 1),
-            hintText: hintText,
+            hintText: widget.hintText,
             hintStyle: const TextStyle(color: Colors.grey),
             //label: Text(label!),
             border: OutlineInputBorder(

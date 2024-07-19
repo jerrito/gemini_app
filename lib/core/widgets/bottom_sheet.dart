@@ -25,9 +25,9 @@ class BottomSheetTextfield extends StatefulWidget {
     this.hintText,
     this.errorText,
     required this.isTextAndImage,
-     this.isTextEmpty,
-     this.isAdded, 
-     this.byte,
+    this.isTextEmpty,
+    this.isAdded,
+    this.byte,
   });
 
   @override
@@ -47,10 +47,10 @@ class _BottomSheetTextFieldState extends State<BottomSheetTextfield> {
       ),
       child: SizedBox(
         width: double.infinity,
-        child: DefaultTextfield(
-          byte:widget.byte,
-          enabled:widget.isTextEmpty,
-          isAdded:widget.isAdded,
+        child: SearchTextfield(
+          byte: widget.byte,
+          enabled: widget.isTextEmpty,
+          isAdded: widget.isAdded,
           validator: widget.validator,
           errorText: widget.errorText,
           onChanged: widget.onChanged,

@@ -25,13 +25,32 @@ class _ConnectionPageState extends State<ConnectionPage>
   String? refreshToken;
   double opacity = 1.0;
   String? token;
-  Animation<double>? opacityAnimation;
+  Animation? animation;
+  late AnimationController animatedController;
+  Color? color;
+  // final colorTween=Ra
 
   @override
   void initState() {
     super.initState();
-    final animatedController =
+    animatedController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
+    animation = ColorTween(begin: Colors.black, end: Colors.white)
+        .animate(animatedController);
+    animation?.addListener(() {
+      setState(() {
+        color = animation?.value;
+      });
+    });
+    animation?.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animatedController.reset();
+        animatedController.forward();
+      } else if (status == AnimationStatus.dismissed) {
+        animatedController.forward();
+      }
+    });
+    animatedController.forward();
 
     userBloc.add(
       GetTokenEvent(),
@@ -39,11 +58,22 @@ class _ConnectionPageState extends State<ConnectionPage>
   }
 
   @override
+  void dispose() {
+    animatedController.dispose();
+    // animation?.removeStatusListener((status) {});
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     tokenProvider = context.read<TokenProvider>();
     userProvider = context.read<UserProvider>();
+    //animatedController.forward();
     return Scaffold(
-        bottomSheet: SizedBox(
+        bottomSheet: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.6))
+          ),
           height: Sizes().height(context, 0.2),
           child: Column(
             children: [
@@ -52,18 +82,9 @@ class _ConnectionPageState extends State<ConnectionPage>
                     width: Sizes().width(context, 0.3),
                     height: Sizes().height(context, 0.15)),
               ),
-              AnimatedOpacity(
-                onEnd: () {
-                  opacity = 0;
-                  setState(() {});
-                  Future.delayed(Durations.short3, () {
-                    opacity = 1;
-                  });
-                },
-                opacity: opacity,
-                duration: const Duration(seconds: 3),
-                curve: Curves.decelerate,
-                child: Text("Loading ..."),
+              Text(
+                "Loading ...",
+                style: TextStyle(color: color),
               )
             ],
           ),
@@ -97,7 +118,6 @@ class _ConnectionPageState extends State<ConnectionPage>
             if (state is GetUserLoaded) {
               final user = state.user;
               userProvider?.user = user;
-              print(user.profile);
               context.goNamed("searchPage");
             }
 

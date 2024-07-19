@@ -53,8 +53,8 @@ class _SigninPageState extends State<SigninPage> {
                 final userData = state.data.user;
                 userProvider.user = userData;
                 tokenProvider.setRefreshToken = state.data.refreshToken;
-                 final authorization={"refreshToken":state.data.refreshToken};
-               authBloc.add(CacheTokenEvent(authorization: authorization)); 
+                final authorization = {"refreshToken": state.data.refreshToken};
+                authBloc.add(CacheTokenEvent(authorization: authorization));
               }
               if (state is SigninError) {
                 if (!context.mounted) return;
@@ -107,7 +107,7 @@ class _SigninPageState extends State<SigninPage> {
 
                         return null;
                       },
-                      builder: (field) => DefaultTextForm(
+                      builder: (field) => DefaultTextFieldForm(
                           textInputType: TextInputType.emailAddress,
                           errorText: field.errorText,
                           onChanged: (value) => field.didChange(value),
@@ -129,7 +129,7 @@ class _SigninPageState extends State<SigninPage> {
 
                         return null;
                       },
-                      builder: (field) => DefaultTextForm(
+                      builder: (field) => DefaultTextFieldForm(
                           errorText: field.errorText,
                           onChanged: (value) => field.didChange(value),
                           controller: passwordController,

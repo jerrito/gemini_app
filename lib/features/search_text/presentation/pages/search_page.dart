@@ -223,7 +223,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                             break;
                           case false:
                             searchBloc.add(
-                              GenerateStreamStopEvent(
+                              GenerateContentEvent(
                                 params: params,
                               ),
                             );
@@ -518,7 +518,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                 child: Column(children: [
                   CircleAvatar(
                     backgroundImage: (profile != null ||
-                            (user.profile!.isNotEmpty && user.profile != null))
+                            (user.profile!.isNotEmpty || user.profile != null))
                         ? CachedNetworkImageProvider(profile ?? user.profile!)
                         : null,
                     child: Text(
@@ -688,7 +688,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                                   "eventType": datas.id,
                                   "dateTime": datas.dateTime,
                                   "hasImage": datas.hasImage,
-                                  "imageUrl": datas.imageUrl,
                                   "path": datas.id,
                                   "id": datas.id,
                                   "userId": datas.userId
@@ -766,6 +765,8 @@ class _SearchTextPage extends State<SearchTextPage> {
                                         value: ids.contains(datas.id),
                                         canDelete: canDeleteData,
                                         title: datas.title,
+                                        imageUrl: datas.dataImage,
+                                        hasImage: datas.hasImage,
                                         onLongPress: () {
                                           if (!canDeleteData) {
                                             canDeleteData = !canDeleteData;

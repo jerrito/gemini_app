@@ -42,6 +42,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       StreamController<SpeechRecognitionResult>();
   List<String> all = [];
   String question = "";
+  String? token;
 
   StreamController<ai.GenerateContentResponse> streamContent =
       StreamController<ai.GenerateContentResponse>.broadcast();
@@ -120,7 +121,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     on<GenerateContentEvent>((event, emit) async {
       emit(GenerateStreamLoading());
-      await generateStreams(event.params).whenComplete(() => print("h"));
+      await generateStreams(event.params);
 
       await emit.onEach(streamContent.stream,
           // generateContent.generateContent(event.params),
@@ -134,7 +135,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             errorMessage: error.toString(),
           ),
         );
-      }).whenComplete(() => print("g"));
+      });
     });
 
     // on<GenerateStreamEvent>((event, emit) async* {
@@ -277,6 +278,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final content = [ai.Content.text(params["text"])];
 
     question = params["text"];
+    token=params["token"];
 
     final response = model.generateContentStream(content, safetySettings: [
       ai.SafetySetting(
@@ -293,19 +295,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   Future<dynamic> addStreamData(String text, String data) async {
-    const storage = FlutterSecureStorage();
-    final authorization = await storage.read(key: "tokenKey");
-    final token = jsonDecode(authorization!);
     final newId = await readData();
     Map<String, dynamic> params = {
       "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
       "title": text,
       "data": data,
-      // "dateTime": DateTime.now().toUtc(),
       "eventType": 1,
-      "hasImage": false,
-      "dataImage": null,
-      "token": token["token"]
+      "token": token
     };
     await dataGeneratedDatasourceImpl.addDataGenerated(params);
     return await addData(params);
@@ -385,7 +381,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         dateTime: params["dateTime"],
         data: params["data"],
         title: params["title"],
-        imageUrl: params["imageUrl"],
         dataImage: params["hasImage"] ? params["dataImage"] as String : null);
     return dataDetails;
   }

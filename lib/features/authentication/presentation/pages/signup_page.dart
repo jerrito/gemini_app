@@ -46,19 +46,19 @@ class _SignupPageState extends State<SignupPage> {
                 if (!context.mounted) return;
                 showSnackbar(context: context, message: state.errorMessage);
               }
-              if(state is CacheTokenLoaded){
+              if (state is CacheTokenLoaded) {
                 context.goNamed("searchPage");
               }
-              if(state is CacheTokenError){
+              if (state is CacheTokenError) {
                 context.goNamed("connection");
               }
               if (state is SignupLoaded) {
                 final data = state.response.user;
                 userProvider?.user = data;
                 final refreshTokenResponse = state.response.refreshToken;
-                tokenProvider?.setRefreshToken=refreshTokenResponse;
-                final authorization={"refreshToken":refreshTokenResponse};
-               authBloc.add(CacheTokenEvent(authorization: authorization)); 
+                tokenProvider?.setRefreshToken = refreshTokenResponse;
+                final authorization = {"refreshToken": refreshTokenResponse};
+                authBloc.add(CacheTokenEvent(authorization: authorization));
               }
             },
             builder: (context, state) {
@@ -105,7 +105,7 @@ class _SignupPageState extends State<SignupPage> {
 
                         return null;
                       },
-                      builder: (field) => DefaultTextForm(
+                      builder: (field) => DefaultTextFieldForm(
                         errorText: field.errorText,
                         onChanged: (value) => field.didChange(value),
                         controller: nameController,
@@ -129,7 +129,7 @@ class _SignupPageState extends State<SignupPage> {
 
                         return null;
                       },
-                      builder: (field) => DefaultTextForm(
+                      builder: (field) => DefaultTextFieldForm(
                         errorText: field.errorText,
                         textInputType: TextInputType.emailAddress,
                         onChanged: (value) => field.didChange(value),
@@ -152,8 +152,9 @@ class _SignupPageState extends State<SignupPage> {
 
                         return null;
                       },
-                      builder: (field) => DefaultTextForm(
+                      builder: (field) => DefaultTextFieldForm(
                         errorText: field.errorText,
+                        isPassword: obscurePassword,
                         onChanged: (value) => field.didChange(value),
                         obscureText: obscureText,
                         suffixIcon: suffixIcon(),
@@ -169,11 +170,29 @@ class _SignupPageState extends State<SignupPage> {
         ));
   }
 
-  bool obscureText = false;
+  bool obscureText = true;
+  bool obscurePassword = true;
   Widget suffixIcon() {
     return Visibility(
-        visible: obscureText,
-        replacement: const Icon(Icons.close),
-        child: const Icon(Icons.remove_red_eye));
+      visible: obscureText,
+      replacement: GestureDetector(
+        onTap: () {
+          obscureText = !obscureText;
+          setState(() {});
+        },
+        child: const Icon(
+          Icons.close,
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          obscureText = !obscureText;
+          setState(() {});
+        },
+        child: const Icon(
+          Icons.remove_red_eye,
+        ),
+      ),
+    );
   }
 }

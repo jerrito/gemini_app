@@ -22,7 +22,7 @@ mixin Dialogs {
     required AuthenticationBloc authBloc,
   }) {
     final userBloc = sl<UserBloc>();
-    final userProvider=context.read<UserProvider>();
+    final userProvider = context.read<UserProvider>();
     final controller = TextEditingController();
     final newPasswordController = TextEditingController();
     final oldPasswordController = TextEditingController();
@@ -58,7 +58,7 @@ mixin Dialogs {
                           return null;
                         },
                         builder: (field) {
-                          return DefaultTextForm(
+                          return DefaultTextFieldForm(
                             onChanged: (value) {
                               field.didChange(value);
                             },
@@ -75,7 +75,7 @@ mixin Dialogs {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: validatePassword,
                           builder: (field) {
-                            return DefaultTextForm(
+                            return DefaultTextFieldForm(
                               onChanged: (value) {
                                 field.didChange(value);
                               },
@@ -100,7 +100,7 @@ mixin Dialogs {
                             return null;
                           },
                           builder: (field) {
-                            return DefaultTextForm(
+                            return DefaultTextFieldForm(
                               onChanged: (value) {
                                 field.didChange(value);
                               },
@@ -124,7 +124,7 @@ mixin Dialogs {
                             return null;
                           },
                           builder: (field) {
-                            return DefaultTextForm(
+                            return DefaultTextFieldForm(
                               onChanged: (value) {
                                 field.didChange(value);
                               },
@@ -167,7 +167,7 @@ mixin Dialogs {
                     }
                     if (state is UpdateUserLoaded) {
                       final data = state.user;
-                      userProvider.user=data;
+                      userProvider.user = data;
                       context.pop();
                     }
                     if (state is UpdateUserError) {
