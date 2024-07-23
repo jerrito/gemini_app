@@ -27,6 +27,9 @@ abstract class AuthenticationRepository {
   //log out
   Future<Either<String, String>> logout(Map<String, dynamic> params);
 
-  // refresh toen
+  // refresh token
   Future<Either<String, String>> refreshToken(String refreshToken);
+ 
+ //delete account 
+  Future<Either<String, String>> deleteAccount(Map<String,dynamic> params);
 }

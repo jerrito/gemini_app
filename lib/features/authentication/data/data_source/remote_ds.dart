@@ -21,7 +21,8 @@ abstract class AuthenticationRemoteDatasource {
 // refresh token
   Future<String> refreshToken(String refreshToken);
 
- 
+// delete account
+  Future<String> deleteAccount(Map<String, dynamic> params);
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -150,6 +151,24 @@ class AuthenticationRemoteDatasourceImpl
     }
   }
 
- 
-  
+  @override
+  Future<String> deleteAccount(Map<String, dynamic> params) async {
+    Map<String, String>? headers = {};
+
+    headers.addAll({
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": params["token"]
+    });
+
+    final response = await client
+        .delete(getUri(endpoint: Url.deleteAccount.endpoint),body: params["body"], headers: headers);
+    final data = jsonDecode(response.body);
+    if (response.statusCode == HttpStatus.ok) {
+      return data["message"];
+    } else {
+      throw Exception(
+        ErrorModel.fromJson(data).toMap(),
+      );
+    }
+  }
 }

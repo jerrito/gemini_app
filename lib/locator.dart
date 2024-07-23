@@ -213,11 +213,10 @@ void initSearch() {
         addMultipleImage: sl(),
         generateContent: sl(),
         chat: sl(),
-        remoteDatasourceImpl: sl(),
         readSQLData: sl(),
         networkInfo: sl(),
         deleteAllData: sl(),
-        dataGeneratedDatasourceImpl: sl()),
+        ),
   );
 
   sl.registerLazySingleton(

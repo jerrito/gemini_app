@@ -11,6 +11,7 @@ enum Url {
   getDataByIdUrl(endpoint: "/api/data/"),
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
+  deleteAccount(endpoint: "/api/user/"),
   updateUser(endpoint: "/api/user/profile"),
   updateProfile(endpoint: "/api/user/profile/picture"),
   changePasswordUrl(endpoint: "/api/user/profile/password"),

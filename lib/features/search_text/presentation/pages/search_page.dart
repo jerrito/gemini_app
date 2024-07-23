@@ -305,6 +305,9 @@ class _SearchTextPage extends State<SearchTextPage> {
                   if (!context.mounted) return;
                   showSnackbar(context: context, message: state.errorMessage);
                 }
+                if (state is DataGeneratedLoaded) {
+                  snapInfo.clear();
+                }
                 if (state is DataGeneratedLoading) {
                   searchBloc.add(ReadSQLDataEvent());
                 }
@@ -317,11 +320,11 @@ class _SearchTextPage extends State<SearchTextPage> {
               if (state is ReadDataLoaded) {
                 _scrollDown();
               }
-              if (state is GenerateStreamLoading) {
-                question = controller.text;
-                controller.text = "";
-                setState(() {});
-              }
+              // if (state is GenerateStreamLoading) {
+              //   question = controller.text;
+              //   controller.text = "";
+              //   setState(() {});
+              // }
               if (state is SearchTextAndImageLoaded) {
                 question = controller.text;
                 controller.text = "";
@@ -370,7 +373,6 @@ class _SearchTextPage extends State<SearchTextPage> {
                   "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
-                  // "dateTime": DateTime.now(),
                   "eventType": 1,
                   "hasImage": false,
                   "dataImage": null
@@ -518,7 +520,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                 child: Column(children: [
                   CircleAvatar(
                     backgroundImage: (profile != null ||
-                            (user.profile!.isNotEmpty || user.profile != null))
+                            (user.profile?.isNotEmpty ?? false))
                         ? CachedNetworkImageProvider(profile ?? user.profile!)
                         : null,
                     child: Text(
@@ -620,12 +622,12 @@ class _SearchTextPage extends State<SearchTextPage> {
                     }
                   }
                   if (state is ListDataGeneratedError) {
-                    if (state.errorMessage !=
-                        "Exception: {message: No data found, error: null, errorCode: 102}") {
-                      context.pop();
-                      showSnackbar(
-                          context: context, message: state.errorMessage);
-                    }
+                    // if (state.errorMessage !=
+                    //     "Exception: {message: No data found, error: null, errorCode: 102}") {
+                    //   context.pop();
+                    //   showSnackbar(
+                    //       context: context, message: state.errorMessage);
+                    // }
                   }
                   if (state is DeleteDataGeneratedLoaded) {
                     context.pop();
@@ -649,6 +651,7 @@ class _SearchTextPage extends State<SearchTextPage> {
                     return const HistoryShimmer();
                   }
                   if (state is ListDataGeneratedError) {
+                    print("ss${state.errorMessage}");
                     if (state.errorMessage ==
                         "Exception: {message: No data found, error: null, errorCode: 102}") {
                       return Lottie.asset(historyJson);

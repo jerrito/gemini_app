@@ -72,8 +72,8 @@ class _ConnectionPageState extends State<ConnectionPage>
     return Scaffold(
         bottomSheet: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(Sizes().height(context, 0.6))
-          ),
+              borderRadius:
+                  BorderRadius.circular(Sizes().height(context, 0.6))),
           height: Sizes().height(context, 0.2),
           child: Column(
             children: [

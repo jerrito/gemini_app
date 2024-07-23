@@ -18,7 +18,6 @@ import 'package:gemini/features/search_text/domain/usecase/read_sql_data.dart';
 import 'package:gemini/features/search_text/domain/usecase/search_text.dart';
 import 'package:gemini/features/search_text/domain/usecase/search_text_image.dart';
 import 'package:gemini/features/sqlite_database/entities/text.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:gemini/main.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -35,8 +34,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final ReadData readSQLData;
   final DeleteAllData deleteAllData;
   final NetworkInfo networkInfo;
-  final SearchRemoteDatasourceImpl remoteDatasourceImpl;
-  final DataGeneratedRemoteDatasourceImpl dataGeneratedDatasourceImpl;
 
   StreamController<SpeechRecognitionResult> words =
       StreamController<SpeechRecognitionResult>();
@@ -48,22 +45,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       StreamController<ai.GenerateContentResponse>.broadcast();
 
   SearchBloc(
-      {
-      // required this.onSpeechResult,
-      // required this.stopSpeechText,
-      // required this.listenSpeechText,
-      required this.dataGeneratedDatasourceImpl,
-      required this.searchText,
+      {required this.searchText,
       required this.networkInfo,
       required this.searchTextAndImage,
       required this.addMultipleImage,
       required this.generateContent,
       required this.chat,
       required this.readSQLData,
-      required this.remoteDatasourceImpl,
       required this.deleteAllData})
       : super(SearchInitState()) {
-    // SEARCH TEXT
     on<SearchTextEvent>((event, emit) async {
       emit(SearchTextLoading());
 
@@ -119,13 +109,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       });
     });
 
+    on<GenerateContentDoneEvent>((event, emit) {
+      emit(GenerateContentAllDone(data: all.join("")));
+      all.clear();
+    });
+   
     on<GenerateContentEvent>((event, emit) async {
       emit(GenerateStreamLoading());
       await generateStreams(event.params);
 
-      await emit.onEach(streamContent.stream,
-          // generateContent.generateContent(event.params),
-          onData: (data) {
+      await emit.onEach(streamContent.stream, onData: (data) {
         emit(GenerateContentLoading());
         all.add(data.text!);
         emit(GenerateContentLoaded(data: data.text));
@@ -138,28 +131,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       });
     });
 
-    // on<GenerateStreamEvent>((event, emit) async* {
-
-    //   final response=yield generateContent.generateContent(event.params);
-
-    //   generateContent.generateContent.asBroadcastStream(
-    //     onListen:(d){
-    //  d.onData((s){
-    //   emit(GenerateContentLoaded(data: s.text));
-    //  });<GenerateStreamEvent>((event, emit) async* {
-
-    //   final response=yield generateContent.generateContent(event.params);
-
-    //   generateContent.generateContent.asBroadcastStream(
-    //     onListen:(d){
-    //  d.onData((s){
-    //   emit(GenerateContentLoaded(data: s.text));
-    //  });
-
-    // });
-
-    // });
-
+   
     on<GenerateStreamStopEvent>((event, emit) async {
       final content = [ai.Content.text(event.params["text"])];
       if (await networkInfo.isConnected) {
@@ -277,34 +249,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Future<dynamic> generateStreams(Map<String, dynamic> params) async {
     final content = [ai.Content.text(params["text"])];
 
-    question = params["text"];
-    token=params["token"];
-
-    final response = model.generateContentStream(content, safetySettings: [
-      ai.SafetySetting(
-          ai.HarmCategory.dangerousContent, ai.HarmBlockThreshold.none)
-    ]);
+    final response = model.generateContentStream(content);
 
     return response.asBroadcastStream().listen((onData) {
       // print(onData.text);
       streamContent.add(onData);
-    }, onDone: () async {
-      String data = all.join("");
-      await addStreamData(question, data);
+    }, onDone: () {
+      add(GenerateContentDoneEvent());
     });
-  }
-
-  Future<dynamic> addStreamData(String text, String data) async {
-    final newId = await readData();
-    Map<String, dynamic> params = {
-      "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
-      "title": text,
-      "data": data,
-      "eventType": 1,
-      "token": token
-    };
-    await dataGeneratedDatasourceImpl.addDataGenerated(params);
-    return await addData(params);
   }
 
   /// Each time to start a speech recognition session
@@ -330,10 +282,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   Future<void> stopSpeechText() async {
     return await _speechToText.stop();
-  }
-
-  Stream<GenerateContentResponse> generateStream(Map<String, dynamic> params) {
-    return remoteDatasourceImpl.generateContent(params);
   }
 
   Future addData(Map<String, dynamic> params) async {

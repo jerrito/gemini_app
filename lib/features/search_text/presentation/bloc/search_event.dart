@@ -47,6 +47,8 @@ final class GenerateStreamStopEvent extends SearchEvent {
 
 }
 
+final class GenerateContentDoneEvent extends SearchEvent{}
+
 final class ReadSQLDataEvent extends SearchEvent {}
 
 final class ReadDataDetailsEvent extends SearchEvent {

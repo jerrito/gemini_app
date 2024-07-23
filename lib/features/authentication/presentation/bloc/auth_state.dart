@@ -34,14 +34,13 @@ class CacheUserDataLoaded extends AuthenticationState {
   CacheUserDataLoaded();
 }
 
-
 class CacheUserDataError extends AuthenticationState {
   final String errorMessage;
   CacheUserDataError({required this.errorMessage});
 }
 
 class GetUserCachedDataLoaded extends AuthenticationState {
-  final  Map<String, dynamic> data;
+  final Map<String, dynamic> data;
   GetUserCachedDataLoaded({required this.data});
 }
 
@@ -61,7 +60,7 @@ class CacheTokenError extends AuthenticationState {
 }
 
 class GetTokenLoaded extends AuthenticationState {
-  final Map<String,dynamic>  authorization;
+  final Map<String, dynamic> authorization;
   GetTokenLoaded({required this.authorization});
 }
 
@@ -83,13 +82,14 @@ class GetUserError extends AuthenticationState {
   GetUserError({required this.errorMessage});
 }
 
-class LogoutLoaded extends AuthenticationState{
+class LogoutLoaded extends AuthenticationState {
   final String successMessage;
   LogoutLoaded({required this.successMessage});
 }
 
-class LogoutLoading extends AuthenticationState{}
-class LogoutError extends AuthenticationState{
+class LogoutLoading extends AuthenticationState {}
+
+class LogoutError extends AuthenticationState {
   final String errorMessage;
   LogoutError({required this.errorMessage});
 }
@@ -98,13 +98,22 @@ class RefreshTokenLoaded extends AuthenticationState {
   final String token;
   RefreshTokenLoaded({required this.token});
 }
-class RefreshTokenLoading extends AuthenticationState{}
+
+class RefreshTokenLoading extends AuthenticationState {}
 
 class RefreshTokenError extends AuthenticationState {
   final String errorMessage;
   RefreshTokenError({required this.errorMessage});
 }
 
+class DeleteAccountLoaded extends AuthenticationState {
+  final String message;
+  DeleteAccountLoaded({required this.message});
+}
 
+class DeleteAccountLoading extends AuthenticationState {}
 
-
+class DeleteAccountError extends AuthenticationState {
+  final String errorMessage;
+  DeleteAccountError({required this.errorMessage});
+}

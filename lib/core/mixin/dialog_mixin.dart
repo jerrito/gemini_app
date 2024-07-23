@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
+import 'package:gemini/core/widgets/default_bottom_sheet.dart';
 import 'package:gemini/core/widgets/default_button.dart';
 import 'package:gemini/core/widgets/default_textfield.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
@@ -13,8 +14,9 @@ import 'package:gemini/locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:string_validator/string_validator.dart';
 
-mixin Dialogs {
-  buildDialog({
+mixin UserProfileMixin {
+  String? successMessage;
+  buildUserDialog({
     required BuildContext context,
     required String? token,
     required String label,
@@ -136,86 +138,151 @@ mixin Dialogs {
                     ]),
                   ),
             Space().height(context, 0.02),
-            BlocListener(
-              bloc: authBloc,
-              listener: (context, state) {
-                if (state is CacheUserDataLoaded) {
-                  context.pop();
-                  showSnackbar(
-                      isSuccessMessage: true,
-                      context: context,
-                      message: "$label updated");
-                }
-                if (state is CacheUserDataError) {
-                  showSnackbar(context: context, message: state.errorMessage);
-                }
-              },
-              child: BlocConsumer(
-                  bloc: userBloc,
-                  listener: (context, state) {
-                    if (state is ChangePasswordLoaded) {
-                      context.pop();
-                      showSnackbar(
-                          isSuccessMessage: true,
-                          context: context,
-                          message: state.data);
-                    }
-                    if (state is ChangePasswordError) {
-                      context.pop();
-                      showSnackbar(
-                          context: context, message: state.errorMessage);
-                    }
-                    if (state is UpdateUserLoaded) {
-                      final data = state.user;
-                      userProvider.user = data;
-                      context.pop();
-                    }
-                    if (state is UpdateUserError) {
-                      context.pop();
-                      showSnackbar(
-                          context: context, message: state.errorMessage);
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is UpdateUserLoading ||
-                        state is ChangePasswordLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return _RowButtons(
-                      onTap: (label == UserProfileData.password.name)
-                          ? () async {
-                              if (formPasswordKey.currentState!.validate()) {
-                                final params = {
-                                  "oldPassword": oldPasswordController.text,
-                                  "newPassword": newPasswordController.text,
-                                  "confirmPassword":
-                                      confirmPasswordController.text,
-                                  "token": token
-                                };
-                                userBloc.add(
-                                  ChangePasswordEvent(
-                                    params: params,
-                                  ),
-                                );
-                              }
-                            }
-                          : () async {
-                              if (formKey.currentState!.validate()) {
-                                final params = {
-                                  "queryParams": {label: controller.text},
-                                  "token": token
-                                };
-                                userBloc.add(UpdateUserEvent(
+            BlocConsumer(
+                bloc: userBloc,
+                listener: (context, state) {
+                  if (state is ChangePasswordLoaded) {
+                    context.pop();
+                    showSnackbar(
+                        isSuccessMessage: true,
+                        context: context,
+                        message: state.data);
+                  }
+                  if (state is ChangePasswordError) {
+                    context.pop();
+                    showSnackbar(context: context, message: state.errorMessage);
+                  }
+                  if (state is UpdateUserLoaded) {
+                    final data = state.user;
+                    userProvider.user = data;
+
+                    context.pop();
+                  }
+                  if (state is UpdateUserError) {
+                    context.pop();
+                    showSnackbar(context: context, message: state.errorMessage);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is UpdateUserLoading ||
+                      state is ChangePasswordLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return _RowButtons(
+                    onTap: (label == UserProfileData.password.name)
+                        ? () async {
+                            if (formPasswordKey.currentState!.validate()) {
+                              final params = {
+                                "oldPassword": oldPasswordController.text,
+                                "newPassword": newPasswordController.text,
+                                "confirmPassword":
+                                    confirmPasswordController.text,
+                                "token": token
+                              };
+                              userBloc.add(
+                                ChangePasswordEvent(
                                   params: params,
-                                ));
-                              }
-                            },
-                    );
-                  }),
-            )
+                                ),
+                              );
+                            }
+                          }
+                        : () async {
+                            if (formKey.currentState!.validate()) {
+                              final params = {
+                                "queryParams": {label: controller.text},
+                                "token": token
+                              };
+                              userBloc.add(UpdateUserEvent(
+                                params: params,
+                              ));
+                            }
+                          },
+                  );
+                })
           ]),
     );
   }
+
+  buildUserRemoveDialog(
+          {required BuildContext context,
+          required String? token,
+          required String label,
+          required AuthenticationBloc authBloc}) async =>
+      await showModalBottomSheet(
+        context: context,
+        builder: (context) => DefaultBottomSheet(
+          label: "Cancel",
+          isLandingPage: false,
+          onTap: () => context.pop(),
+          profileWidget: BlocConsumer(
+            listener: (listener, state) {
+              if (state is DeleteAccountLoaded) {
+                context.pushNamed("");
+              }
+              if (state is DeleteAccountError) {
+                showSnackbar(context: context, message: "");
+              }
+              if (state is CacheTokenError) {
+                if (!context.mounted) return;
+                showSnackbar(context: context, message: state.errorMessage);
+              }
+              if (state is CacheTokenLoaded) {
+                if (!context.mounted) return;
+                showSnackbar(
+                    isSuccessMessage: true,
+                    context: context,
+                    message: successMessage!);
+
+                context.goNamed("landing");
+              }
+              if (state is LogoutError) {
+                if (!context.mounted) return;
+                showSnackbar(context: context, message: state.errorMessage);
+              }
+              if (state is LogoutLoaded) {
+                final data = state.successMessage;
+                successMessage = data;
+
+                final Map<String, dynamic> params = {"refreshToken": null};
+                authBloc.add(
+                  CacheTokenEvent(
+                    authorization: params,
+                  ),
+                );
+              }
+            },
+            bloc: authBloc,
+            builder: (context, state) {
+              if (state is DeleteAccountLoading || state is LogoutLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return TextButton(
+                onPressed: () {
+                  final Map<String, dynamic> params = {
+                    "token": token,
+                    "body":{
+                      "password":""
+                      }
+                    };
+                  label == ""?
+                  authBloc.add(
+                    DeleteAccountEvent(
+                      params: params,
+                    ),
+                  ):
+                  authBloc.add(LogoutEvent(params: params));
+                },
+                child: Text(
+                  label,
+                   style: TextStyle(color: Colors.red)
+                ),
+              );
+            },
+          ),
+        ),
+      );
 
   String? validateString(String? value) {
     if (value?.isEmpty ?? true) {

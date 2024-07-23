@@ -56,3 +56,11 @@ class RefreshTokenEvent extends AuthenticationEvent{
   RefreshTokenEvent({required this.refreshToken});
 
 }
+
+
+class DeleteAccountEvent extends AuthenticationEvent{
+  final Map<String,dynamic> params;
+
+  DeleteAccountEvent({required this.params});
+  
+}
