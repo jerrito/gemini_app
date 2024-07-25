@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini/core/routes/go_router.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
+import 'package:gemini/features/teacher/presentation/providers/teacher.dart';
 import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/locator.dart';
 import 'package:gemini/features/sqlite_database/database/text_database.dart';
@@ -30,6 +31,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => TeacherProvider()),
         ChangeNotifierProvider(create: (context) => TokenProvider()),
         ],
       child: MaterialApp.router(

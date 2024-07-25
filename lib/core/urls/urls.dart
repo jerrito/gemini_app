@@ -5,6 +5,7 @@ enum Url {
   verifyTokenUrl(endpoint: "/verify_token"),
   homeUrl(endpoint: "/api/auth/me"),
   addDataUrl(endpoint: "/api/data"),
+  becomeATeacherUrl(endpoint: "/api/admin/signup"),
   listDataUrl(endpoint: '/api/data'),
   deleteDataUrl(endpoint: "/api/data/"),
   deleteMultipleDataUrl(endpoint: "/api/data/delete/list"),

@@ -210,78 +210,99 @@ mixin UserProfileMixin {
           required AuthenticationBloc authBloc}) async =>
       await showModalBottomSheet(
         context: context,
-        builder: (context) => DefaultBottomSheet(
-          label: "Cancel",
-          isLandingPage: false,
-          onTap: () => context.pop(),
-          profileWidget: BlocConsumer(
-            listener: (listener, state) {
-              if (state is DeleteAccountLoaded) {
-                context.pushNamed("");
-              }
-              if (state is DeleteAccountError) {
-                showSnackbar(context: context, message: "");
-              }
-              if (state is CacheTokenError) {
-                if (!context.mounted) return;
-                showSnackbar(context: context, message: state.errorMessage);
-              }
-              if (state is CacheTokenLoaded) {
-                if (!context.mounted) return;
-                showSnackbar(
-                    isSuccessMessage: true,
-                    context: context,
-                    message: successMessage!);
+        builder: (context) => Builder(builder: (context) {
+          return StatefulBuilder(builder: (context, jerryState) {
+            return DefaultBottomSheet(
+              label: "Cancel",
+              isLandingPage: false,
+              onTap: () => context.pop(),
+              profileWidget: BlocConsumer(
+                listener: (listener, state) async {
+                  if (state is DeleteAccountLoaded) {
+                    final data = state.message;
+                    jerryState(() {
+                      successMessage = data;
+                    });
+                    final Map<String, dynamic> params = {};
+                    authBloc.add(DeleteTokenEvent(params: params));
+                  }
 
-                context.goNamed("landing");
-              }
-              if (state is LogoutError) {
-                if (!context.mounted) return;
-                showSnackbar(context: context, message: state.errorMessage);
-              }
-              if (state is LogoutLoaded) {
-                final data = state.successMessage;
-                successMessage = data;
+                  if (state is DeleteAccountError) {
+                    context.pop();
+                    showSnackbar(context: context, message: state.errorMessage);
+                  }
+                  if (state is DeleteTokenError) {
+                    if (!context.mounted) return;
+                    showSnackbar(context: context, message: state.errorMessage);
+                  }
+                  if (state is DeleteTokenLoaded) {
+                    if (!context.mounted) return;
+                    showSnackbar(
+                        isSuccessMessage: true,
+                        context: context,
+                        message: successMessage ?? "");
 
-                final Map<String, dynamic> params = {"refreshToken": null};
-                authBloc.add(
-                  CacheTokenEvent(
-                    authorization: params,
-                  ),
-                );
-              }
-            },
-            bloc: authBloc,
-            builder: (context, state) {
-              if (state is DeleteAccountLoading || state is LogoutLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return TextButton(
-                onPressed: () {
-                  final Map<String, dynamic> params = {
-                    "token": token,
-                    "body":{
-                      "password":""
-                      }
-                    };
-                  label == ""?
-                  authBloc.add(
-                    DeleteAccountEvent(
-                      params: params,
-                    ),
-                  ):
-                  authBloc.add(LogoutEvent(params: params));
+                    context.goNamed("landing");
+                  }
+                  if (state is LogoutError) {
+                    context.pop();
+                    if (!context.mounted) return;
+                    showSnackbar(
+                      context: context,
+                      message: state.errorMessage,
+                    );
+                  }
+                  if (state is LogoutLoaded) {
+                    final data = state.successMessage;
+                    jerryState(() {
+                      successMessage = data;
+                    });
+
+                    final Map<String, dynamic> params = {"refreshToken": null};
+                    authBloc.add(
+                      DeleteTokenEvent(
+                        params: params,
+                      ),
+                    );
+                  }
                 },
-                child: Text(
-                  label,
-                   style: TextStyle(color: Colors.red)
-                ),
-              );
-            },
-          ),
-        ),
+                bloc: authBloc,
+                builder: (context, state) {
+                  if (state is DeleteAccountLoading || state is LogoutLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return TextButton(
+                    onPressed: () async {
+                      //: TODO Add password dialog
+                      final Map<String, dynamic> params = {
+                        "token": token,
+                        "body": {
+                          "password": "112233"
+                          // 112233   context.read<UserProvider>().user?.password
+                        }
+                      };
+                      label == "deleteUser"
+                          ? authBloc.add(
+                              DeleteAccountEvent(
+                                params: params,
+                              ),
+                            )
+                          : authBloc.add(LogoutEvent(params: params));
+                    },
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          });
+        }),
       );
 
   String? validateString(String? value) {

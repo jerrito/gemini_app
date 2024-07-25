@@ -1,3 +1,4 @@
+import 'package:gemini/features/authentication/data/models/admin_model.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 
 class UserModel extends User {
@@ -6,6 +7,8 @@ class UserModel extends User {
     required super.email,
     required super.password,
     required super.profile,
+    required super.isStudent,
+    required super.role,
   });
 
   factory UserModel.fromJson(Map<String, dynamic>? json) => UserModel(
@@ -13,6 +16,8 @@ class UserModel extends User {
         email: json?["email"],
         password: json?["password"],
         profile: json?["profile"],
+        isStudent: json?["isStudent"],
+        role: json?["role"],
       );
 
   @override
@@ -21,24 +26,27 @@ class UserModel extends User {
         "email": email,
         "password": password,
         "profile": profile,
+        "isStudent": isStudent,
+        "role": role,
       };
 }
 
 class SigninResponseModel extends SigninResponse {
-  const SigninResponseModel({required super.user, required super.refreshToken, required super.token});
+  const SigninResponseModel({required super.data, required super.token});
 
   factory SigninResponseModel.fromJson(Map<String, dynamic> json) =>
-      SigninResponseModel(user: UserModel.fromJson(json["user"]),
-        token:json["token"],
-        refreshToken: json["refreshToken"]);
+      SigninResponseModel(
+        data: SignupResponseModel.fromJson(json["user"]),
+        token: json["token"],
+      );
 }
 
+class SignupResponseModel extends SignupResponse {
+  const SignupResponseModel(
+      {required super.user, required super.refreshToken});
 
-class SignupResponseModel extends SignupResponse{
- const SignupResponseModel({required super.user, required super.refreshToken});
-
- factory SignupResponseModel.fromJson(Map<String, dynamic> json) =>
- SignupResponseModel(user: UserModel.fromJson(json["user"]),
-  refreshToken: json["refreshToken"]);
-
+  factory SignupResponseModel.fromJson(Map<String, dynamic>? json) =>
+      SignupResponseModel(
+        user: UserModel.fromJson(json?["user"]),
+        refreshToken: json?["refreshToken"]);
 }

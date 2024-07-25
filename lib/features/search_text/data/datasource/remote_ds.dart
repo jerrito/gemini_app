@@ -46,7 +46,6 @@ class SearchRemoteDatasourceImpl implements SearchRemoteDatasource {
       imageParts
           .add(ai.DataPart('image/${params["ext"][i]}', params["image"][i]));
     }
-    print(imageParts[0]);
     final response = await model.generateContent([
       ai.Content.multi([prompt, ...imageParts])
     ]);

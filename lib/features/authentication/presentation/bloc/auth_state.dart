@@ -117,3 +117,29 @@ class DeleteAccountError extends AuthenticationState {
   final String errorMessage;
   DeleteAccountError({required this.errorMessage});
 }
+
+
+
+class DeleteTokenLoaded extends AuthenticationState {
+  DeleteTokenLoaded();
+}
+
+class DeleteTokenLoading extends AuthenticationState {}
+
+class DeleteTokenError extends AuthenticationState {
+  final String errorMessage;
+  DeleteTokenError({required this.errorMessage});
+}
+
+
+class BecomeATeacherLoaded extends AuthenticationState {
+ final AdminResponse adminResponse;
+  BecomeATeacherLoaded({required this.adminResponse});
+}
+
+class BecomeATeacherLoading extends AuthenticationState {}
+
+class BecomeATeacherError extends AuthenticationState {
+  final String errorMessage;
+  BecomeATeacherError({required this.errorMessage});
+}

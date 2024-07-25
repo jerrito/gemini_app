@@ -6,7 +6,6 @@ import "dart:convert";
 import "package:gemini/core/error/error_model.dart";
 import "package:gemini/core/urls/urls.dart";
 import 'package:http/http.dart' as http;
-import 'package:typed_data/src/typed_buffer.dart' as buffer;
 
 abstract class DataGeneratedRemoteDatasource {
   //add  searched text to database
@@ -115,7 +114,6 @@ class DataGeneratedRemoteDatasourceImpl
       headers: headers,
     );
     final decodedResponse = jsonDecode(response.body);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return DataModel.fromJson(decodedResponse);
     } else {

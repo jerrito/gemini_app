@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/features/authentication/data/data_source/local_ds.dart';
 import 'package:gemini/features/authentication/data/data_source/remote_ds.dart';
+import 'package:gemini/features/authentication/domain/entities/admin.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
 
@@ -38,7 +39,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         final response = await userRemoteDatasource.signupUser(params);
         return Right(response);
       } catch (e) {
-        print(e);
         return Left(e.toString());
       }
     } else {
@@ -142,6 +142,33 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.deleteAccount(params);
+
+        return Right(response);
+      } catch (e) {
+        return Left(e.toString());
+      }
+    } else {
+      return Left(networkInfo.noNetworkMessage);
+    }
+  }
+  
+  @override
+  Future<Either<String, dynamic>> deleteToken(Map<String, dynamic> params) async{
+       try {
+      final response = await userLocalDatasource.deleteToken(params);
+
+      return Right(response);
+    } catch (e) {
+      return Left(e.toString());
+    }
+
+  }
+
+  @override
+  Future<Either<String, AdminResponse>> becomeATeacher(Map<String, dynamic> params) async{
+   if (await networkInfo.isConnected) {
+      try {
+        final response = await userRemoteDatasource.becomeATeacher(params);
 
         return Right(response);
       } catch (e) {

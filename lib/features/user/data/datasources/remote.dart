@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:typed_data/src/typed_buffer.dart' as buffer;
-
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:gemini/features/authentication/data/models/user_model.dart';
@@ -38,7 +36,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
     final decodedResponse = jsonDecode(response.body);
     print(decodedResponse);
     if (response.statusCode == 200) {
-      return UserModel.fromJson(decodedResponse);
+      return UserModel.fromJson(decodedResponse["user"]);
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse));
     }
@@ -50,11 +48,6 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     };
-    // buffer.Uint8Buffer dataBuffer = buffer.Uint8Buffer();
-
-    // dataBuffer.addAll(params["dataImage"]);
-    // print(dataBuffer);
-
     final Map<String, dynamic> body = {"data": params["dataImage"]};
     final response = await client.put(
         getUri(endpoint: Url.updateProfile.endpoint),

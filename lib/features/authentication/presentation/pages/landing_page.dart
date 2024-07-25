@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini/assets/images/images.dart';
-import 'package:gemini/core/size/sizes.dart';
-import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/widgets/default_bottom_sheet.dart';
-import 'package:gemini/core/widgets/default_button.dart';
 import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
+import 'package:gemini/features/authentication/data/models/admin_model.dart';
 import 'package:gemini/features/authentication/data/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,6 +24,8 @@ abstract class AuthenticationRemoteDatasource {
 
 // delete account
   Future<String> deleteAccount(Map<String, dynamic> params);
+
+  Future<AdminModelResponse> becomeATeacher(Map<String,dynamic>params);
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -40,7 +43,6 @@ class AuthenticationRemoteDatasourceImpl
       "userName": params["userName"],
       "email": params["email"],
       "password": params["password"],
-      "profile": ""
     };
 
     final response = await client.post(
@@ -52,8 +54,8 @@ class AuthenticationRemoteDatasourceImpl
         body,
       ),
     );
+
     final data = jsonDecode(response.body);
-    print(data);
     if (response.statusCode == 200) {
       return SignupResponseModel.fromJson(data);
     } else {
@@ -79,6 +81,8 @@ class AuthenticationRemoteDatasourceImpl
       ),
     );
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
+
     if (response.statusCode == 200) {
       return SigninResponseModel.fromJson(decodedResponse);
     } else {
@@ -122,7 +126,7 @@ class AuthenticationRemoteDatasourceImpl
     );
     final data = jsonDecode(response.body);
     if (response.statusCode == HttpStatus.ok) {
-      return data["success"];
+      return data["message"];
     } else {
       throw Exception(
         ErrorModel.fromJson(data).toMap(),
@@ -142,6 +146,7 @@ class AuthenticationRemoteDatasourceImpl
     final response = await client
         .post(getUri(endpoint: Url.refreshUrl.endpoint), headers: headers);
     final data = jsonDecode(response.body);
+
     if (response.statusCode == HttpStatus.ok) {
       return data["token"];
     } else {
@@ -160,8 +165,11 @@ class AuthenticationRemoteDatasourceImpl
       "Authorization": params["token"]
     });
 
-    final response = await client
-        .delete(getUri(endpoint: Url.deleteAccount.endpoint),body: params["body"], headers: headers);
+    final response = await client.delete(
+      getUri(endpoint: Url.deleteAccount.endpoint),
+      body: jsonEncode(params["body"]),
+      headers: headers,
+    );
     final data = jsonDecode(response.body);
     if (response.statusCode == HttpStatus.ok) {
       return data["message"];
@@ -170,5 +178,30 @@ class AuthenticationRemoteDatasourceImpl
         ErrorModel.fromJson(data).toMap(),
       );
     }
+  }
+  
+  @override
+  Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params) async{
+    
+ Map<String, String>? headers = {};
+
+    headers.addAll({
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": params["token"]
+    });
+
+    final response = await client.post(
+      getUri(endpoint: Url.becomeATeacherUrl.endpoint),
+      body: jsonEncode(params["body"]),
+      headers: headers,
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == HttpStatus.ok) {
+      return AdminModelResponse.fromJson(data);
+    } else {
+      throw Exception(
+        ErrorModel.fromJson(data).toMap(),
+      );
+    }    
   }
 }

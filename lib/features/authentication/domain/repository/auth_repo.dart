@@ -1,4 +1,5 @@
 import "package:dartz/dartz.dart";
+import "package:gemini/features/authentication/domain/entities/admin.dart";
 import "package:gemini/features/authentication/domain/entities/user.dart";
 
 abstract class AuthenticationRepository {
@@ -21,6 +22,9 @@ abstract class AuthenticationRepository {
   //get token
   Future<Either<String, Map<String, dynamic>>> getToken();
 
+// delete token
+Future<Either<String,dynamic>>  deleteToken(Map<String, dynamic> params);
+
   // get cached User
   Future<Either<String, Map<String, dynamic>>> getCachedUser();
 
@@ -32,4 +36,7 @@ abstract class AuthenticationRepository {
  
  //delete account 
   Future<Either<String, String>> deleteAccount(Map<String,dynamic> params);
+
+// become a teacher
+Future<Either<String,AdminResponse>> becomeATeacher(Map<String,dynamic> params);
 }

@@ -1,7 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/usecase/usecase.dart';
+import 'package:gemini/features/authentication/domain/entities/admin.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
+import 'package:gemini/features/authentication/domain/usecases/become_a_teacher.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_token.dart';
+import 'package:gemini/features/authentication/domain/usecases/delete_account.dart';
+import 'package:gemini/features/authentication/domain/usecases/delete_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
@@ -24,19 +28,24 @@ class AuthenticationBloc
   final GetCacheUser getCacheUser;
   final LogOut logout;
   final RefreshToken refreshToken;
-  AuthenticationBloc({
-    required this.getCacheUser,
-    required this.refreshToken,
-    required this.signup,
-    required this.signin,
-    required this.getUserData,
-    required this.cacheUserData,
-    required this.cacheToken,
-    required this.getToken,
-    required this.logout,
-  }) : super(InitState()) {
- 
-  //! SIGNUP 
+  final DeleteAccount deleteAccount;
+  final DeleteToken deleteToken;
+  final BecomeATeacher becomeATeacher;
+  AuthenticationBloc(
+      {required this.getCacheUser,
+      required this.refreshToken,
+      required this.signup,
+      required this.signin,
+      required this.getUserData,
+      required this.deleteToken,
+      required this.cacheUserData,
+      required this.cacheToken,
+      required this.getToken,
+      required this.logout,
+      required this.deleteAccount,
+      required this.becomeATeacher})
+      : super(InitState()) {
+    //! SIGNUP
     on<SignupEvent>(
       (event, emit) async {
         emit(SignupLoading());
@@ -53,7 +62,7 @@ class AuthenticationBloc
       },
     );
 
-  //! SIGN IN
+    //! SIGN IN
     on<SigninEvent>(
       (event, emit) async {
         emit(SigninLoading());
@@ -154,6 +163,22 @@ class AuthenticationBloc
       },
     );
 
+    //! BECOME A TEACHER
+    on<BecomeATeacherEvent>(
+      (event, emit) async {
+        emit(BecomeATeacherLoading());
+        final response = await becomeATeacher.call(event.params);
+        emit(
+          response.fold(
+            (e) => BecomeATeacherError(errorMessage: e),
+            (response) => BecomeATeacherLoaded(
+              adminResponse: response,
+            ),
+          ),
+        );
+      },
+    );
+
     //! REFRESH TOKEN
     on<RefreshTokenEvent>(
       (event, emit) async {
@@ -166,5 +191,31 @@ class AuthenticationBloc
         ));
       },
     );
+
+    //! DELETE ACCOUNT
+    on<DeleteAccountEvent>((event, emit) async {
+      emit(DeleteAccountLoading());
+      final response = await deleteAccount.call(event.params);
+      emit(
+        response.fold(
+          (e) => DeleteAccountError(errorMessage: e),
+          (response) => DeleteAccountLoaded(
+            message: response,
+          ),
+        ),
+      );
+    });
+
+    //! DELETE Token
+    on<DeleteTokenEvent>((event, emit) async {
+      emit(DeleteTokenLoading());
+      final response = await deleteToken.call(event.params);
+      emit(
+        response.fold(
+          (e) => DeleteTokenError(errorMessage: e),
+          (response) => DeleteTokenLoaded(),
+        ),
+      );
+    });
   }
 }

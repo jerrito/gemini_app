@@ -16,7 +16,6 @@ import 'package:gemini/features/user/presentation/widgets/remove_user.dart';
 import 'package:gemini/features/user/presentation/widgets/show_image_pick.dart';
 import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
 import 'package:gemini/locator.dart';
-import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class UserProfile extends StatefulWidget {
@@ -54,95 +53,96 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
         child: SafeArea(
-          child: Column(
-            children: [
-              Space().height(context, 0.05),
-              Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: (userProvider?.profile != null ||
-                            (user.profile?.isNotEmpty ?? user.profile != null))
-                        ? CachedNetworkImageProvider(
-                            userProvider?.profile ?? user.profile!)
-                        : Image.asset(defaultImage).image,
-                    radius: Sizes().height(context, 0.06),
-                  ),
-                  BlocConsumer(
-                      listener: (context, state) {
-                        if (state is UpdateProfileLoaded) {
-                          profile = state.profile;
-                          userProvider?.profileUpdate = profile!;
-                        }
-                        if (state is UpdateProfileError) {
-                          print(state.errorMessage);
-                          showSnackbar(
-                              context: context, message: state.errorMessage);
-                        }
-                      },
-                      bloc: userBloc,
-                      builder: (context, state) {
-                        if (state is UpdateProfileLoading) {
-                          return const CircularProgressIndicator();
-                        }
-                        return CircleAvatar(
-                          backgroundColor: Colors.blueGrey,
-                          child: IconButton(
-                            onPressed: () async {
-                              final Uint8List? imageBuffer =
-                                  await buildPickImage(
-                                context: context,
-                              );
-                              if (imageBuffer != null) {
-                                final params = {
-                                  "dataImage": imageBuffer,
-                                  "token": token
-                                };
-                                userBloc
-                                    .add(UpdateProfileEvent(params: params));
-                              }
-                            },
-                            icon: const Icon(Icons.camera_alt),
-                          ),
-                        );
-                      })
-                ],
-              ),
-              Space().height(context, 0.05),
-              Column(
-                children: List.generate(
-                  listProfileData.length,
-                  (int index) => UserProfileWidget(
-                    userProfileData: listProfileData[index],
-                    onTap: () async {
-                      await buildUserDialog(
-                          context: context,
-                          data: listUserData[index] ?? "",
-                          label: listProfileData[index].name,
-                          token: token,
-                          authBloc: authBloc);
-                    },
-                    label: listUserData[index] ?? "",
-                  ),
-                ),
-              ),
-              Column(
-                children: List<RemoveUser>.of(
-                  removeUser.entries.map((e) => RemoveUser(
-                        onTap: () {
-                          buildUserRemoveDialog(
-                            authBloc: authBloc,
-                            context: context,
-                            token: token,
-                            label: e.value.name,
-                          );
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Space().height(context, 0.05),
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: (userProvider?.profile != null ||
+                              (user.profile?.isNotEmpty ??
+                                  user.profile != null))
+                          ? CachedNetworkImageProvider(
+                              userProvider?.profile ?? user.profile!)
+                          : Image.asset(defaultImage).image,
+                      radius: Sizes().height(context, 0.06),
+                    ),
+                    BlocConsumer(
+                        listener: (context, state) {
+                          if (state is UpdateProfileLoaded) {
+                            profile = state.profile;
+                            userProvider?.profileUpdate = profile!;
+                          }
+                          if (state is UpdateProfileError) {
+                            showSnackbar(
+                                context: context, message: state.errorMessage);
+                          }
                         },
-                        removeData: e.value,
-                      )),
+                        bloc: userBloc,
+                        builder: (context, state) {
+                          if (state is UpdateProfileLoading) {
+                            return const CircularProgressIndicator();
+                          }
+                          return CircleAvatar(
+                            backgroundColor: Colors.blueGrey,
+                            child: IconButton(
+                              onPressed: () async {
+                                final Uint8List? imageBuffer =
+                                    await buildPickImage(
+                                  context: context,
+                                );
+                                if (imageBuffer != null) {
+                                  final params = {
+                                    "dataImage": imageBuffer,
+                                    "token": token
+                                  };
+                                  userBloc
+                                      .add(UpdateProfileEvent(params: params));
+                                }
+                              },
+                              icon: const Icon(Icons.camera_alt),
+                            ),
+                          );
+                        })
+                  ],
                 ),
-              ),
-             
-            ],
+                Space().height(context, 0.05),
+                Column(
+                  children: List.generate(
+                    listProfileData.length,
+                    (int index) => UserProfileWidget(
+                      userProfileData: listProfileData[index],
+                      onTap: () async {
+                        await buildUserDialog(
+                            context: context,
+                            data: listUserData[index] ?? "",
+                            label: listProfileData[index].name,
+                            token: token,
+                            authBloc: authBloc);
+                      },
+                      label: listUserData[index] ?? "",
+                    ),
+                  ),
+                ),
+                Column(
+                  children: List<RemoveUser>.of(
+                    removeUser.entries.map((e) => RemoveUser(
+                          onTap: () async {
+                            await buildUserRemoveDialog(
+                              authBloc: authBloc,
+                              context: context,
+                              token: token,
+                              label: e.value.name,
+                            );
+                          },
+                          removeData: e.value,
+                        )),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

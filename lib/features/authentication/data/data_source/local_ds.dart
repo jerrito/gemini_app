@@ -8,6 +8,7 @@ abstract class AuthenticationLocalDatasource {
   cacheToken(Map<String, dynamic> authorization);
   Future<Map<String, dynamic>> getCachedUser();
   Future<Map<String, dynamic>> getToken();
+  deleteToken(Map<String,dynamic> params);
 }
 
 class AuthenticationLocalDatasourceImpl
@@ -41,5 +42,11 @@ class AuthenticationLocalDatasourceImpl
   Future<Map<String, dynamic>> getToken() async {
     final authorization = await storage.read(key: tokenKey);
     return jsonDecode(authorization!);
+  }
+  
+  @override
+  deleteToken(Map<String, dynamic> params) async{
+    final response=await storage.delete(key: tokenKey);
+    return response;
   }
 }

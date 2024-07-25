@@ -1,13 +1,20 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:equatable/equatable.dart';
+import 'package:gemini/features/authentication/domain/entities/admin.dart';
 
 class User extends Equatable {
-  final String? userName, email, password, profile;
+  final String? userName, email, password,role, profile;
+  final bool? isStudent;
+
 
   const User({
+   required this.isStudent, 
     required this.userName,
     required this.email,
     required this.password,
     required this.profile,
+    required this.role,
   });
 
   @override
@@ -28,26 +35,26 @@ class User extends Equatable {
 
 
 class SigninResponse extends Equatable {
-  final User user;
-  final String refreshToken, token;
+  final SignupResponse data;
+  final String token;
 
- const SigninResponse({required this.user, required this.token, required this.refreshToken});
+ const SigninResponse({required this.data, required this.token});
  
   @override
-  List<Object?> get props => [user, token, refreshToken];
+  List<Object?> get props => [data, token];
 }
 
 class SignupResponse extends Equatable {
-
+ 
   final User user;
   final String refreshToken;
-
-  const SignupResponse({required this.user, required this.refreshToken});
+ 
+  const SignupResponse({ required this.user, required this.refreshToken});
 
   
 
   @override
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [user,refreshToken];
 
 }
 

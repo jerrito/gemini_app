@@ -4,8 +4,11 @@ import 'package:gemini/features/authentication/data/data_source/local_ds.dart';
 import 'package:gemini/features/authentication/data/data_source/remote_ds.dart';
 import 'package:gemini/features/authentication/data/repository/auth_repo_impl.dart';
 import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
+import 'package:gemini/features/authentication/domain/usecases/become_a_teacher.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
+import 'package:gemini/features/authentication/domain/usecases/delete_account.dart';
+import 'package:gemini/features/authentication/domain/usecases/delete_token.dart';
 import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
@@ -102,7 +105,7 @@ void user() {
 
 // usecases
 
-sl.registerLazySingleton(
+  sl.registerLazySingleton(
     () => ChangePassword(
       repository: sl(),
     ),
@@ -208,15 +211,15 @@ void initSearch() {
   //bloc
   sl.registerFactory(
     () => SearchBloc(
-        searchText: sl(),
-        searchTextAndImage: sl(),
-        addMultipleImage: sl(),
-        generateContent: sl(),
-        chat: sl(),
-        readSQLData: sl(),
-        networkInfo: sl(),
-        deleteAllData: sl(),
-        ),
+      searchText: sl(),
+      searchTextAndImage: sl(),
+      addMultipleImage: sl(),
+      generateContent: sl(),
+      chat: sl(),
+      readSQLData: sl(),
+      networkInfo: sl(),
+      deleteAllData: sl(),
+    ),
   );
 
   sl.registerLazySingleton(
@@ -310,11 +313,30 @@ void initAuthentication() {
         getCacheUser: sl(),
         logout: sl(),
         refreshToken: sl(),
-),
+        deleteAccount: sl(),
+        deleteToken: sl(),
+        becomeATeacher: sl()
+        ),
   );
 
   //usecases
-  
+
+  sl.registerLazySingleton(
+    () => BecomeATeacher(
+      repository: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => DeleteToken(
+      repository: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => DeleteAccount(
+      repository: sl(),
+    ),
+  );
 
   sl.registerLazySingleton(
     () => RefreshToken(

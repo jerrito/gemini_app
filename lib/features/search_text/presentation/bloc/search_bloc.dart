@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gemini/core/api/api_key.dart' as key;
 import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/core/usecase/usecase.dart';
-import 'package:gemini/features/data_generated/data/datasources/remote_ds.dart';
-import 'package:gemini/features/search_text/data/datasource/remote_ds.dart';
 import 'package:gemini/features/data_generated/domain/entities/data.dart';
 import 'package:gemini/features/search_text/domain/usecase/add_multi_images.dart';
 import 'package:gemini/features/search_text/domain/usecase/chat.dart';
@@ -237,7 +233,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           ai.HarmCategory.dangerousContent, ai.HarmBlockThreshold.none)
     ]);
     await for (final r in response) {
-      print(r.text);
       return r.text;
     }
   }
@@ -252,7 +247,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final response = model.generateContentStream(content);
 
     return response.asBroadcastStream().listen((onData) {
-      // print(onData.text);
+      // onData.text);
       streamContent.add(onData);
     }, onDone: () {
       add(GenerateContentDoneEvent());

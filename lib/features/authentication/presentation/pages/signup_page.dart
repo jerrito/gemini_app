@@ -57,6 +57,7 @@ class _SignupPageState extends State<SignupPage> {
                 userProvider?.user = data;
                 final refreshTokenResponse = state.response.refreshToken;
                 tokenProvider?.setRefreshToken = refreshTokenResponse;
+                tokenProvider?.setToken=state.response.refreshToken;
                 final authorization = {"refreshToken": refreshTokenResponse};
                 authBloc.add(CacheTokenEvent(authorization: authorization));
               }

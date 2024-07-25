@@ -64,3 +64,16 @@ class DeleteAccountEvent extends AuthenticationEvent{
   DeleteAccountEvent({required this.params});
   
 }
+
+class DeleteTokenEvent extends AuthenticationEvent{
+  final Map<String,dynamic> params;
+
+  DeleteTokenEvent({required this.params});
+  }
+
+  class BecomeATeacherEvent extends AuthenticationEvent{
+    final Map<String,dynamic> params;
+
+  BecomeATeacherEvent({required this.params});
+
+  }

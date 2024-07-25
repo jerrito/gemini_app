@@ -1,8 +1,10 @@
+import 'package:gemini/features/authentication/presentation/pages/become_a_teacher.dart';
 import 'package:gemini/features/authentication/presentation/pages/landing_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/no_internet_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 import 'package:gemini/features/connection_page.dart';
+import 'package:gemini/features/learning/presentation/pages/home.dart';
 import 'package:gemini/features/search_text/presentation/pages/search_page.dart';
 import 'package:gemini/features/search_text/presentation/pages/test.dart';
 import 'package:gemini/features/user/presentation/pages/user_profile.dart';
@@ -14,6 +16,11 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
       name: "searchPage",
       builder: (context, state) => const SearchTextPage(),
       routes: [
+        GoRoute(
+          path:"becomeATeacher",
+          name:"becomeATeacher",
+          builder:(context,state)=>const BecomeATeacher()
+        ),
         GoRoute(
             path: "test",
             name: "test",
@@ -59,4 +66,10 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
           builder: (context, state) => const SigninPage(),
         ),
       ]),
+
+    GoRoute(
+      path:"/learning",
+      name:"learning",
+      builder:(context,state)=> const LearningHomePage()
+    )  
 ]);

@@ -34,7 +34,7 @@ class SearchTextPage extends StatefulWidget {
   State<SearchTextPage> createState() => _SearchTextPage();
 }
 
-class _SearchTextPage extends State<SearchTextPage> {
+class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderStateMixin{
   final form = GlobalKey<FormState>();
   final searchBloc = sl<SearchBloc>();
   final dataGeneratedBloc = sl<DataGeneratedBloc>();
@@ -43,6 +43,8 @@ class _SearchTextPage extends State<SearchTextPage> {
   final searchBloc3 = sl<SearchBloc>();
   final authBloc = sl<AuthenticationBloc>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  Animation? animation;
+  late AnimationController animatedController;
 
   List<Uint8List> all = [], newAll = [];
   List<String> imageExtensions = [], snapInfo = [];
@@ -65,20 +67,49 @@ class _SearchTextPage extends State<SearchTextPage> {
   late User user;
   getTime() {
     Timer.periodic(const Duration(seconds: 90), (timer) {
-      // print(timer.tick);
+      // timer.tick);
     });
   }
 
   Future<List<TextEntity>?> remove() async {
     return await searchBloc.readData();
   }
-
+ 
+ double opacity=1;
   @override
   void initState() {
     super.initState();
     initText = controller.text;
     searchBloc2.add(ReadSQLDataEvent());
+    animatedController =
+        AnimationController(duration: const Duration(seconds: 3), vsync: this);
+    animation = DecorationTween()
+        .animate(animatedController);
+    animation?.addListener(() {
+      setState(() {
+        // color = animation?.value;
+      });
+    });
+    animation?.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animatedController.reset();
+        animatedController.forward();
+      } else if (status == AnimationStatus.dismissed) {
+        animatedController.forward();
+      }
+    });
+    animatedController.forward();
+
+
   }
+
+  @override
+  void dispose() {
+    animatedController.dispose();
+    // animation?.removeStatusListener((status) {});
+    super.dispose();
+  }
+
 
   List<TextEntity>? data = [];
 
@@ -168,6 +199,36 @@ class _SearchTextPage extends State<SearchTextPage> {
             ),
             Space().width(context, 0.04)
           ]),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
+      floatingActionButton: AnimatedOpacity(
+        duration:Durations.extralong2,
+        opacity:opacity,
+        onEnd:()async{
+
+ while(true){
+  Future.delayed(
+    Durations.extralong1,(){
+      setState((){opacity=0;});
+    }
+  ).whenComplete((){
+    Future.delayed(
+    Durations.extralong1,(){
+      setState((){opacity=1;});
+    }
+  );
+  });
+ }
+        },
+        child:
+        
+         Container(
+            width: double.infinity,
+            height: Sizes().height(context, 0.05),
+            decoration:BoxDecoration(
+        color:Colors.blueAccent
+            ),
+            child: Text("Hello",textAlign:TextAlign.center)),
+      ),
       bottomSheet: Form(
         key: form,
         child: Container(
@@ -301,7 +362,6 @@ class _SearchTextPage extends State<SearchTextPage> {
               bloc: dataGeneratedBloc,
               listener: (context, state) {
                 if (state is DataGeneratedError) {
-                  print(state.errorMessage);
                   if (!context.mounted) return;
                   showSnackbar(context: context, message: state.errorMessage);
                 }
@@ -350,14 +410,14 @@ class _SearchTextPage extends State<SearchTextPage> {
               }
 
               if (state is ReadAll) {
-                final textEntity = data!.last;
-                final params = {
-                  "token": token,
-                  "data": textEntity.data?.replaceAll("\n", ""),
-                  "title": textEntity.title,
-                  "dataImage": textEntity.dataImage,
-                  "hasImage": textEntity.hasImage
-                };
+                // final textEntity = data!.last;
+                // final params = {
+                //   "token": token,
+                //   "data": textEntity.data?.replaceAll("\n", ""),
+                //   "title": textEntity.title,
+                //   "dataImage": textEntity.dataImage,
+                //   "hasImage": textEntity.hasImage
+                // };
                 _scrollDown();
                 // searchBloc.add(DataEvent(params: params));
               }
@@ -415,7 +475,7 @@ class _SearchTextPage extends State<SearchTextPage> {
               }
 
               if (state is GenerateContentLoaded) {
-                final data = state.data;
+                // final data = state.data;
 
                 return Column(
                   children: [
@@ -647,11 +707,10 @@ class _SearchTextPage extends State<SearchTextPage> {
                   if (state is ListDataGeneratedLoading ||
                       state is DeleteDataGeneratedLoading ||
                       state is DeleteListDataGeneratedLoading) {
-                    //  print("dd");
+                    //  "dd");
                     return const HistoryShimmer();
                   }
                   if (state is ListDataGeneratedError) {
-                    print("ss${state.errorMessage}");
                     if (state.errorMessage ==
                         "Exception: {message: No data found, error: null, errorCode: 102}") {
                       return Lottie.asset(historyJson);
