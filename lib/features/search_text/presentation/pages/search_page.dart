@@ -34,7 +34,8 @@ class SearchTextPage extends StatefulWidget {
   State<SearchTextPage> createState() => _SearchTextPage();
 }
 
-class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderStateMixin{
+class _SearchTextPage extends State<SearchTextPage>
+    with SingleTickerProviderStateMixin {
   final form = GlobalKey<FormState>();
   final searchBloc = sl<SearchBloc>();
   final dataGeneratedBloc = sl<DataGeneratedBloc>();
@@ -74,8 +75,8 @@ class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderSta
   Future<List<TextEntity>?> remove() async {
     return await searchBloc.readData();
   }
- 
- double opacity=1;
+
+  double opacity = 1;
   @override
   void initState() {
     super.initState();
@@ -83,8 +84,7 @@ class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderSta
     searchBloc2.add(ReadSQLDataEvent());
     animatedController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
-    animation = DecorationTween()
-        .animate(animatedController);
+    animation = DecorationTween().animate(animatedController);
     animation?.addListener(() {
       setState(() {
         // color = animation?.value;
@@ -99,8 +99,6 @@ class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderSta
       }
     });
     animatedController.forward();
-
-
   }
 
   @override
@@ -109,7 +107,6 @@ class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderSta
     // animation?.removeStatusListener((status) {});
     super.dispose();
   }
-
 
   List<TextEntity>? data = [];
 
@@ -200,34 +197,34 @@ class _SearchTextPage extends State<SearchTextPage> with SingleTickerProviderSta
             Space().width(context, 0.04)
           ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
-      floatingActionButton: AnimatedOpacity(
-        duration:Durations.extralong2,
-        opacity:opacity,
-        onEnd:()async{
-
- while(true){
-  Future.delayed(
-    Durations.extralong1,(){
-      setState((){opacity=0;});
-    }
-  ).whenComplete((){
-    Future.delayed(
-    Durations.extralong1,(){
-      setState((){opacity=1;});
-    }
-  );
-  });
- }
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          context.goNamed("becomeATeacher");
         },
-        child:
-        
-         Container(
-            width: double.infinity,
-            height: Sizes().height(context, 0.05),
-            decoration:BoxDecoration(
-        color:Colors.blueAccent
-            ),
-            child: Text("Hello",textAlign:TextAlign.center)),
+        child: AnimatedOpacity(
+          duration: Durations.extralong2,
+          opacity: opacity,
+          onEnd: () async {
+            while (true) {
+              Future.delayed(Durations.extralong1, () {
+                setState(() {
+                  opacity = 0;
+                });
+              }).whenComplete(() {
+                Future.delayed(Durations.extralong1, () {
+                  setState(() {
+                    opacity = 1;
+                  });
+                });
+              });
+            }
+          },
+          child: Container(
+              width: double.infinity,
+              height: Sizes().height(context, 0.03),
+              decoration: BoxDecoration(color: Colors.blueAccent),
+              child: Text("Hello", textAlign: TextAlign.center)),
+        ),
       ),
       bottomSheet: Form(
         key: form,

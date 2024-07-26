@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/size/sizes.dart';
+import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/widgets/default_button.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/features/teacher/presentation/providers/teacher.dart';
 import 'package:gemini/features/user/presentation/providers/user_provider.dart';
@@ -10,7 +12,8 @@ import 'package:gemini/locator.dart';
 import 'package:go_router/go_router.dart';
 
 class BecomeATeacher extends StatefulWidget {
-  const BecomeATeacher({super.key});
+ final bool isStudent;
+  const BecomeATeacher({super.key,required this.isStudent});
 
   @override
   State<BecomeATeacher> createState() => _BecomeATeacherState();
@@ -30,8 +33,8 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
   List<DropdownMenuItem> items = [];
   @override
   Widget build(BuildContext context) {
-    teacherProvider=context.read<TeacherProvider>();
-    userProvider=context.read<UserProvider>();
+    teacherProvider = context.read<TeacherProvider>();
+    userProvider = context.read<UserProvider>();
     items = data.entries
         .map(
           (entry) => DropdownMenuItem<String>(
@@ -43,23 +46,37 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
         )
         .toList();
     return Scaffold(
-        body: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: Sizes().width(context, 0.04),
-          ),
-          child: Column(
-            children: [
-              DropdownButton(
-                items: items,
-                onChanged: (value) {
-                  setState(() {
-                    this.value = value;
-                  });
-                },
-                value: value,
-              ),
-              SizedBox(height: Sizes().height(context, 0.05)),
-            ],
+        appBar: AppBar(
+          title: const Text(widget.isStudent? 'Become A Student':'Become A Teacher'),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: Sizes().width(context, 0.04),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Space().height(
+                  context,
+                  0.02,
+                ),
+                const Text(
+                  "Select your teaching subject",
+                ),
+                DropdownButton(
+                  isExpanded: true,
+                  items: items,
+                  onChanged: (value) {
+                    setState(() {
+                      this.value = value;
+                    });
+                  },
+                  value: value,
+                ),
+                SizedBox(height: Sizes().height(context, 0.05)),
+              ],
+            ),
           ),
         ),
         bottomSheet: BlocConsumer(
@@ -67,8 +84,8 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
             listener: (context, state) {
               if (state is BecomeATeacherLoaded) {
                 final data = state.adminResponse;
-              userProvider.user = data.user;
-                teacherProvider.admin=data.admin;
+                userProvider.user = data.user;
+                teacherProvider.admin = data.admin;
                 context.goNamed("learning");
               }
               if (state is BecomeATeacherError) {
@@ -78,9 +95,25 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
             },
             builder: (context, state) {
               if (state is BecomeATeacherLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               }
-              return const DefaultButton();
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: Sizes().height(context, 0.01),
+                    vertical: Sizes().height(context, 0.02)),
+                child: DefaultButton(
+                  label: "Continue",
+                  onTap: () {
+                    final Map<String, dynamic> params = {
+                      "token": context.read<TokenProvider>().token,
+                      "body": {"subject": value}
+                    };
+                    authBloc.add(BecomeATeacherEvent(params: params));
+                  },
+                ),
+              );
             }));
   }
 }

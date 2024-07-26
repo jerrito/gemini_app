@@ -17,7 +17,7 @@ class DefaultButton extends StatelessWidget {
           foregroundColor: Colors.white
         ),
         onPressed: onTap,
-        child: Text(label!),
+        child: Text(label ?? ""),
       ) ,
     );
   }
