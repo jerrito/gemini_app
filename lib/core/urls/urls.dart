@@ -1,6 +1,6 @@
 enum Url {
-  signupUrl(endpoint: "/api/auth/signup"),
-  signinUrl(endpoint: "/api/auth/signin"),
+  signupUrl(endpoint: "/api/auth/firebase/signup"),
+  signinUrl(endpoint: "/api/auth/firebase/signin"),
   verifyOTPUrl(endpoint: "api/verify_otp"),
   verifyTokenUrl(endpoint: "/verify_token"),
   homeUrl(endpoint: "/api/auth/me"),

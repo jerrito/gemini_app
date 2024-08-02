@@ -3,9 +3,9 @@ import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/features/authentication/data/data_source/local_ds.dart';
 import 'package:gemini/features/authentication/data/data_source/remote_ds.dart';
 import 'package:gemini/features/authentication/domain/entities/admin.dart';
-import 'package:gemini/features/authentication/domain/entities/user.dart';
+// import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final NetworkInfo networkInfo;
   final AuthenticationRemoteDatasource userRemoteDatasource;
@@ -17,7 +17,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       required this.networkInfo});
 
   @override
-  Future<Either<String, SigninResponse>> signin(
+  Future<Either<String, UserCredential>> signin(
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
@@ -32,7 +32,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<String, SignupResponse>> signup(
+  Future<Either<String, UserCredential>> signup(
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
@@ -70,7 +70,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<String, User>> getUser(Map<String, dynamic> params) async {
+  Future<Either<String, UserCredential>> getUser(Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.getUser(params);

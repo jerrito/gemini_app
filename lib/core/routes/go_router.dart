@@ -19,7 +19,8 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
         GoRoute(
           path:"becomeATeacher",
           name:"becomeATeacher",
-          builder:(context,state)=>const BecomeATeacher()
+          builder:(context,state)=> BecomeATeacher(
+            isStudent:bool.parse(state.uri.queryParameters["isStudent"].toString()))
         ),
         GoRoute(
             path: "test",

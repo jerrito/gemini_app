@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/assets/animations/animations.dart';
@@ -9,7 +10,6 @@ import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/core/widgets/bottom_sheet.dart';
-import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/data_generated/presentation/bloc/data_generated_bloc.dart';
 import 'package:gemini/features/search_text/presentation/widgets/data_add.dart';
@@ -132,7 +132,7 @@ class _SearchTextPage extends State<SearchTextPage>
   @override
   Widget build(BuildContext context) {
     token = context.read<TokenProvider>().token;
-    user = context.watch<UserProvider>().user!;
+    user = context.watch<UserProvider>().user! ;
     profile = context.watch<UserProvider>().profile;
     return Scaffold(
       key: scaffoldKey,
@@ -577,16 +577,16 @@ class _SearchTextPage extends State<SearchTextPage>
                 child: Column(children: [
                   CircleAvatar(
                     backgroundImage: (profile != null ||
-                            (user.profile?.isNotEmpty ?? false))
-                        ? CachedNetworkImageProvider(profile ?? user.profile!)
+                            (user.photoURL?.isNotEmpty ?? false))
+                        ? CachedNetworkImageProvider(profile ?? user.photoURL!)
                         : null,
                     child: Text(
-                      user.userName?.substring(0, 2) ?? "NA",
+                      user.displayName?.substring(0, 2) ?? "NA",
                     ),
                   ),
                   Space().height(context, 0.02),
                   Text(
-                    user.userName ?? user.email ?? "",
+                    user.displayName ?? user.email ?? "",
                   ),
                 ]),
               ),

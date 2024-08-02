@@ -1,20 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:gemini/features/authentication/data/models/admin_model.dart';
 import 'package:gemini/features/authentication/data/models/user_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthenticationRemoteDatasource {
   //signup
-  Future<SignupResponseModel> signupUser(Map<String, dynamic> params);
+  Future<UserCredential> signupUser(Map<String, dynamic> params);
 
 // signin
-  Future<SigninResponseModel> signinUser(Map<String, dynamic> params);
+  Future<UserCredential> signinUser(Map<String, dynamic> params);
 
   // get user
-  Future<UserModel> getUser(Map<String, dynamic> params);
+  Future<UserCredential> getUser(Map<String, dynamic> params);
 
   // logout
   Future<String> logout(Map<String, dynamic> params);
@@ -25,7 +28,7 @@ abstract class AuthenticationRemoteDatasource {
 // delete account
   Future<String> deleteAccount(Map<String, dynamic> params);
 
-  Future<AdminModelResponse> becomeATeacher(Map<String,dynamic>params);
+  Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params);
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -34,7 +37,7 @@ class AuthenticationRemoteDatasourceImpl
 
   AuthenticationRemoteDatasourceImpl({required this.client});
   @override
-  Future<SignupResponseModel> signupUser(Map<String, dynamic> params) async {
+  Future<UserCredential> signupUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
@@ -57,14 +60,14 @@ class AuthenticationRemoteDatasourceImpl
 
     final data = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      return SignupResponseModel.fromJson(data);
+      return data;
     } else {
       throw Exception(ErrorModel.fromJson(data).toMap());
     }
   }
 
   @override
-  Future<SigninResponseModel> signinUser(Map<String, dynamic> params) async {
+  Future<UserCredential> signinUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
@@ -72,6 +75,7 @@ class AuthenticationRemoteDatasourceImpl
     final Map<String, dynamic> body = {
       "email": params["email"],
       "password": params["password"],
+      "phoneNumber":params["phoneNumber"]
     };
     final response = await client.post(
       getUri(endpoint: Url.signinUrl.endpoint),
@@ -84,26 +88,26 @@ class AuthenticationRemoteDatasourceImpl
     print(decodedResponse);
 
     if (response.statusCode == 200) {
-      return SigninResponseModel.fromJson(decodedResponse);
+      return decodedResponse;
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse).toMap());
     }
   }
 
   @override
-  Future<UserModel> getUser(Map<String, dynamic> params) async {
+  Future<UserCredential> getUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Authorization": await FirebaseMessaging.instance.getToken() ?? ""
     });
 
     final response = await client.get(getUri(endpoint: Url.homeUrl.endpoint),
         headers: headers);
     final decodedResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      return UserModel.fromJson(decodedResponse);
+      return decodedResponse;
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse).toMap());
     }
@@ -140,9 +144,11 @@ class AuthenticationRemoteDatasourceImpl
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": refreshToken
+      "Authorization": await FirebaseMessaging.instance.getToken() ?? ""
     });
 
+   print(await FirebaseMessaging.instance.getToken());
+   print(FirebaseAuth.instance.currentUser?.refreshToken);
     final response = await client
         .post(getUri(endpoint: Url.refreshUrl.endpoint), headers: headers);
     final data = jsonDecode(response.body);
@@ -179,11 +185,10 @@ class AuthenticationRemoteDatasourceImpl
       );
     }
   }
-  
+
   @override
-  Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params) async{
-    
- Map<String, String>? headers = {};
+  Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params) async {
+    Map<String, String>? headers = {};
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
@@ -202,6 +207,6 @@ class AuthenticationRemoteDatasourceImpl
       throw Exception(
         ErrorModel.fromJson(data).toMap(),
       );
-    }    
+    }
   }
 }

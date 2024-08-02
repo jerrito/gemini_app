@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gemini/features/authentication/domain/entities/user.dart';
-
+// import 'package:gemini/features/authentication/domain/entities/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 class UserProvider extends ChangeNotifier {
   User? _user;
   String? _profile;

@@ -9,7 +9,7 @@ import 'package:gemini/locator.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class ConnectionPage extends StatefulWidget {
   const ConnectionPage({super.key});
 
@@ -117,7 +117,7 @@ class _ConnectionPageState extends State<ConnectionPage>
             }
             if (state is GetUserLoaded) {
               final user = state.user;
-              userProvider?.user = user;
+              userProvider?.user = user.user;
               context.goNamed("searchPage");
             }
 

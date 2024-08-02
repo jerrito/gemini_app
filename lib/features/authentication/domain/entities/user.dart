@@ -34,27 +34,27 @@ class User extends Equatable {
 
 
 
-class SigninResponse extends Equatable {
-  final SignupResponse data;
-  final String token;
+// SigninResponse extends Equatable {
+//   final SignupResponse data;
+//   final String token;
 
- const SigninResponse({required this.data, required this.token});
+//  const SigninResponse({required this.data, required this.token});
  
-  @override
-  List<Object?> get props => [data, token];
-}
+//   @override
+//   List<Object?> get props => [data, token];
+// }
 
-class SignupResponse extends Equatable {
+// class SignupResponse extends Equatable {
  
-  final User user;
-  final String refreshToken;
+//   final User user;
+//   final String refreshToken;
  
-  const SignupResponse({ required this.user, required this.refreshToken});
+//   const SignupResponse({ required this.user, required this.refreshToken});
 
   
 
-  @override
-  List<Object?> get props => [user,refreshToken];
+//   @override
+//   List<Object?> get props => [user,refreshToken];
 
-}
+// }
 

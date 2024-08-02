@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
-import 'package:gemini/features/authentication/domain/entities/user.dart';
+// import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/core/mixin/dialog_mixin.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
@@ -17,7 +17,7 @@ import 'package:gemini/features/user/presentation/widgets/show_image_pick.dart';
 import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
 import 'package:gemini/locator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class UserProfile extends StatefulWidget {
   const UserProfile({
     super.key,
@@ -46,7 +46,7 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
     token = context.read<TokenProvider>().token ?? "";
     listUserData.setAll(
       0,
-      [user.userName, user.email, "Change Password"],
+      [user.displayName, user.email, "Change Password"],
     );
 
     return Scaffold(
@@ -62,10 +62,10 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
                   children: [
                     CircleAvatar(
                       backgroundImage: (userProvider?.profile != null ||
-                              (user.profile?.isNotEmpty ??
-                                  user.profile != null))
+                              (user.photoURL?.isNotEmpty ??
+                                  user.photoURL != null))
                           ? CachedNetworkImageProvider(
-                              userProvider?.profile ?? user.profile!)
+                              userProvider?.profile ?? user.photoURL!)
                           : Image.asset(defaultImage).image,
                       radius: Sizes().height(context, 0.06),
                     ),

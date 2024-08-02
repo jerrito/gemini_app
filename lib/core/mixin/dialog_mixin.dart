@@ -154,7 +154,7 @@ mixin UserProfileMixin {
                   }
                   if (state is UpdateUserLoaded) {
                     final data = state.user;
-                    userProvider.user = data;
+                    userProvider.user = data as dynamic;
 
                     context.pop();
                   }

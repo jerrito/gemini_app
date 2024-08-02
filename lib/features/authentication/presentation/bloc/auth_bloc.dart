@@ -14,6 +14,7 @@ import 'package:gemini/features/authentication/domain/usecases/log_out.dart';
 import 'package:gemini/features/authentication/domain/usecases/refresh_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/signin.dart';
 import 'package:gemini/features/authentication/domain/usecases/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 

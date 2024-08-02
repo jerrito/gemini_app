@@ -2,12 +2,12 @@ import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:gemini/features/authentication/domain/entities/user.dart';
+// import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/user/domain/usecases/add_image.dart';
 import 'package:gemini/features/user/domain/usecases/update_profile.dart';
 import 'package:gemini/features/user/domain/usecases/update_user.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 part 'user_event.dart';
 part 'user_state.dart';
 
@@ -34,7 +34,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(
         response.fold(
           (error) => UpdateUserError(errorMessage: error),
-          (response) => UpdateUserLoaded(user: response),
+          (response) => UpdateUserLoaded(user: response as UserCredential),
         ),
       );
     });

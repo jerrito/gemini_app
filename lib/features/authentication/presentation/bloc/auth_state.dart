@@ -5,7 +5,7 @@ abstract class AuthenticationState {}
 class InitState extends AuthenticationState {}
 
 class SignupLoaded extends AuthenticationState {
-  final SignupResponse response;
+  final UserCredential response;
 
   SignupLoaded({required this.response});
 }
@@ -18,7 +18,7 @@ class SignupError extends AuthenticationState {
 }
 
 class SigninLoaded extends AuthenticationState {
-  final SigninResponse data;
+  final UserCredential data;
 
   SigninLoaded({required this.data});
 }
@@ -70,7 +70,7 @@ class GetTokenError extends AuthenticationState {
 }
 
 class GetUserLoaded extends AuthenticationState {
-  final User user;
+  final UserCredential user;
 
   GetUserLoaded({required this.user});
 }

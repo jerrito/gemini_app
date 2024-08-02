@@ -47,7 +47,7 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
         .toList();
     return Scaffold(
         appBar: AppBar(
-          title: const Text(widget.isStudent? 'Become A Student':'Become A Teacher'),
+          title: Text(widget.isStudent? 'Become A Student':'Become A Teacher'),
         ),
         body: SafeArea(
           child: Padding(
@@ -84,7 +84,7 @@ class _BecomeATeacherState extends State<BecomeATeacher> {
             listener: (context, state) {
               if (state is BecomeATeacherLoaded) {
                 final data = state.adminResponse;
-                userProvider.user = data.user;
+                userProvider.user = data.user as dynamic;
                 teacherProvider.admin = data.admin;
                 context.goNamed("learning");
               }

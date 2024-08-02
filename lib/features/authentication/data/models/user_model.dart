@@ -31,22 +31,22 @@ class UserModel extends User {
       };
 }
 
-class SigninResponseModel extends SigninResponse {
-  const SigninResponseModel({required super.data, required super.token});
+// class SigninResponseModel extends SigninResponse {
+//   const SigninResponseModel({required super.data, required super.token});
 
-  factory SigninResponseModel.fromJson(Map<String, dynamic> json) =>
-      SigninResponseModel(
-        data: SignupResponseModel.fromJson(json["user"]),
-        token: json["token"],
-      );
-}
+//   factory SigninResponseModel.fromJson(Map<String, dynamic> json) =>
+//       SigninResponseModel(
+//         data: SignupResponseModel.fromJson(json["user"]),
+//         token: json["token"],
+//       );
+// }
 
-class SignupResponseModel extends SignupResponse {
-  const SignupResponseModel(
-      {required super.user, required super.refreshToken});
+// class SignupResponseModel extends SignupResponse {
+//   const SignupResponseModel(
+//       {required super.user, required super.refreshToken});
 
-  factory SignupResponseModel.fromJson(Map<String, dynamic>? json) =>
-      SignupResponseModel(
-        user: UserModel.fromJson(json?["user"]),
-        refreshToken: json?["refreshToken"]);
-}
+//   factory SignupResponseModel.fromJson(Map<String, dynamic>? json) =>
+//       SignupResponseModel(
+//         user: UserModel.fromJson(json?["user"]),
+//         refreshToken: json?["refreshToken"]);
+// }

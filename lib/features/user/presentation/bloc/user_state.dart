@@ -10,7 +10,7 @@ abstract class UserState extends Equatable {
 class UserInitial extends UserState {}
 
 class UpdateUserLoaded extends UserState {
-  final User user;
+  final UserCredential user;
 
   const UpdateUserLoaded({required this.user});
 }

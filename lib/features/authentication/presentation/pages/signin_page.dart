@@ -50,11 +50,11 @@ class _SigninPageState extends State<SigninPage> {
                 context.goNamed("connection");
               }
               if (state is SigninLoaded) {
-                final userData = state.data.data.user;
+                final userData = state.data.user;
                 userProvider.user = userData;
-                tokenProvider.setRefreshToken = state.data.data.refreshToken;
-                tokenProvider.setToken=state.data.token;
-                final authorization = {"refreshToken": state.data.data.refreshToken};
+                tokenProvider.setRefreshToken = state.data.user!.uid;
+                tokenProvider.setToken=state.data.user!.uid;
+                final authorization = {"refreshToken": state.data.user!.refreshToken};
                 authBloc.add(CacheTokenEvent(authorization: authorization));
               }
               if (state is SigninError) {
