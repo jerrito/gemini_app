@@ -47,7 +47,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
             bloc: authBloc,
             listener: (context, state) async {
               if (state is CodeSent) {
-                Navigator.push(
+               final data=await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
                     return OTPPage(
@@ -62,9 +62,15 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                     );
                   }),
                 );
+                if(data == "resend"){
+                  authBloc.add(
+                  PhoneNumberEvent(
+                      phoneNumber: "+233${phoneNumberController.text}"),
+                );
+                }
               }
               if (state is CodeCompleted) {
-                // print("verification completed ${authCredential.smsCode}");
+                print("verification completed ${state.authCredential.smsCode}");
                 // print(" ${authCredential.verificationId}");
                 User? user = FirebaseAuth.instance.currentUser;
 

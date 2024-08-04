@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
@@ -12,6 +15,7 @@ import 'package:go_router/go_router.dart';
 //import 'package:house_rental_admin/src/home/presentation/pages/home_page.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:pinput/pinput.dart';
 import 'package:telephony/telephony.dart';
 
 class OTPRequest {
@@ -75,9 +79,11 @@ class _OTPPageState extends State<OTPPage> {
     }
   }
 
+  final PinController = TextEditingController();
   @override
   void initState() {
     super.initState();
+    timeCount();
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
         // print(message.address); //+977981******67, sender nubmer
@@ -94,6 +100,7 @@ class _OTPPageState extends State<OTPPage> {
           //prase code from the OTP sms
           // print("This is $otpcode");
           otpBox.set(otpcode.split(""));
+          PinController.append(otpcode, 6);
           //split otp code to list of number
           //and populate to otb boxes
           setState(() {});
@@ -126,35 +133,27 @@ class _OTPPageState extends State<OTPPage> {
                 isSuccessMessage: true,
               );
             }
+            if (state is CacheTokenError) {
+              showSnackbar(context: context, message: "Error caching token");
+            }
+            if (state is CacheTokenLoaded) {
+              context.pushNamed("signup", queryParameters: {"phoneNumber": ""});
+            }
             if (state is VerifyOTPLoaded) {
               if (widget.otpRequest.isLogin) {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) {
-                //     return HomePage(
-                //       isLogin: widget.otpRequest.isLogin,
-                //       phoneNumber: widget.otpRequest.phoneNumber,
-                //       uid: state.user.uid,
-                //     );
-                //   }),
-                // );
+                final token =
+                    await FirebaseAuth.instance.currentUser?.getIdToken();
+                final authorization = {"token": token};
+                authBloc.add(
+                  CacheTokenEvent(
+                    authorization: authorization,
+                  ),
+                );
               } else {
                 if (widget.otpRequest.oldNumberString == null) {
-                  context.pushNamed("signup");
                 } else {
                   context.pushNamed("changeNumber",
                       queryParameters: {"phoneNumber": state.user.phoneNumber});
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) {
-                  //     return SignupPage(
-                  //       phoneNumber: state.user.phoneNumber ?? "",
-                  //       uid: state.user.uid,
-                  //     );
-                  //   }),
-                  // );
-
-                  //  context.goNamed("signin");
                 }
               }
             }
@@ -182,33 +181,33 @@ class _OTPPageState extends State<OTPPage> {
                       "We've sent a code to the number ${widget.otpRequest.phoneNumber}",
                     ),
                     Space().height(context, 0.04),
-                    OTPTextField(
-                      length: 6,
-                      onChanged: onKeyPressed,
-                      keyboardType: TextInputType.number,
-                      controller: otpBox,
-                      otpFieldStyle: OtpFieldStyle(
-                          borderColor: Colors.black,
-                          enabledBorderColor: Colors.black),
-                      width: MediaQuery.of(context).size.width,
-                      fieldWidth: 50,
-                      fieldStyle: FieldStyle.box,
-                      style: const TextStyle(
-                        fontSize: 17,
-                      ),
-                      textFieldAlignment: MainAxisAlignment.spaceAround,
-                      //fieldStyle: F,
-                      onCompleted: (val) async {
-                        // print(val);
-                        Future.delayed(const Duration(seconds: 2), () {
-                          PhoneAuthCredential params =
-                              PhoneAuthProvider.credential(
-                                  verificationId:
-                                      widget.otpRequest.verifyId.toString(),
-                                  smsCode: _otpString);
-                          authBloc.add(VerifyOTPEvent(params: params));
-                        });
-                      },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Pinput(
+                          defaultPinTheme: theme(false),
+                          focusedPinTheme: theme(false),
+                          errorPinTheme: theme(true),
+                          controller: PinController,
+                          onChanged: onKeyPressed,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          length: 6,
+                          onCompleted: (val) async {
+                            Future.delayed(const Duration(seconds: 2), () {
+                              PhoneAuthCredential params =
+                                  PhoneAuthProvider.credential(
+                                      verificationId:
+                                          widget.otpRequest.verifyId.toString(),
+                                      smsCode: _otpString);
+                              authBloc.add(
+                                VerifyOTPEvent(
+                                  params: params,
+                                ),
+                              );
+                            });
+                          },
+                        ),
+                      ],
                     ),
                     Space().height(context, 0.04),
                     timer(),
@@ -224,8 +223,7 @@ class _OTPPageState extends State<OTPPage> {
                         ),
                         TextButton(
                             onPressed: () {
-                              authBloc.add(PhoneNumberEvent(
-                                  phoneNumber: widget.otpRequest.phoneNumber!));
+                              context.pop("resend");
                             },
                             child: Visibility(
                               visible: !isResend,
@@ -253,21 +251,43 @@ class _OTPPageState extends State<OTPPage> {
             "Code expired",
             style: TextStyle(color: Colors.blue, fontSize: 16),
           ),
-          child: TweenAnimationBuilder(
-            onEnd: () {
-              isResend = false;
-              setState(() {});
-            },
-            tween: Tween(begin: 90.0, end: 0),
-            duration: const Duration(seconds: 120),
-            builder: (BuildContext context, value, Widget? child) => Text(
-              "This code will expire in 00:${(value).toInt()}",
-              style: const TextStyle(color: Colors.blue, fontSize: 16),
-            ),
+          child: Text(
+            "This code will expire in 00:${(time).toInt()}",
+            style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
         )
       ],
     );
+  }
+
+  PinTheme theme(bool isErrorTheme) {
+    return PinTheme(
+        width: Sizes().width(context, 0.1),
+        margin: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.02)),
+        height: Sizes().height(context, 0.05),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Sizes().height(context, 0.01)),
+            border: Border.all(
+                color: isErrorTheme
+                    ? Colors.red
+                    : Theme.of(context).brightness == Brightness.light
+                        ? Colors.black12
+                        : Colors.white)));
+  }
+
+  int time = 120;
+  void timeCount() {
+    Timer.periodic(Duration(seconds: 1), (f) {
+      print(f.tick.toString());
+
+      setState(() {
+        time--;
+      });
+      if (time == 0) {
+        isResend = !isResend;
+        f.cancel();
+      }
+    });
   }
 
   void onKeyPressed(String inputValue) {
