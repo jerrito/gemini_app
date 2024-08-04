@@ -9,6 +9,8 @@ import 'package:gemini/features/authentication/domain/usecases/cache_token.dart'
 import 'package:gemini/features/authentication/domain/usecases/cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/delete_account.dart';
 import 'package:gemini/features/authentication/domain/usecases/delete_token.dart';
+import 'package:gemini/features/authentication/domain/usecases/verify_otp.dart';
+import 'package:gemini/features/authentication/domain/usecases/verify_phone.dart';
 import 'package:gemini/features/user/domain/usecases/change_password.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_cache_user.dart';
 import 'package:gemini/features/authentication/domain/usecases/get_token.dart';
@@ -315,12 +317,25 @@ void initAuthentication() {
         refreshToken: sl(),
         deleteAccount: sl(),
         deleteToken: sl(),
-        becomeATeacher: sl()
+        becomeATeacher: sl(),
+        verifyNumber: sl(),
+        verifyOTP: sl()
         ),
   );
 
   //usecases
 
+
+sl.registerLazySingleton(
+    () => VerifyOTP(
+      repository: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => VerifyPhoneNumber(
+      repository: sl(),
+    ),
+  );
   sl.registerLazySingleton(
     () => BecomeATeacher(
       repository: sl(),

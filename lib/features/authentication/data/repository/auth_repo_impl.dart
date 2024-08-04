@@ -178,4 +178,52 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(networkInfo.noNetworkMessage);
     }
   }
+
+    @override
+  Future<Either<String, void>> verifyPhoneNumber(
+      String phoneNumber,
+      Function(String verificationId, int? resendToken) onCodeSent,
+      Function(PhoneAuthCredential phoneAuthCredential) onCompleted,
+      Function(FirebaseAuthException) onFailed) async {
+    if (await networkInfo.isConnected) {
+      try {
+       
+          return Right(await FirebaseAuth.instance.verifyPhoneNumber(
+            phoneNumber: phoneNumber,
+            timeout: const Duration(seconds: 120),
+            verificationCompleted: (PhoneAuthCredential credential) async {
+              await onCompleted(credential);
+            },
+            verificationFailed: (FirebaseAuthException e) async {
+              await onFailed(e);
+              // return Left(e.message);
+            },
+            codeSent: (String verificationId, int? resendToken) async {
+              await onCodeSent(verificationId, resendToken);
+            },
+            codeAutoRetrievalTimeout: (String verificationId) {
+              // Auto retrieval timeout
+            },
+          ));
+        
+      } catch (e) {
+        onFailed(
+            FirebaseAuthException(message: e.toString(), code: 'UNKNOWN'));
+        return Left(e.toString());
+      }
+    } else {
+      return Left(networkInfo.noNetworkMessage);
+    }
+  }
+
+    @override
+  Future<Either<String, User>> verifyOTP(
+      PhoneAuthCredential credential) async {
+    if (await networkInfo.isConnected) {
+      final response = await userRemoteDatasource.verifyOTP(credential);
+      return Right(response);
+    } else {
+      return Left(networkInfo.noNetworkMessage);
+    }
+  }
   }

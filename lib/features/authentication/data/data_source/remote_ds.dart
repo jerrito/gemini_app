@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:gemini/features/authentication/data/models/admin_model.dart';
@@ -29,6 +30,8 @@ abstract class AuthenticationRemoteDatasource {
   Future<String> deleteAccount(Map<String, dynamic> params);
 
   Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params);
+
+  Future<User> verifyOTP(PhoneAuthCredential credential);
 }
 
 class AuthenticationRemoteDatasourceImpl
@@ -75,7 +78,7 @@ class AuthenticationRemoteDatasourceImpl
     final Map<String, dynamic> body = {
       "email": params["email"],
       "password": params["password"],
-      "phoneNumber":params["phoneNumber"]
+      "phoneNumber": params["phoneNumber"]
     };
     final response = await client.post(
       getUri(endpoint: Url.signinUrl.endpoint),
@@ -147,8 +150,8 @@ class AuthenticationRemoteDatasourceImpl
       "Authorization": await FirebaseMessaging.instance.getToken() ?? ""
     });
 
-   print(await FirebaseMessaging.instance.getToken());
-   print(FirebaseAuth.instance.currentUser?.refreshToken);
+    print(await FirebaseMessaging.instance.getToken());
+    print(FirebaseAuth.instance.currentUser?.refreshToken);
     final response = await client
         .post(getUri(endpoint: Url.refreshUrl.endpoint), headers: headers);
     final data = jsonDecode(response.body);
@@ -208,5 +211,17 @@ class AuthenticationRemoteDatasourceImpl
         ErrorModel.fromJson(data).toMap(),
       );
     }
+  }
+
+  @override
+  Future<User> verifyOTP(PhoneAuthCredential credential) async {
+    final response =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+    if (kDebugMode) {
+      print(response.user?.uid);
+    }
+
+    return response.user!;
   }
 }

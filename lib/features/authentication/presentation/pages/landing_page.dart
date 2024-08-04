@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/widgets/default_bottom_sheet.dart';
+import 'package:gemini/features/authentication/presentation/pages/number_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 
@@ -21,20 +22,20 @@ class _LandingPageState extends State<LandingPage> {
         height: double.infinity,
         width: double.infinity,
       ),
-      bottomSheet:DefaultBottomSheet(
-        onTap:  () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SigninPage()),
-                  );
-                },
-          onTap2:() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignupPage()),
-                  );
-                }      
-      )
+      bottomSheet: DefaultBottomSheet(onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SigninPage()),
+        );
+      }, onTap2: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const PhoneNumberPage(
+                    isLogin: true,
+                  )),
+        );
+      }),
     );
   }
 }

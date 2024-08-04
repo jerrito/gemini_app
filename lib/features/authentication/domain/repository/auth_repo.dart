@@ -41,4 +41,15 @@ abstract class AuthenticationRepository {
 // become a teacher
   Future<Either<String, AdminResponse>> becomeATeacher(
       Map<String, dynamic> params);
+
+Future<Either<String, void>> verifyPhoneNumber(
+      String phoneNumber,
+      Function(String verificationId, int? resendToken) onCodeSent,
+      Function(PhoneAuthCredential phoneAuthCredential) onCompleted,
+      Function(FirebaseAuthException) onFailed);
+
+
+ Future<Either<String, User>> verifyOTP(
+      PhoneAuthCredential credential);      
+
 }

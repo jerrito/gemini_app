@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:gemini/core/firebase_app_check.dart';
 import 'package:gemini/core/routes/go_router.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/teacher/presentation/providers/teacher.dart';
@@ -22,7 +23,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  print( await FirebaseMessaging.instance.getToken());
+ await FirebaseAppCheckHelper.initialiseAppCheck();
+
+  print(await FirebaseAuth.instance.currentUser?.getIdToken());
 
   initDependencies();
   database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();

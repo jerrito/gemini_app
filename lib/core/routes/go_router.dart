@@ -1,6 +1,7 @@
 import 'package:gemini/features/authentication/presentation/pages/become_a_teacher.dart';
 import 'package:gemini/features/authentication/presentation/pages/landing_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/no_internet_page.dart';
+import 'package:gemini/features/authentication/presentation/pages/number_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 import 'package:gemini/features/connection_page.dart';
@@ -17,11 +18,11 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
       builder: (context, state) => const SearchTextPage(),
       routes: [
         GoRoute(
-          path:"becomeATeacher",
-          name:"becomeATeacher",
-          builder:(context,state)=> BecomeATeacher(
-            isStudent:bool.parse(state.uri.queryParameters["isStudent"].toString()))
-        ),
+            path: "becomeATeacher",
+            name: "becomeATeacher",
+            builder: (context, state) => BecomeATeacher(
+                isStudent: bool.parse(
+                    state.uri.queryParameters["isStudent"].toString()))),
         GoRoute(
             path: "test",
             name: "test",
@@ -57,20 +58,28 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
       builder: (context, state) => const LandingPage(),
       routes: [
         GoRoute(
+          path: "phone",
+          name: "phone",
+          builder: (context, state) => const PhoneNumberPage(
+            isLogin: true,
+          ),
+          routes: [
+            GoRoute(
           path: "signup",
           name: "signup",
           builder: (context, state) => const SignupPage(),
         ),
+          ]
+        ),
+        
         GoRoute(
           path: "signin",
           name: "signin",
           builder: (context, state) => const SigninPage(),
         ),
       ]),
-
-    GoRoute(
-      path:"/learning",
-      name:"learning",
-      builder:(context,state)=> const LearningHomePage()
-    )  
+  GoRoute(
+      path: "/learning",
+      name: "learning",
+      builder: (context, state) => const LearningHomePage())
 ]);

@@ -14,7 +14,10 @@ import 'package:gemini/features/authentication/domain/usecases/log_out.dart';
 import 'package:gemini/features/authentication/domain/usecases/refresh_token.dart';
 import 'package:gemini/features/authentication/domain/usecases/signin.dart';
 import 'package:gemini/features/authentication/domain/usecases/signup.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gemini/features/authentication/domain/usecases/verify_otp.dart';
+import 'package:gemini/features/authentication/domain/usecases/verify_phone.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
@@ -32,8 +35,13 @@ class AuthenticationBloc
   final DeleteAccount deleteAccount;
   final DeleteToken deleteToken;
   final BecomeATeacher becomeATeacher;
+  final VerifyPhoneNumber verifyNumber;
+  final VerifyOTP verifyOTP;
   AuthenticationBloc(
-      {required this.getCacheUser,
+      {
+        required this.verifyOTP,
+        required this.verifyNumber,
+      required this.getCacheUser,
       required this.refreshToken,
       required this.signup,
       required this.signin,
@@ -60,6 +68,89 @@ class AuthenticationBloc
             response: response,
           ),
         ));
+      },
+    );
+
+    on<PhoneNumberEvent>((event, emit) async {
+      emit(
+        VerifyPhoneNumberLoading(),
+      );
+
+      await verifyNumber.verifyPhoneNumber(
+        event.phoneNumber,
+        (verificationId, resendToken) => add(
+          CodeSentEvent(
+            forceResendingToken: resendToken!,
+            verificationId: verificationId,
+          ),
+        ),
+        (phoneAuthCredential) => add(
+          VerificationCompleteEvent(phoneAuthCredential: phoneAuthCredential),
+        ),
+        (p0) => add(
+          PhoneNumberErrorEvent(error: p0.message!),
+        ),
+      );
+    });
+
+    //!Code Sent
+    on<CodeSentEvent>((event, emit) async {
+      emit(
+        CodeSent(
+            verifyId: event.verificationId, token: event.forceResendingToken),
+      );
+    });
+
+    on<VerificationCompleteEvent>((event, emit) {
+      emit(
+        CodeCompleted(authCredential: event.phoneAuthCredential),
+      );
+    });
+    on<PhoneNumberErrorEvent>((event, emit) {
+      emit(
+        GenericError(errorMessage: event.error),
+      );
+    });
+
+    // on<PhoneNumberLoginEvent>((event, emit) async {
+    //   emit(
+    //     VerifyPhoneNumberLoading(),
+    //   );
+
+    //   await verifyPhoneNumberLogin.verifyPhoneNumberLogin(
+    //     event.phoneNumber,
+    //     (verificationId, resendToken) => add(
+    //       CodeSentEvent(
+    //         forceResendingToken: resendToken!,
+    //         verificationId: verificationId,
+    //       ),
+    //     ),
+    //     (phoneAuthCredential) => add(
+    //       VerificationCompleteEvent(phoneAuthCredential: phoneAuthCredential),
+    //     ),
+    //     (p0) => add(
+    //       PhoneNumberErrorEvent(error: p0.message!),
+    //     ),
+    //   );
+    // });
+    on<VerifyOTPEvent>(
+      (event, emit) async {
+        emit(
+          VerifyOTPLoading(),
+        );
+
+        final response = await verifyOTP.call(event.params);
+
+        emit(
+          response.fold(
+            (error) => VerifyOTPFailed(errorMessage: error),
+            (response) => VerifyOTPLoaded(user: response),
+          ),
+        );
+
+        // // ignore: unused_label
+        // transformer:
+        // restartable();
       },
     );
 

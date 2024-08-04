@@ -5,7 +5,7 @@ abstract class AuthenticationState {}
 class InitState extends AuthenticationState {}
 
 class SignupLoaded extends AuthenticationState {
-  final UserCredential response;
+  final auth.UserCredential response;
 
   SignupLoaded({required this.response});
 }
@@ -18,21 +18,63 @@ class SignupError extends AuthenticationState {
 }
 
 class SigninLoaded extends AuthenticationState {
-  final UserCredential data;
+  final auth.UserCredential data;
 
   SigninLoaded({required this.data});
 }
 
 class SigninLoading extends AuthenticationState {}
 
+class VerifyPhoneNumberLoading extends AuthenticationState {}
+
 class SigninError extends AuthenticationState {
   final String errorMessage;
   SigninError({required this.errorMessage});
 }
 
+class GenericError extends AuthenticationState {
+  final String errorMessage;
+   GenericError({required this.errorMessage});
+}
+
+class CodeSent extends AuthenticationState {
+  final String verifyId;
+  final int? token;
+   CodeSent({required this.verifyId, required this.token});
+}
+
+class CodeCompleted extends AuthenticationState {
+  final auth.PhoneAuthCredential authCredential;
+   CodeCompleted({required this.authCredential});
+}
+
+class VerifyOTPLoading extends AuthenticationState {}
+
+class VerifyOTPLoaded extends AuthenticationState {
+  final auth.User user;
+   VerifyOTPLoaded({required this.user});
+}
+
+class VerifyOTPFailed extends AuthenticationState {
+  final String errorMessage;
+   VerifyOTPFailed({required this.errorMessage});
+}
 class CacheUserDataLoaded extends AuthenticationState {
   CacheUserDataLoaded();
 }
+
+
+class CheckPhoneNumberLoaded extends AuthenticationState {
+  final bool isNumberChecked;
+   CheckPhoneNumberLoaded({required this.isNumberChecked});
+}
+
+class CheckPhoneNumberChangeError extends AuthenticationState {
+  final String errorMessage;
+   CheckPhoneNumberChangeError({required this.errorMessage});
+}
+
+class CheckPhoneNumberChangeLoading extends AuthenticationState {}
 
 class CacheUserDataError extends AuthenticationState {
   final String errorMessage;
@@ -70,7 +112,7 @@ class GetTokenError extends AuthenticationState {
 }
 
 class GetUserLoaded extends AuthenticationState {
-  final UserCredential user;
+  final auth.UserCredential user;
 
   GetUserLoaded({required this.user});
 }

@@ -13,6 +13,47 @@ class SigninEvent extends AuthenticationEvent {
 }
 
 
+final class PhoneNumberEvent extends AuthenticationEvent {
+  final String phoneNumber;
+
+   PhoneNumberEvent({required this.phoneNumber});
+}
+final class PhoneNumberErrorEvent extends AuthenticationEvent {
+  final String error;
+   PhoneNumberErrorEvent({required this.error});
+}
+final class PhoneNumberLoginEvent extends AuthenticationEvent {
+  final String phoneNumber;
+   PhoneNumberLoginEvent({required this.phoneNumber});
+}
+
+
+class CheckPhoneNumberEvent extends AuthenticationEvent {
+  final Map<String, dynamic> params;
+   CheckPhoneNumberEvent({required this.params});
+}
+final class CodeSentEvent extends AuthenticationEvent {
+  final String verificationId;
+  final int forceResendingToken;
+
+   CodeSentEvent({
+    required this.forceResendingToken,
+    required this.verificationId,
+  });
+}
+
+final class VerificationCompleteEvent extends AuthenticationEvent {
+  final auth.PhoneAuthCredential phoneAuthCredential;
+   VerificationCompleteEvent({required this.phoneAuthCredential});
+}
+
+final class VerifyOTPEvent extends AuthenticationEvent {
+  final auth.PhoneAuthCredential params;
+
+   VerifyOTPEvent({required this.params});
+}
+
+
 class CreateUserWithEmailAndPasswordEvent extends AuthenticationEvent {
   final Map<String, dynamic> params;
   CreateUserWithEmailAndPasswordEvent({required this.params});
