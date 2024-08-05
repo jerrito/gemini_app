@@ -27,7 +27,7 @@ getUri(
     {String? path,
     Map<String, dynamic>? queryParams,
     required String endpoint}) {
-  String baseUrl = 'gemini-server-qpjy.onrender.com';
+  String baseUrl = 'gemini-server-1-qpjy.onrender.com';
   var url = Uri.https(baseUrl, endpoint + (path ?? ""), queryParams);
 
   return url;

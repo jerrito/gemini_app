@@ -12,6 +12,7 @@ import 'package:gemini/core/widgets/default_textfield.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/features/authentication/presentation/pages/otp_page.dart';
 import 'package:gemini/locator.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'package:string_validator/string_validator.dart';
 
@@ -33,6 +34,8 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
   final authBloc = sl<AuthenticationBloc>();
   final formKey = GlobalKey<FormState>();
   final phoneNumberController = TextEditingController();
+  PhoneNumber phone = PhoneNumber();
+  String number = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,13 +50,13 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
             bloc: authBloc,
             listener: (context, state) async {
               if (state is CodeSent) {
-               final data=await Navigator.push(
+                final data = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
                     return OTPPage(
                       otpRequest: OTPRequest(
                           isLogin: widget.isLogin,
-                          phoneNumber: "+233${phoneNumberController.text}",
+                          phoneNumber: number,
                           forceResendingToken: state.token,
                           verifyId: state.verifyId,
                           uid: widget.uid,
@@ -62,11 +65,10 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                     );
                   }),
                 );
-                if(data == "resend"){
+                if (data == "resend") {
                   authBloc.add(
-                  PhoneNumberEvent(
-                      phoneNumber: "+233${phoneNumberController.text}"),
-                );
+                    PhoneNumberEvent(phoneNumber: number),
+                  );
                 }
               }
               if (state is CodeCompleted) {
@@ -95,15 +97,13 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
               }
               if (state is CheckPhoneNumberChangeError) {
                 authBloc.add(
-                  PhoneNumberEvent(
-                      phoneNumber: "+233${phoneNumberController.text}"),
+                  PhoneNumberEvent(phoneNumber: number),
                 );
               }
               if (state is CheckPhoneNumberLoaded) {
                 //if (state.isNumberChecked == true) {
                 authBloc.add(
-                  PhoneNumberEvent(
-                      phoneNumber: "+233${phoneNumberController.text}"),
+                  PhoneNumberEvent(phoneNumber: number),
                 );
                 // } else {
                 //   if (!context.mounted) return;
@@ -139,15 +139,14 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                       if (widget.oldNumberString != null) {
                         Map<String, dynamic> params = {
                           "start_number": widget.oldNumberString,
-                          "phone_number": "+233${phoneNumberController.text}"
+                          "phone_number": number
                         };
                         authBloc.add(
                           CheckPhoneNumberEvent(params: params),
                         );
                       } else {
                         authBloc.add(
-                          PhoneNumberEvent(
-                              phoneNumber: "+233${phoneNumberController.text}"),
+                          PhoneNumberEvent(phoneNumber: number),
                         );
                       }
                     }
@@ -167,63 +166,39 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                 textAlign: TextAlign.start,
               ),
               Space().height(context, 0.090),
-              FormField<String>(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return fieldRequired;
-                    }
-                    if (!isNumeric(value!)) {
-                      return "Only numbers required";
-                    }
-                    if (!isLength(value, 9, 9)) {
-                      return 'Nine numbers required';
-                    }
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // label
+                  Text(widget.oldNumberString != null
+                      ? "Enter Old Phone Number"
+                      : "Enter Phone Number"),
 
-                    return null;
-                  },
-                  // onChanged: (value) {
-                  //   if (value!.startsWith("0", 0)) {
-                  //     phoneNumberController.text = value.substring(1);
-                  //   }
-                  // },
-                  builder: (field) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.oldNumberString != null
-                            ? "Enter Old Phone Number"
-                            : "Enter Phone Number"),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            SizedBox(
-                                height: 35,
-                                child: Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                      "ghanaSVG",
-                                      width: 30,
-                                    ),
-                                    Space().width(context, 0.005),
-                                    const Text("+233"),
-                                  ],
-                                )),
-                            SizedBox(
-                              width: 270,
-                              child: DefaultTextFieldForm(
-                                textInputType: TextInputType.number,
-                                controller: phoneNumberController,
-                                label: "",
-                                errorText: field.errorText,
-                                onChanged: (p0) => field.didChange(p0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }),
+                  // phone textfield
+                  InternationalPhoneNumberInput(
+                    onInputChanged: (value) {
+                      number = value.phoneNumber!;
+                      setState(() {});
+                    },
+                    onInputValidated: (bool v) {
+                      print(v);
+                    },
+                    selectorConfig: const SelectorConfig(
+                      selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                    ),
+                    inputBorder: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(Sizes().height(context, 0.01)),
+                      borderSide: const BorderSide(
+                        color: Colors.black12,
+                      ),
+                    ),
+                    initialValue: phone,
+                    textFieldController: phoneNumberController,
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                  )
+                ],
+              ),
               Space().height(context, 0.030),
             ]),
           ),

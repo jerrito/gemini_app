@@ -137,7 +137,7 @@ class _OTPPageState extends State<OTPPage> {
               showSnackbar(context: context, message: "Error caching token");
             }
             if (state is CacheTokenLoaded) {
-              context.pushNamed("signup", queryParameters: {"phoneNumber": ""});
+              context.pushNamed("signup", queryParameters: {"phoneNumber":widget.otpRequest.phoneNumber });
             }
             if (state is VerifyOTPLoaded) {
               if (widget.otpRequest.isLogin) {
@@ -277,7 +277,7 @@ class _OTPPageState extends State<OTPPage> {
 
   int time = 120;
   void timeCount() {
-    Timer.periodic(Duration(seconds: 1), (f) {
+    Timer.periodic(const Duration(seconds: 1), (f) {
       print(f.tick.toString());
 
       setState(() {

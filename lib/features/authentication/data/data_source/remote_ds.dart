@@ -37,14 +37,19 @@ abstract class AuthenticationRemoteDatasource {
 class AuthenticationRemoteDatasourceImpl
     implements AuthenticationRemoteDatasource {
   final http.Client client;
+  final FirebaseAuth firebaseAuth;
 
-  AuthenticationRemoteDatasourceImpl({required this.client});
+  AuthenticationRemoteDatasourceImpl({
+    required this.client,
+    required this.firebaseAuth,
+  });
   @override
   Future<UserCredential> signupUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
     });
+
     final Map<String, dynamic> body = {
       "userName": params["userName"],
       "email": params["email"],
@@ -100,10 +105,10 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<UserCredential> getUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-
+  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": await FirebaseMessaging.instance.getToken() ?? ""
+      "Authorization": "Bearer $authoken"
     });
 
     final response = await client.get(getUri(endpoint: Url.homeUrl.endpoint),
@@ -119,10 +124,12 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> logout(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
+  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Authorization": "Bearer $authoken"
+          
     });
 
     final response = await client.post(
@@ -144,14 +151,13 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> refreshToken(String refreshToken) async {
     Map<String, String>? headers = {};
-
+  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? refreshToken;
+  
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": await FirebaseMessaging.instance.getToken() ?? ""
+      "Authorization":"Bearer $authoken"
     });
 
-    print(await FirebaseMessaging.instance.getToken());
-    print(FirebaseAuth.instance.currentUser?.refreshToken);
     final response = await client
         .post(getUri(endpoint: Url.refreshUrl.endpoint), headers: headers);
     final data = jsonDecode(response.body);
@@ -168,10 +174,11 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> deleteAccount(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
+  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Authorization":"Bearer $authoken"
     });
 
     final response = await client.delete(
@@ -192,10 +199,11 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
+  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Authorization":"Bearer $authoken"
     });
 
     final response = await client.post(

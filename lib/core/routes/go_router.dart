@@ -58,24 +58,26 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
       builder: (context, state) => const LandingPage(),
       routes: [
         GoRoute(
-          path: "phone",
-          name: "phone",
-          builder: (context, state) => const PhoneNumberPage(
-            isLogin: true,
-          ),
-          routes: [
-            GoRoute(
-          path: "signup",
-          name: "signup",
-          builder: (context, state) => const SignupPage(),
-        ),
-          ]
-        ),
-        
+            path: "phone",
+            name: "phone",
+            builder: (context, state) => const PhoneNumberPage(
+                  isLogin: true,
+                ),
+            routes: [
+              GoRoute(
+                path: "signup",
+                name: "signup",
+                builder: (context, state) => SignupPage(
+                    phoneNumber:
+                        state.uri.queryParameters["phoneNumber"].toString()),
+              ),
+            ]),
         GoRoute(
           path: "signin",
           name: "signin",
-          builder: (context, state) => const SigninPage(),
+          builder: (context, state) => SigninPage(
+            phoneNumber: state.uri.queryParameters["phoneNumber"].toString(),
+          ),
         ),
       ]),
   GoRoute(

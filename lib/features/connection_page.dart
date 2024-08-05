@@ -10,6 +10,7 @@ import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart'
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 class ConnectionPage extends StatefulWidget {
   const ConnectionPage({super.key});
 
@@ -93,10 +94,15 @@ class _ConnectionPageState extends State<ConnectionPage>
           bloc: userBloc,
           listener: (context, state) {
             if (state is GetTokenLoaded) {
-              refreshToken = state.authorization["refreshToken"];
+              token = state.authorization["token"];
+              final Map<String, dynamic> params = {
+                "token":token
+              };
               setState(() {});
               userBloc.add(
-                RefreshTokenEvent(refreshToken: refreshToken!),
+                GetUserEvent(
+                  params: params,
+                ),
               );
             }
             if (state is RefreshTokenError) {

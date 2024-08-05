@@ -25,7 +25,9 @@ class _LandingPageState extends State<LandingPage> {
       bottomSheet: DefaultBottomSheet(onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const SigninPage()),
+          MaterialPageRoute(builder: (context) => const SigninPage(
+            phoneNumber: "",
+          )),
         );
       }, onTap2: () {
         Navigator.push(

@@ -1,4 +1,5 @@
 import 'package:data_connection_checker_nulls/data_connection_checker_nulls.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/features/authentication/data/data_source/local_ds.dart';
 import 'package:gemini/features/authentication/data/data_source/remote_ds.dart';
@@ -71,6 +72,12 @@ void initDependencies() async {
 
   //http
   sl.registerLazySingleton(() => http.Client());
+
+// firebase auth
+
+  sl.registerLazySingleton(
+    () => FirebaseAuth.instance,
+  );
 
   //network
   sl.registerLazySingleton(
@@ -319,14 +326,12 @@ void initAuthentication() {
         deleteToken: sl(),
         becomeATeacher: sl(),
         verifyNumber: sl(),
-        verifyOTP: sl()
-        ),
+        verifyOTP: sl()),
   );
 
   //usecases
 
-
-sl.registerLazySingleton(
+  sl.registerLazySingleton(
     () => VerifyOTP(
       repository: sl(),
     ),
@@ -421,6 +426,7 @@ sl.registerLazySingleton(
   sl.registerLazySingleton<AuthenticationRemoteDatasource>(
     () => AuthenticationRemoteDatasourceImpl(
       client: sl(),
+      firebaseAuth: sl(),
     ),
   );
 

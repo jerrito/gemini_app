@@ -15,7 +15,11 @@ import 'package:go_router/go_router.dart';
 import 'package:string_validator/string_validator.dart';
 
 class SigninPage extends StatefulWidget {
-  const SigninPage({super.key});
+  final String phoneNumber;
+  const SigninPage({
+    super.key,
+    required this.phoneNumber,
+  });
 
   @override
   State<SigninPage> createState() => _SigninPageState();
@@ -52,10 +56,10 @@ class _SigninPageState extends State<SigninPage> {
               if (state is SigninLoaded) {
                 final userData = state.data.user;
                 userProvider.user = userData;
-                tokenProvider.setRefreshToken = state.data.user!.uid;
-                tokenProvider.setToken=state.data.user!.uid;
-                final authorization = {"refreshToken": state.data.user!.refreshToken};
-                authBloc.add(CacheTokenEvent(authorization: authorization));
+                // tokenProvider.setRefreshToken = state.data.user!.uid;
+                // tokenProvider.setToken=state.data.user!.uid;
+                // final authorization = {"refreshToken": state.data.user!.refreshToken};
+                // authBloc.add(CacheTokenEvent(authorization: authorization));
               }
               if (state is SigninError) {
                 if (!context.mounted) return;
@@ -72,6 +76,7 @@ class _SigninPageState extends State<SigninPage> {
                   onTap: () {
                     if (formKey.currentState!.validate()) {
                       final Map<String, dynamic> params = {
+                        "phoneNumber":widget.phoneNumber,
                         "email": emailController.text,
                         "password": passwordController.text
                       };
