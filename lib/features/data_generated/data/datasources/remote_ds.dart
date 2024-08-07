@@ -71,7 +71,7 @@ class DataGeneratedRemoteDatasourceImpl
     );
 
     final decodedResponse = jsonDecode(response.body);
-   
+
     if (response.statusCode == 200) {
       return List<DataModel>.from(
           decodedResponse.map((e) => DataModel.fromJson(e)));
@@ -108,9 +108,9 @@ class DataGeneratedRemoteDatasourceImpl
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
     });
-    String path = params["path"];
+    String id = params["path"];
     final response = await client.get(
-      getUri(path: path, endpoint: Url.listDataUrl.endpoint),
+      getUri(path: id, endpoint: Url.listDataUrl.endpoint),
       headers: headers,
     );
     final decodedResponse = jsonDecode(response.body);

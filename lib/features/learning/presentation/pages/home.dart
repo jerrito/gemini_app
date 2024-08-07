@@ -13,19 +13,19 @@ class _LearningHomePageState extends State<LearningHomePage> {
     return Scaffold(
       body:Column(children: [
         Container(
-          child: Text('Learning Home Page'),
+          child: const Text('Learning Home Page'),
         ),
         ElevatedButton(
           onPressed: () {
           },
-          child: Text('Go to Details'),
+          child: const Text('Go to Details'),
         ),
         ElevatedButton(
           onPressed: () {
             // Navigate to the previous page
             Navigator.pop(context);
           },
-          child: Text('Go back'),
+          child: const Text('Go back'),
         ),
       ],)
     );

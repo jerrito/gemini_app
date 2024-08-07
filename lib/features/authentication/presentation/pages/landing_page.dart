@@ -3,7 +3,6 @@ import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/widgets/default_bottom_sheet.dart';
 import 'package:gemini/features/authentication/presentation/pages/number_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
-import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -25,16 +24,17 @@ class _LandingPageState extends State<LandingPage> {
       bottomSheet: DefaultBottomSheet(onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const SigninPage(
-            phoneNumber: "",
-          )),
+          MaterialPageRoute(
+              builder: (context) => const PhoneNumberPage(
+                    isSignup: false,
+                  )),
         );
       }, onTap2: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => const PhoneNumberPage(
-                    isLogin: true,
+                    isSignup: true,
                   )),
         );
       }),

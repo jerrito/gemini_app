@@ -1,4 +1,3 @@
-import 'package:gemini/features/authentication/data/models/admin_model.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 
 class UserModel extends User {

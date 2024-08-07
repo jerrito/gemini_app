@@ -61,7 +61,7 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
             path: "phone",
             name: "phone",
             builder: (context, state) => const PhoneNumberPage(
-                  isLogin: true,
+                  isSignup: true,
                 ),
             routes: [
               GoRoute(

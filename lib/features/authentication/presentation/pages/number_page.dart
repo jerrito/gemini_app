@@ -3,25 +3,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
-import 'package:gemini/core/strngs.dart';
 import 'package:gemini/core/widgets/default_button.dart';
-import 'package:gemini/core/widgets/default_textfield.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:gemini/features/authentication/presentation/pages/otp_page.dart';
+import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/locator.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
-import 'package:string_validator/string_validator.dart';
-
 class PhoneNumberPage extends StatefulWidget {
-  final bool isLogin;
+  final bool isSignup;
   final String? id, uid, oldNumberString;
   const PhoneNumberPage(
       {super.key,
-      required this.isLogin,
+      required this.isSignup,
       this.id,
       this.uid,
       this.oldNumberString});
@@ -34,13 +30,15 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
   final authBloc = sl<AuthenticationBloc>();
   final formKey = GlobalKey<FormState>();
   final phoneNumberController = TextEditingController();
-  PhoneNumber phone = PhoneNumber(isoCode: "Gh",dialCode: "+233");
+  PhoneNumber phone = PhoneNumber(isoCode: "Gh", dialCode: "+233");
   String number = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Verify Number"),
+          title: Text(
+            widget.isSignup == true ? "Verify Number" : "Signin With Number",
+          ),
         ),
         bottomSheet: Padding(
           padding: EdgeInsets.symmetric(
@@ -55,7 +53,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                   MaterialPageRoute(builder: (context) {
                     return OTPPage(
                       otpRequest: OTPRequest(
-                          isLogin: widget.isLogin,
+                          isSignup: widget.isSignup,
                           phoneNumber: number,
                           forceResendingToken: state.token,
                           verifyId: state.verifyId,
@@ -101,28 +99,27 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                 );
               }
               if (state is CheckPhoneNumberLoaded) {
-                //if (state.isNumberChecked == true) {
-                authBloc.add(
-                  PhoneNumberEvent(phoneNumber: number),
-                );
-                // } else {
-                //   if (!context.mounted) return;
-                //   showSnackbar(
-                //     context: context,
-                //     message: "Entered number not equal to old number",
-                //     isSuccessMessage: true,
-                //   );
-                // }
+                if (state.isNumberChecked == true) {
+                  authBloc.add(
+                    PhoneNumberEvent(phoneNumber: number),
+                  );
+                } else {
+                  if (!context.mounted) return;
+                  showSnackbar(
+                    context: context,
+                    message: "Entered number not equal to old number",
+                    isSuccessMessage: true,
+                  );
+                }
               }
-              // if (state is CheckPhoneNumberChangeError) {
-              //   if (!context.mounted) return;
-              //   showSnackbar(
-              //       context: context,
-              //       message:state.errorMessage,
-              //       isSuccessMessage: true,
-              //     );
-
-              // }
+              if (state is CheckPhoneNumberChangeError) {
+                if (!context.mounted) return;
+                showSnackbar(
+                  context: context,
+                  message: state.errorMessage,
+                  isSuccessMessage: true,
+                );
+              }
             },
             builder: (context, state) {
               if (state is VerifyPhoneNumberLoading) {
@@ -162,7 +159,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Space().height(context, 0.030),
               const Text(
-                "Enter your number to get a verification message",
+                "Enter your number to get a verification code",
                 textAlign: TextAlign.start,
               ),
               Space().height(context, 0.090),

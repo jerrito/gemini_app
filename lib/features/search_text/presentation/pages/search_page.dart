@@ -222,8 +222,8 @@ class _SearchTextPage extends State<SearchTextPage>
           child: Container(
               width: double.infinity,
               height: Sizes().height(context, 0.03),
-              decoration: BoxDecoration(color: Colors.blueAccent),
-              child: Text("Hello", textAlign: TextAlign.center)),
+              decoration: const BoxDecoration(color: Colors.blueAccent),
+              child: const Text("Hello", textAlign: TextAlign.center)),
         ),
       ),
       bottomSheet: Form(
