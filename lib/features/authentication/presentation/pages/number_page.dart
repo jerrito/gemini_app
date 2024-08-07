@@ -34,7 +34,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
   final authBloc = sl<AuthenticationBloc>();
   final formKey = GlobalKey<FormState>();
   final phoneNumberController = TextEditingController();
-  PhoneNumber phone = PhoneNumber();
+  PhoneNumber phone = PhoneNumber(isoCode: "Gh",dialCode: "+233");
   String number = "";
   @override
   Widget build(BuildContext context) {
