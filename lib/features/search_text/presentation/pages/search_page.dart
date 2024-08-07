@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/assets/animations/animations.dart';
@@ -10,6 +9,7 @@ import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/core/spacing/whitspacing.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/core/widgets/bottom_sheet.dart';
+import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/data_generated/presentation/bloc/data_generated_bloc.dart';
 import 'package:gemini/features/search_text/presentation/widgets/data_add.dart';
@@ -577,16 +577,16 @@ class _SearchTextPage extends State<SearchTextPage>
                 child: Column(children: [
                   CircleAvatar(
                     backgroundImage: (profile != null ||
-                            (user.photoURL?.isNotEmpty ?? false))
-                        ? CachedNetworkImageProvider(profile ?? user.photoURL!)
+                            (user.profile?.isNotEmpty ?? false))
+                        ? CachedNetworkImageProvider(profile ?? user.profile!)
                         : null,
                     child: Text(
-                      user.displayName?.substring(0, 2) ?? "NA",
+                      user.userName?.substring(0, 2) ?? "NA",
                     ),
                   ),
                   Space().height(context, 0.02),
                   Text(
-                    user.displayName ?? user.email ?? "",
+                    user.userName ?? user.email ?? "",
                   ),
                 ]),
               ),

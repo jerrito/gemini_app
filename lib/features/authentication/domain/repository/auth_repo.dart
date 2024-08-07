@@ -1,20 +1,21 @@
 import "package:dartz/dartz.dart";
 import "package:gemini/features/authentication/domain/entities/admin.dart";
 // import "package:gemini/features/authentication/domain/entities/user.dart";
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import "package:gemini/features/authentication/domain/entities/user.dart";
 
 abstract class AuthenticationRepository {
 // signup
-  Future<Either<String, UserCredential>> signup(Map<String, dynamic> params);
+  Future<Either<String, User>> signup(Map<String, dynamic> params);
 
 // signin
-  Future<Either<String, UserCredential>> signin(Map<String, dynamic> params);
+  Future<Either<String, User>> signin(Map<String, dynamic> params);
 
   //cache user
   Future<Either<String, dynamic>> cacheUserData(Map<String, dynamic> params);
 
   //get User
-  Future<Either<String, UserCredential>> getUser(Map<String, dynamic> params);
+  Future<Either<String, User>> getUser(Map<String, dynamic> params);
 
   //cache token
   Future<Either<String, dynamic>> cacheToken(
@@ -45,11 +46,11 @@ abstract class AuthenticationRepository {
 Future<Either<String, void>> verifyPhoneNumber(
       String phoneNumber,
       Function(String verificationId, int? resendToken) onCodeSent,
-      Function(PhoneAuthCredential phoneAuthCredential) onCompleted,
-      Function(FirebaseAuthException) onFailed);
+      Function(auth.PhoneAuthCredential phoneAuthCredential) onCompleted,
+      Function(auth.FirebaseAuthException) onFailed);
 
 
- Future<Either<String, User>> verifyOTP(
-      PhoneAuthCredential credential);      
+ Future<Either<String, auth.User>> verifyOTP(
+      auth.PhoneAuthCredential credential);      
 
 }

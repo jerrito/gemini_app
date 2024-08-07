@@ -54,7 +54,7 @@ class _SigninPageState extends State<SigninPage> {
                 context.goNamed("connection");
               }
               if (state is SigninLoaded) {
-                final userData = state.data.user;
+                final userData = state.data;
                 userProvider.user = userData;
                 // tokenProvider.setRefreshToken = state.data.user!.uid;
                 // tokenProvider.setToken=state.data.user!.uid;

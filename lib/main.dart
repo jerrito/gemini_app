@@ -25,7 +25,7 @@ void main() async {
 
  await FirebaseAppCheckHelper.initialiseAppCheck();
 
-  print(await FirebaseAuth.instance.currentUser?.getIdToken());
+  // print(await FirebaseAuth.instance.currentUser?.getIdToken());
 
   initDependencies();
   database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();

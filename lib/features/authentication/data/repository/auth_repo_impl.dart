@@ -1,11 +1,13 @@
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/features/authentication/data/data_source/local_ds.dart';
 import 'package:gemini/features/authentication/data/data_source/remote_ds.dart';
 import 'package:gemini/features/authentication/domain/entities/admin.dart';
+import 'package:gemini/features/authentication/domain/entities/user.dart';
 // import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/domain/repository/auth_repo.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final NetworkInfo networkInfo;
   final AuthenticationRemoteDatasource userRemoteDatasource;
@@ -17,8 +19,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       required this.networkInfo});
 
   @override
-  Future<Either<String, UserCredential>> signin(
-      Map<String, dynamic> params) async {
+  Future<Either<String, User>> signin(Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.signinUser(params);
@@ -32,8 +33,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<String, UserCredential>> signup(
-      Map<String, dynamic> params) async {
+  Future<Either<String, User>> signup(Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.signupUser(params);
@@ -70,7 +70,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<String, UserCredential>> getUser(Map<String, dynamic> params) async {
+  Future<Either<String, User>> getUser(Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.getUser(params);
@@ -136,9 +136,10 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(networkInfo.noNetworkMessage);
     }
   }
-  
+
   @override
-  Future<Either<String, String>> deleteAccount(Map<String, dynamic> params) async{
+  Future<Either<String, String>> deleteAccount(
+      Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.deleteAccount(params);
@@ -151,22 +152,23 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(networkInfo.noNetworkMessage);
     }
   }
-  
+
   @override
-  Future<Either<String, dynamic>> deleteToken(Map<String, dynamic> params) async{
-       try {
+  Future<Either<String, dynamic>> deleteToken(
+      Map<String, dynamic> params) async {
+    try {
       final response = await userLocalDatasource.deleteToken(params);
 
       return Right(response);
     } catch (e) {
       return Left(e.toString());
     }
-
   }
 
   @override
-  Future<Either<String, AdminResponse>> becomeATeacher(Map<String, dynamic> params) async{
-   if (await networkInfo.isConnected) {
+  Future<Either<String, AdminResponse>> becomeATeacher(
+      Map<String, dynamic> params) async {
+    if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.becomeATeacher(params);
 
@@ -179,36 +181,34 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
-    @override
+  @override
   Future<Either<String, void>> verifyPhoneNumber(
       String phoneNumber,
       Function(String verificationId, int? resendToken) onCodeSent,
-      Function(PhoneAuthCredential phoneAuthCredential) onCompleted,
-      Function(FirebaseAuthException) onFailed) async {
+      Function(auth.PhoneAuthCredential phoneAuthCredential) onCompleted,
+      Function(auth.FirebaseAuthException) onFailed) async {
     if (await networkInfo.isConnected) {
       try {
-       
-          return Right(await FirebaseAuth.instance.verifyPhoneNumber(
-            phoneNumber: phoneNumber,
-            timeout: const Duration(seconds: 120),
-            verificationCompleted: (PhoneAuthCredential credential) async {
-              await onCompleted(credential);
-            },
-            verificationFailed: (FirebaseAuthException e) async {
-              await onFailed(e);
-              // return Left(e.message);
-            },
-            codeSent: (String verificationId, int? resendToken) async {
-              await onCodeSent(verificationId, resendToken);
-            },
-            codeAutoRetrievalTimeout: (String verificationId) {
-              // Auto retrieval timeout
-            },
-          ));
-        
+        return Right(await auth.FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: phoneNumber,
+          timeout: const Duration(seconds: 120),
+          verificationCompleted: (auth.PhoneAuthCredential credential) async {
+            await onCompleted(credential);
+          },
+          verificationFailed: (auth.FirebaseAuthException e) async {
+            await onFailed(e);
+            // return Left(e.message);
+          },
+          codeSent: (String verificationId, int? resendToken) async {
+            await onCodeSent(verificationId, resendToken);
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {
+            // Auto retrieval timeout
+          },
+        ));
       } catch (e) {
         onFailed(
-            FirebaseAuthException(message: e.toString(), code: 'UNKNOWN'));
+            auth.FirebaseAuthException(message: e.toString(), code: 'UNKNOWN'));
         return Left(e.toString());
       }
     } else {
@@ -216,9 +216,9 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
-    @override
-  Future<Either<String, User>> verifyOTP(
-      PhoneAuthCredential credential) async {
+  @override
+  Future<Either<String, auth.User>> verifyOTP(
+      auth.PhoneAuthCredential credential) async {
     if (await networkInfo.isConnected) {
       final response = await userRemoteDatasource.verifyOTP(credential);
       return Right(response);
@@ -226,4 +226,4 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(networkInfo.noNetworkMessage);
     }
   }
-  }
+}

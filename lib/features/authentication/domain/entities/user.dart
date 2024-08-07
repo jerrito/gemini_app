@@ -1,21 +1,22 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:equatable/equatable.dart';
-import 'package:gemini/features/authentication/domain/entities/admin.dart';
 
 class User extends Equatable {
-  final String? userName, email, password,role, profile;
-  final bool? isStudent;
+  final String? userName, email, password, uid, profile, phoneNumber;
+  final bool? emailVerified, disabled;
+  final MetaData? metaData;
 
-
-  const User({
-   required this.isStudent, 
-    required this.userName,
-    required this.email,
-    required this.password,
-    required this.profile,
-    required this.role,
-  });
+  const User(
+      {required this.emailVerified,
+      required this.userName,
+      required this.email,
+      required this.password,
+      required this.profile,
+      required this.disabled,
+      required this.phoneNumber,
+      required this.metaData,
+      required this.uid});
 
   @override
   List<Object?> get props => [
@@ -32,6 +33,23 @@ class User extends Equatable {
       };
 }
 
+class MetaData extends Equatable {
+  final String? lastSignInTime, creationTime, lastRefreshTime;
+
+  const MetaData({
+    required this.lastSignInTime,
+    required this.creationTime,
+    required this.lastRefreshTime,
+  });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [
+        lastRefreshTime,
+        creationTime,
+        lastSignInTime,
+      ];
+}
 
 
 // SigninResponse extends Equatable {

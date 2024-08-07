@@ -12,13 +12,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthenticationRemoteDatasource {
   //signup
-  Future<UserCredential> signupUser(Map<String, dynamic> params);
+  Future<UserModel> signupUser(Map<String, dynamic> params);
 
 // signin
-  Future<UserCredential> signinUser(Map<String, dynamic> params);
+  Future<UserModel> signinUser(Map<String, dynamic> params);
 
   // get user
-  Future<UserCredential> getUser(Map<String, dynamic> params);
+  Future<UserModel> getUser(Map<String, dynamic> params);
 
   // logout
   Future<String> logout(Map<String, dynamic> params);
@@ -44,17 +44,23 @@ class AuthenticationRemoteDatasourceImpl
     required this.firebaseAuth,
   });
   @override
-  Future<UserCredential> signupUser(Map<String, dynamic> params) async {
+  Future<UserModel> signupUser(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
+      "Accept": "application/json",
+      'Authorization': authoken
     });
 
     final Map<String, dynamic> body = {
       "userName": params["userName"],
       "email": params["email"],
       "password": params["password"],
+      "phoneNumber": params["phoneNumber"]
     };
+    // User;
 
     final response = await client.post(
       getUri(
@@ -67,18 +73,20 @@ class AuthenticationRemoteDatasourceImpl
     );
 
     final data = jsonDecode(response.body);
+    print(data);
     if (response.statusCode == 200) {
-      return data;
+      return UserModel.fromJson(data);
     } else {
       throw Exception(ErrorModel.fromJson(data).toMap());
     }
   }
 
   @override
-  Future<UserCredential> signinUser(Map<String, dynamic> params) async {
+  Future<UserModel> signinUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
-      "Content-Type": "application/json; charset=UTF-8",
+      "Content-Type": "application/json",
+      "Accept": "application/json",
     });
     final Map<String, dynamic> body = {
       "email": params["email"],
@@ -94,28 +102,34 @@ class AuthenticationRemoteDatasourceImpl
     );
     final decodedResponse = jsonDecode(response.body);
     print(decodedResponse);
+    
+    // Pig
 
     if (response.statusCode == 200) {
-      return decodedResponse;
+      return UserModel.fromJson(decodedResponse);
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse).toMap());
     }
   }
 
   @override
-  Future<UserCredential> getUser(Map<String, dynamic> params) async {
+  Future<UserModel> getUser(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    print(authoken);
     headers.addAll({
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": "Bearer $authoken"
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      'Authorization': authoken
     });
 
     final response = await client.get(getUri(endpoint: Url.homeUrl.endpoint),
         headers: headers);
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
-      return decodedResponse;
+      return UserModel.fromJson(decodedResponse);
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse).toMap());
     }
@@ -124,13 +138,11 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> logout(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
-    headers.addAll({
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": "Bearer $authoken"
-          
-    });
+    headers.addAll(
+        {"Content-Type": "application/json", "Authorization": authoken});
 
     final response = await client.post(
       getUri(
@@ -151,11 +163,12 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> refreshToken(String refreshToken) async {
     Map<String, String>? headers = {};
-  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? refreshToken;
-  
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? refreshToken;
+
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization":"Bearer $authoken"
+      "Authorization": authoken
     });
 
     final response = await client
@@ -174,11 +187,12 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<String> deleteAccount(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization":"Bearer $authoken"
+      "Authorization": "Bearer $authoken"
     });
 
     final response = await client.delete(
@@ -199,11 +213,12 @@ class AuthenticationRemoteDatasourceImpl
   @override
   Future<AdminModelResponse> becomeATeacher(Map<String, dynamic> params) async {
     Map<String, String>? headers = {};
-  final String authoken=await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
 
     headers.addAll({
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization":"Bearer $authoken"
+      "Authorization": "Bearer $authoken"
     });
 
     final response = await client.post(

@@ -54,11 +54,11 @@ class _SignupPageState extends State<SignupPage> {
               context.goNamed("connection");
             }
             if (state is SignupLoaded) {
-              final data = state.response.user;
+              final data = state.response;
               userProvider?.user = data;
               // final refreshTokenResponse = state.response.user!.uid;
               // tokenProvider?.setRefreshToken = refreshTokenResponse;
-              tokenProvider?.setToken = state.response.user!.uid;
+              // tokenProvider?.setToken = state.response.uid;
               // final authorization = {"refreshToken": refreshTokenResponse};
               // authBloc.add(CacheTokenEvent(authorization: authorization));
             }

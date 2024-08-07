@@ -5,7 +5,7 @@ class FirebaseAppCheckHelper {
 
   static Future initialiseAppCheck() async {
     await FirebaseAppCheck.instance.activate(
-      //webProvider: 'recaptcha-v3-site-key',
+      webProvider: _webProvider(),
       androidProvider: _androidProvider(),
     );
   }
@@ -17,4 +17,8 @@ class FirebaseAppCheckHelper {
 
     return AndroidProvider.playIntegrity;
   }
+}
+
+ReCaptchaV3Provider _webProvider(){
+  return ReCaptchaV3Provider('recaptcha-v3-site-key');
 }

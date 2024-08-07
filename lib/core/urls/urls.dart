@@ -3,18 +3,18 @@ enum Url {
   signinUrl(endpoint: "/api/auth/firebase/signin"),
   verifyOTPUrl(endpoint: "api/verify_otp"),
   verifyTokenUrl(endpoint: "/verify_token"),
-  homeUrl(endpoint: "/api/auth/me"),
-  addDataUrl(endpoint: "/api/data"),
+  homeUrl(endpoint: "/api/auth/firebase/me"),
+  addDataUrl(endpoint: "/api/firestore/data"),
   becomeATeacherUrl(endpoint: "/api/admin/signup"),
-  listDataUrl(endpoint: '/api/data'),
-  deleteDataUrl(endpoint: "/api/data/"),
-  deleteMultipleDataUrl(endpoint: "/api/data/delete/list"),
-  getDataByIdUrl(endpoint: "/api/data/"),
+  listDataUrl(endpoint: '/api/firestore/data'),
+  deleteDataUrl(endpoint: "/api/firestore/datas/"),
+  deleteMultipleDataUrl(endpoint: "/api/firestore/data/list"),
+  getDataByIdUrl(endpoint: "/api/firestore/data/"),
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
-  deleteAccount(endpoint: "/api/user/"),
-  updateUser(endpoint: "/api/user/profile"),
-  updateProfile(endpoint: "/api/user/profile/picture"),
+  deleteAccount(endpoint: "/api/user/firebase"),
+  updateUser(endpoint: "/api/user/firebase/profile"),
+  updateProfile(endpoint: "/api/user/firebase/profile/picture"),
   changePasswordUrl(endpoint: "/api/user/profile/password"),
   fUrl(endpoint: "/verify_otp");
 
@@ -27,7 +27,7 @@ getUri(
     {String? path,
     Map<String, dynamic>? queryParams,
     required String endpoint}) {
-  String baseUrl = 'gemini-server-1-qpjy.onrender.com';
+  String baseUrl = 'gemini-server-1.onrender.com';
   var url = Uri.https(baseUrl, endpoint + (path ?? ""), queryParams);
 
   return url;

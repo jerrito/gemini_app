@@ -9,7 +9,6 @@ import 'package:gemini/locator.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ConnectionPage extends StatefulWidget {
   const ConnectionPage({super.key});
@@ -94,10 +93,9 @@ class _ConnectionPageState extends State<ConnectionPage>
           bloc: userBloc,
           listener: (context, state) {
             if (state is GetTokenLoaded) {
+              print(state.authorization["token"]);
               token = state.authorization["token"];
-              final Map<String, dynamic> params = {
-                "token":token
-              };
+              final Map<String, dynamic> params = {"token": token};
               setState(() {});
               userBloc.add(
                 GetUserEvent(
@@ -105,6 +103,7 @@ class _ConnectionPageState extends State<ConnectionPage>
                 ),
               );
             }
+
             if (state is RefreshTokenError) {
               if (state.errorMessage == "No internet connection") {
                 context.goNamed("noInternet");
@@ -123,12 +122,17 @@ class _ConnectionPageState extends State<ConnectionPage>
             }
             if (state is GetUserLoaded) {
               final user = state.user;
-              userProvider?.user = user.user;
+              userProvider?.user = user;
               context.goNamed("searchPage");
             }
 
             if (state is GetUserError) {
-              context.goNamed("signin");
+              if (state.errorMessage == "No internet connection") {
+                context.goNamed("noInternet");
+              } else {
+                print(state.errorMessage);
+                context.goNamed("signin");
+              }
             }
             if (state is GetTokenError) {
               context.goNamed("landing");
