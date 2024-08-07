@@ -9,17 +9,15 @@ class TextEntity {
 
   final String? title, data;
 
-  final int? eventType;
-
   final bool? hasImage;
 
   final Uint8List? dataImage;
 
-  const TextEntity(
-      {required this.hasImage,
-      required this.textId,
-      required this.title,
-      required this.data,
-      required this.dataImage,
-      required this.eventType});
+  const TextEntity({
+    required this.hasImage,
+    required this.textId,
+    required this.title,
+    required this.data,
+    required this.dataImage,
+  });
 }

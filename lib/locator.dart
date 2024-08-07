@@ -156,6 +156,7 @@ void user() {
   sl.registerLazySingleton<UserRemoteDatasource>(
     () => UserRemoteDatasourceImpl(
       client: sl(),
+      firebaseAuth: sl(),
     ),
   );
 }
@@ -212,6 +213,7 @@ void dataGenerated() {
   sl.registerLazySingleton<DataGeneratedRemoteDatasource>(
     () => DataGeneratedRemoteDatasourceImpl(
       client: http.Client(),
+      firebaseAuth: sl(),
     ),
   );
 }
@@ -232,7 +234,10 @@ void initSearch() {
   );
 
   sl.registerLazySingleton(
-    () => DataGeneratedRemoteDatasourceImpl(client: sl()),
+    () => DataGeneratedRemoteDatasourceImpl(
+      client: sl(),
+      firebaseAuth: sl(),
+    ),
   );
 
   sl.registerLazySingleton(

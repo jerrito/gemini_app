@@ -1,5 +1,6 @@
 import "dart:typed_data";
 
+import "package:firebase_auth/firebase_auth.dart";
 import 'package:gemini/features/data_generated/data/models/data_model.dart';
 import "dart:async";
 import "dart:convert";
@@ -20,21 +21,29 @@ abstract class DataGeneratedRemoteDatasource {
   //  delete multiple data generated
   Future<bool> deleteMultipleDataGenerated(Map<String, dynamic> params);
 
+  // get data by id
   Future<DataModel> getDataGeneratedById(Map<String, dynamic> params);
 }
 
 class DataGeneratedRemoteDatasourceImpl
     implements DataGeneratedRemoteDatasource {
   final http.Client client;
+  final FirebaseAuth firebaseAuth;
 
-  DataGeneratedRemoteDatasourceImpl({required this.client});
+  DataGeneratedRemoteDatasourceImpl({
+    required this.firebaseAuth,
+    required this.client,
+  });
 
   @override
   Future<DataModel> addDataGenerated(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
 
     final Map<String, dynamic> body = {
@@ -60,10 +69,13 @@ class DataGeneratedRemoteDatasourceImpl
 
   @override
   Future<List<DataModel>> listDataGenerated(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
     final response = await client.get(
       getUri(endpoint: Url.listDataUrl.endpoint),
@@ -82,7 +94,14 @@ class DataGeneratedRemoteDatasourceImpl
 
   @override
   Future<bool> deleteDataGenerated(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
+    headers.addAll(<String, String>{
+      "Content-Type": "application/json; charset=UTF-8",
+      "Accept": "application/json",
+      'Authorization': authoken
+    });
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": params["token"]
@@ -103,10 +122,13 @@ class DataGeneratedRemoteDatasourceImpl
 
   @override
   Future<DataModel> getDataGeneratedById(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
     String id = params["path"];
     final response = await client.get(
@@ -123,10 +145,13 @@ class DataGeneratedRemoteDatasourceImpl
 
   @override
   Future<bool> deleteMultipleDataGenerated(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
     Map<String, dynamic> body = {"list": params["list"]};
     final response = await client.delete(

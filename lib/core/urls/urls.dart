@@ -12,9 +12,9 @@ enum Url {
   getDataByIdUrl(endpoint: "/api/firestore/data/"),
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
-  deleteAccount(endpoint: "/api/user/firebase"),
+  deleteAccount(endpoint: "/api/user/firebase/profile"),
   updateUser(endpoint: "/api/user/firebase/profile"),
-  updateProfile(endpoint: "/api/user/firebase/profile/picture"),
+  updateProfilePicture(endpoint: "/api/user/firebase/profile/picture"),
   changePasswordUrl(endpoint: "/api/user/profile/password"),
   fUrl(endpoint: "/verify_otp");
 

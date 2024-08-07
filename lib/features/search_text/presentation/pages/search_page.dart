@@ -14,6 +14,7 @@ import 'package:gemini/features/authentication/presentation/providers/token.dart
 import 'package:gemini/features/data_generated/presentation/bloc/data_generated_bloc.dart';
 import 'package:gemini/features/search_text/presentation/widgets/data_add.dart';
 import 'package:gemini/features/search_text/presentation/widgets/generated_data_title.dart';
+import 'package:gemini/features/search_text/presentation/widgets/icon_button.dart';
 import 'package:gemini/features/search_text/presentation/widgets/read_data_generated.dart';
 import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/locator.dart';
@@ -122,17 +123,17 @@ class _SearchTextPage extends State<SearchTextPage>
     );
   }
 
-  void execute(
-      {required TextEntity textEntity,
-      required int eventType,
-      bool? isTextImage}) async {
+  void execute({
+    required TextEntity textEntity,
+    bool? isTextImage,
+  }) async {
     searchBloc2.add(ReadAllEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     token = context.read<TokenProvider>().token;
-    user = context.watch<UserProvider>().user! ;
+    user = context.watch<UserProvider>().user!;
     profile = context.watch<UserProvider>().profile;
     return Scaffold(
       key: scaffoldKey,
@@ -394,7 +395,6 @@ class _SearchTextPage extends State<SearchTextPage>
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
                   // "dateTime": DateTime.now(),
-                  "eventType": 2,
                   "hasImage": true,
                   "dataImage": byte
                 };
@@ -430,7 +430,6 @@ class _SearchTextPage extends State<SearchTextPage>
                   "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
-                  "eventType": 1,
                   "hasImage": false,
                   "dataImage": null
                 };
@@ -597,15 +596,15 @@ class _SearchTextPage extends State<SearchTextPage>
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        GestureDetector(
+                        IconGesture(
                           onTap: () {
                             canDeleteData = !canDeleteData;
                             ids.clear();
                             setState(() {});
                           },
-                          child: const Icon(Icons.deselect_outlined),
+                          icon: Icons.deselect_outlined,
                         ),
-                        GestureDetector(
+                        IconGesture(
                           onTap: () {
                             if (ids.isNotEmpty) {
                               final Map<String, dynamic> params = {
@@ -616,16 +615,15 @@ class _SearchTextPage extends State<SearchTextPage>
                                   DeleteListDataGeneratedEvent(params: params));
                             }
                           },
-                          child: const Icon(Icons.delete),
+                          icon: Icons.delete,
                         ),
-                        GestureDetector(
+                        IconGesture(
                           onTap: () {
                             ids.addAll(allSelectIds);
 
                             setState(() {});
                           },
-                          child:
-                              const Icon(Icons.check_box_outline_blank_rounded),
+                          icon: Icons.check_box_outline_blank_rounded,
                         )
                       ],
                     )
@@ -639,13 +637,13 @@ class _SearchTextPage extends State<SearchTextPage>
                                   fontWeight: FontWeight.w600,
                                   decoration: TextDecoration.underline)),
                         ),
-                        IconButton(
-                            onPressed: () {
+                        IconGesture(
+                            onTap: () {
                               canDeleteData = !canDeleteData;
                               ids.clear();
                               setState(() {});
                             },
-                            icon: const Icon(Icons.checklist_outlined)),
+                            icon: Icons.checklist_outlined),
                       ],
                     ),
               BlocConsumer(
@@ -744,7 +742,6 @@ class _SearchTextPage extends State<SearchTextPage>
                                   "title": datas.title,
                                   "data": datas.data,
                                   "dataImage": datas.dataImage,
-                                  "eventType": datas.id,
                                   "dateTime": datas.dateTime,
                                   "hasImage": datas.hasImage,
                                   "path": datas.id,

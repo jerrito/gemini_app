@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
@@ -11,7 +12,7 @@ abstract class UserRemoteDatasource {
   Future<UserModel> updateUser(Map<String, dynamic> params);
 
   // update profile
-  Future<String> updateProfile(Map<String, dynamic> params);
+  Future<String> updateProfilePicture(Map<String, dynamic> params);
 
   //change password
   Future<String> changePassword(Map<String, dynamic> params);
@@ -19,15 +20,20 @@ abstract class UserRemoteDatasource {
 
 class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   final http.Client client;
+  final FirebaseAuth firebaseAuth;
 
-  UserRemoteDatasourceImpl({required this.client});
+  UserRemoteDatasourceImpl({required this.firebaseAuth, required this.client});
   @override
   Future<UserModel> updateUser(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
+
     final Map<String, dynamic> queryParams = params["queryParams"];
     final response = await client.put(
       getUri(endpoint: Url.updateUser.endpoint, queryParams: queryParams),
@@ -43,14 +49,18 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
   }
 
   @override
-  Future<String> updateProfile(Map<String, dynamic> params) async {
-    final Map<String, String> headers = {
+  Future<String> updateProfilePicture(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
+    Map<String, String>? headers = {};
+    headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
-    };
+      "Accept": "application/json",
+      'Authorization': authoken
+    });
     final Map<String, dynamic> body = {"data": params["dataImage"]};
     final response = await client.put(
-        getUri(endpoint: Url.updateProfile.endpoint),
+        getUri(endpoint: Url.updateProfilePicture.endpoint),
         body: jsonEncode(body),
         headers: headers);
     final decodedResponse = jsonDecode(response.body);
@@ -64,10 +74,13 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
 
   @override
   Future<String> changePassword(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
-    headers.addAll({
+    headers.addAll(<String, String>{
       "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
+      "Accept": "application/json",
+      'Authorization': authoken
     });
     final Map<String, dynamic> body = {
       "old_password": params["oldPassword"],

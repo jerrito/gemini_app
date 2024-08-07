@@ -17,7 +17,7 @@ class UserRepositoryImpl implements UserRepository {
     required this.remoteDatasource,
   });
 
- //! UPDATE USER
+  //! UPDATE USER
   @override
   Future<Either<String, User>> updateUser(Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
@@ -34,14 +34,13 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  
   //! UPDATE PROFILE
   @override
   Future<Either<String, String>> updateProfile(
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {
-        final response = await remoteDatasource.updateProfile(params);
+        final response = await remoteDatasource.updateProfilePicture(params);
         return Right(response);
       } catch (e) {
         return Left(
@@ -55,7 +54,7 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
- //! PICK IMAGE
+  //! PICK IMAGE
   @override
   Future<Either<String, Uint8List?>> pickImage(
       Map<String, dynamic> params) async {

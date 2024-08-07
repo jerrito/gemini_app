@@ -81,10 +81,13 @@ class AuthenticationRemoteDatasourceImpl
 
   @override
   Future<UserModel> signinUser(Map<String, dynamic> params) async {
+    final String authoken =
+        await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
-      "Content-Type": "application/json",
+      "Content-Type": "application/json; charset=UTF-8",
       "Accept": "application/json",
+      'Authorization': authoken
     });
     final Map<String, dynamic> body = {
       "email": params["email"],
@@ -100,7 +103,7 @@ class AuthenticationRemoteDatasourceImpl
     );
     final decodedResponse = jsonDecode(response.body);
     print(decodedResponse);
-    
+
     // Pig
 
     if (response.statusCode == 200) {

@@ -109,7 +109,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       emit(GenerateContentAllDone(data: all.join("")));
       all.clear();
     });
-   
+
     on<GenerateContentEvent>((event, emit) async {
       emit(GenerateStreamLoading());
       await generateStreams(event.params);
@@ -127,7 +127,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       });
     });
 
-   
     on<GenerateStreamStopEvent>((event, emit) async {
       final content = [ai.Content.text(event.params["text"])];
       if (await networkInfo.isConnected) {
@@ -286,7 +285,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         title: params["title"],
         data: params["data"],
         dataImage: params["dataImage"],
-        eventType: params["eventType"],
         hasImage: params["hasImage"] ?? false);
 
     return await personDao?.insertData(textEntity);
@@ -300,7 +298,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         title: params["title"],
         data: params["data"],
         dataImage: params["dataImage"],
-        eventType: params["eventType"],
         hasImage: params["hasImage"] ?? false);
 
     return await textDao?.deleteData(textEntity);
