@@ -39,7 +39,8 @@ class UserProfileWidget extends StatelessWidget {
 enum UserProfileData {
   userName(svg: profileSVG),
   email(svg: emailSVG),
-  password(svg: lockSVG);
+  password(svg: lockSVG),
+  phoneNumber(svg: phoneSVG);
 
   final String svg;
   const UserProfileData({required this.svg});

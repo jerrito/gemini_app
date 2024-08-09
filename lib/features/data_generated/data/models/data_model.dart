@@ -2,8 +2,6 @@ import 'package:gemini/features/data_generated/domain/entities/data.dart';
 
 class DataModel extends Data {
   const DataModel({
-    required super.userId,
-    required super.id,
     required super.data,
     required super.title,
     required super.dataImage,
@@ -12,13 +10,16 @@ class DataModel extends Data {
   });
 
   factory DataModel.fromJson(Map<String, dynamic>? json) => DataModel(
-        userId: json?["userId"],
-        id: json?["id"],
         data: json?["data"],
         title: json?["title"],
         dataImage: json?["dataImage"],
         hasImage: json?["hasImage"],
-        dateTime: DateTime.parse(json?["dateTime"]),
+        dateTime: json?["dateTime"],
       );
 }
 
+class DataIdsModel extends DataIds {
+  const DataIdsModel({required super.ids});
+
+  
+}

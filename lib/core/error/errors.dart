@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class Errors extends Equatable{
  final String? errorMessage, error;
- final num? errorCode;
+ final String? errorCode;
 
   const Errors({required this.errorMessage, required this.error, required this.errorCode});
  

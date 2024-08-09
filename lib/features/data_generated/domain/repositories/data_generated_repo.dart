@@ -1,13 +1,14 @@
 // add Data
 import 'package:dartz/dartz.dart';
 import 'package:gemini/features/data_generated/domain/entities/data.dart';
+import 'package:gemini/features/data_generated/domain/entities/data_info.dart';
 
 abstract class DataGeneratedRepository {
 // add data generated
   Future<Either<String, Data>> addDataGenerated(Map<String, dynamic> params);
 
 // get all data generated
-  Future<Either<String, List<Data>>> allDataGenerated(
+  Future<Either<String, DataInfo>> allDataGenerated(
       Map<String, dynamic> params);
 
 //delete data generated

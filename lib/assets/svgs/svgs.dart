@@ -6,3 +6,4 @@ const profileSVG = "${assetPath}profiles.svg";
 const showPasswordSVG = "${assetPath}show_password.svg";
 const hidePasswordSVG = "${assetPath}hide_password.svg";
 const emailSVG = "${assetPath}mail.svg";
+const phoneSVG = "${assetPath}phone.svg";

@@ -1,22 +1,32 @@
-
 import 'package:equatable/equatable.dart';
 
 class Data extends Equatable {
   final String? data, title;
   final bool? hasImage;
-  final int userId, id;
   final dynamic dataImage;
-  final DateTime? dateTime;
+  final int dateTime;
 
   const Data(
       {required this.dateTime,
       required this.hasImage,
-      required this.userId,
-      required this.id,
       required this.data,
       required this.title,
       required this.dataImage});
   @override
-  List<Object?> get props =>
-      [data, title, userId, dateTime, id, hasImage, dataImage];
+  List<Object?> get props => [
+        data,
+        title,
+        dateTime,
+        hasImage,
+        dataImage,
+      ];
+}
+
+class DataIds extends Equatable {
+  final List<String> ids;
+
+  const DataIds({required this.ids});
+
+  @override
+  List<Object?> get props => [ids];
 }

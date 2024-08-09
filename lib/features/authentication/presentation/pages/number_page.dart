@@ -14,13 +14,12 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class PhoneNumberPage extends StatefulWidget {
   final bool isSignup;
-  final String? id, uid, oldNumberString;
-  const PhoneNumberPage(
-      {super.key,
-      required this.isSignup,
-      this.id,
-      this.uid,
-      this.oldNumberString});
+  final String? oldNumberString;
+  const PhoneNumberPage({
+    super.key,
+    required this.isSignup,
+    this.oldNumberString,
+  });
 
   @override
   State<PhoneNumberPage> createState() => _PhoneNumberPageState();
@@ -30,14 +29,18 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
   final authBloc = sl<AuthenticationBloc>();
   final formKey = GlobalKey<FormState>();
   final phoneNumberController = TextEditingController();
-  PhoneNumber phone = PhoneNumber(isoCode: "Gh", dialCode: "+233");
+  PhoneNumber phone = PhoneNumber(isoCode: "GH", dialCode: "+233");
   String number = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.isSignup == true ? "Verify Number" : "Signin With Number",
+            widget.isSignup == true
+                ? "Verify Number"
+                : widget.oldNumberString != null
+                    ? "Verify old number"
+                    : "Signin With Number",
           ),
         ),
         bottomSheet: Padding(
@@ -57,8 +60,6 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                           phoneNumber: number,
                           forceResendingToken: state.token,
                           verifyId: state.verifyId,
-                          uid: widget.uid,
-                          id: widget.id,
                           oldNumberString: widget.oldNumberString),
                     );
                   }),
@@ -93,11 +94,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text(state.errorMessage)));
               }
-              if (state is CheckPhoneNumberChangeError) {
-                authBloc.add(
-                  PhoneNumberEvent(phoneNumber: number),
-                );
-              }
+
               if (state is CheckPhoneNumberLoaded) {
                 if (state.isNumberChecked == true) {
                   authBloc.add(
@@ -117,7 +114,6 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                 showSnackbar(
                   context: context,
                   message: state.errorMessage,
-                  isSuccessMessage: true,
                 );
               }
             },
@@ -176,9 +172,6 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                     onInputChanged: (value) {
                       number = value.phoneNumber!;
                       setState(() {});
-                    },
-                    onInputValidated: (bool v) {
-                      print(v);
                     },
                     selectorConfig: const SelectorConfig(
                       selectorType: PhoneInputSelectorType.BOTTOM_SHEET,

@@ -18,6 +18,8 @@ import 'package:gemini/features/user/presentation/widgets/show_image_pick.dart';
 import 'package:gemini/features/user/presentation/widgets/user_profile.dart';
 import 'package:gemini/locator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
+
 class UserProfile extends StatefulWidget {
   const UserProfile({
     super.key,
@@ -46,10 +48,17 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
     token = context.read<TokenProvider>().token ?? "";
     listUserData.setAll(
       0,
-      [user.userName, user.email, "Change Password"],
+      [
+        user.userName,
+        user.email,
+        "Change Password",
+      ],
     );
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("User Profile"),
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: Sizes().width(context, 0.04)),
         child: SafeArea(
@@ -126,6 +135,12 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
                     ),
                   ),
                 ),
+                UserProfileWidget(
+                  label: user.phoneNumber ?? "",
+                  onTap: () => context.pushNamed("number",
+                      queryParameters: {"oldNumberString": user.phoneNumber}),
+                  userProfileData: UserProfileData.phoneNumber,
+                ),
                 Column(
                   children: List<RemoveUser>.of(
                     removeUser.entries.map((e) => RemoveUser(
@@ -157,6 +172,6 @@ class _UserProfileState extends State<UserProfile> with UserProfileMixin {
   List<UserProfileData> listProfileData = [
     UserProfileData.userName,
     UserProfileData.email,
-    UserProfileData.password
+    UserProfileData.password,
   ];
 }

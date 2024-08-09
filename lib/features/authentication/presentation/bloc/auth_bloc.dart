@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini/core/usecase/usecase.dart';
 import 'package:gemini/features/authentication/domain/entities/admin.dart';
@@ -37,9 +38,8 @@ class AuthenticationBloc
   final VerifyPhoneNumber verifyNumber;
   final VerifyOTP verifyOTP;
   AuthenticationBloc(
-      {
-        required this.verifyOTP,
-        required this.verifyNumber,
+      {required this.verifyOTP,
+      required this.verifyNumber,
       required this.getCacheUser,
       required this.refreshToken,
       required this.signup,
@@ -308,5 +308,27 @@ class AuthenticationBloc
         ),
       );
     });
+
+    //! Check Phone Number
+    on<CheckPhoneNumberEvent>((event, emit) {
+      final response = checkPhoneNumber(event.params);
+      emit(
+        response.fold(
+          (error) => CheckPhoneNumberChangeError(
+            errorMessage: error,
+          ),
+          (response) => CheckPhoneNumberLoaded(
+            isNumberChecked: response,
+          ),
+        ),
+      );
+    });
+  }
+  Either<String, bool> checkPhoneNumber(Map<String, dynamic> params) {
+    if (params["start_number"] != params["phone_number"]) {
+      return const Left("Wrong old number");
+    } else {
+      return const Right(true);
+    }
   }
 }

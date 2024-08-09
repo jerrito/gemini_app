@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:gemini/core/network/networkinfo.dart';
 import 'package:gemini/features/data_generated/data/datasources/remote_ds.dart';
 import 'package:gemini/features/data_generated/domain/entities/data.dart';
+import 'package:gemini/features/data_generated/domain/entities/data_info.dart';
 import 'package:gemini/features/data_generated/domain/repositories/data_generated_repo.dart';
 
 class DataGeneratedRepositorympl implements DataGeneratedRepository {
@@ -27,7 +28,7 @@ class DataGeneratedRepositorympl implements DataGeneratedRepository {
   }
 
   @override
-  Future<Either<String, List<Data>>> allDataGenerated(
+  Future<Either<String, DataInfo>> allDataGenerated(
       Map<String, dynamic> params) async {
     if (await networkInfo.isConnected) {
       try {

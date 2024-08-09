@@ -18,15 +18,13 @@ import 'package:pinput/pinput.dart';
 import 'package:telephony/telephony.dart';
 
 class OTPRequest {
-  String? verifyId, phoneNumber, id, uid, oldNumberString;
+  String? verifyId, phoneNumber, oldNumberString;
   int? forceResendingToken;
   bool isSignup;
   //void Function()? onSuccessCallback;
 
   OTPRequest({
     this.verifyId,
-    this.uid,
-    this.id,
     this.phoneNumber,
     this.forceResendingToken,
     required this.isSignup,
@@ -120,40 +118,39 @@ class _OTPPageState extends State<OTPPage> {
                 });
               }
               if (state is VerifyOTPLoaded) {
-                if (widget.otpRequest.isSignup) {
-                  token = await FirebaseAuth.instance.currentUser?.getIdToken();
-                  setState(() {});
-                  final authorization = {"token": token};
+                if (widget.otpRequest.oldNumberString == null) {
+                  final Map<String, dynamic> params = {"token": token};
                   authBloc.add(
-                    CacheTokenEvent(
-                      authorization: authorization,
+                    GetUserEvent(
+                      params: params,
                     ),
                   );
                 } else {
-                  if (widget.otpRequest.oldNumberString == null) {
-                    final Map<String, dynamic> params = {"token": token};
-                    authBloc.add(
-                      GetUserEvent(
-                        params: params,
-                      ),
-                    );
-                  } else {
-                    context.pushNamed("changeNumber", queryParameters: {
-                      "phoneNumber": state.user.phoneNumber
-                    });
-                  }
+                  context.pushNamed("changeNumber",
+                      queryParameters: {"phoneNumber": state.user.phoneNumber});
                 }
               }
               if (state is GetUserLoaded) {
-                if (state.user.email == null) {
-                  if (!context.mounted) return;
-                  context.pushNamed("signup", queryParameters: {
-                    "phoneNumber": widget.otpRequest.phoneNumber
-                  });
-                } else {
+                if (state.user.email != null) {
                   userProvider.user = state.user;
                   if (!context.mounted) return;
                   context.goNamed("searchPage");
+                  showSnackbar(
+                    isSuccessMessage: true,
+                    context: context,
+                    message: "Number already registered",
+                  );
+                } else {
+                  if (widget.otpRequest.isSignup || state.user.email == null) {
+                    if (!context.mounted) return;
+                    context.pushNamed("signup", queryParameters: {
+                      "phoneNumber": widget.otpRequest.phoneNumber
+                    });
+                  }
+                  if (widget.otpRequest.oldNumberString != null) {
+                    if (!context.mounted) return;
+                    context.goNamed("changeNumber");
+                  }
                 }
               }
               if (state is GetUserError) {
@@ -227,7 +224,7 @@ class _OTPPageState extends State<OTPPage> {
                                 context.pop("resend");
                               },
                               child: Offstage(
-                                offstage: !isResend,
+                                offstage: isResend,
                                 child: const Text("Resend",
                                     style: TextStyle(
                                       fontSize: 15,

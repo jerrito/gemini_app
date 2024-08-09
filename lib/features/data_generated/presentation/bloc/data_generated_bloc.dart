@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gemini/features/data_generated/domain/entities/data.dart';
+import 'package:gemini/features/data_generated/domain/entities/data_info.dart';
 import 'package:gemini/features/data_generated/domain/usecases/add_data_generated.dart';
 import 'package:gemini/features/data_generated/domain/usecases/delete_data_generated.dart';
 import 'package:gemini/features/data_generated/domain/usecases/delete_multiple_data.dart';

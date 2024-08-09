@@ -130,8 +130,7 @@ class _ConnectionPageState extends State<ConnectionPage>
               if (state.errorMessage == "No internet connection") {
                 context.goNamed("noInternet");
               } else {
-                print(state.errorMessage);
-                context.goNamed("signin");
+                context.goNamed("landing");
               }
             }
             if (state is GetTokenError) {

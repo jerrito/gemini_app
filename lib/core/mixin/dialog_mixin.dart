@@ -168,35 +168,55 @@ mixin UserProfileMixin {
                       state is ChangePasswordLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  return _RowButtons(
-                    onTap: (label == UserProfileData.password.name)
-                        ? () async {
-                            if (formPasswordKey.currentState!.validate()) {
-                              final params = {
-                                "oldPassword": oldPasswordController.text,
-                                "newPassword": newPasswordController.text,
-                                "confirmPassword":
-                                    confirmPasswordController.text,
-                                "token": token
-                              };
-                              userBloc.add(
-                                ChangePasswordEvent(
-                                  params: params,
-                                ),
-                              );
-                            }
-                          }
-                        : () async {
-                            if (formKey.currentState!.validate()) {
-                              final params = {
-                                "queryParams": {label: controller.text},
-                                "token": token
-                              };
-                              userBloc.add(UpdateUserEvent(
-                                params: params,
-                              ));
-                            }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        width: Sizes().width(context, 0.3),
+                        child: DefaultButton(
+                          label: "Cancel",
+                          onTap: () {
+                            context.pop();
                           },
+                        ),
+                      ),
+                      SizedBox(
+                        width: Sizes().width(context, 0.3),
+                        child: DefaultButton(
+                            label: "Update",
+                            onTap: (label == UserProfileData.password.name)
+                                ? () async {
+                                    if (formPasswordKey.currentState!
+                                        .validate()) {
+                                      final params = {
+                                        "oldPassword":
+                                            oldPasswordController.text,
+                                        "newPassword":
+                                            newPasswordController.text,
+                                        "confirmPassword":
+                                            confirmPasswordController.text,
+                                        "token": token
+                                      };
+                                      userBloc.add(
+                                        ChangePasswordEvent(
+                                          params: params,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                : () async {
+                                    if (formKey.currentState!.validate()) {
+                                      final params = {
+                                        "queryParams": {label: controller.text},
+                                        "token": token
+                                      };
+                                      userBloc.add(UpdateUserEvent(
+                                        params: params,
+                                      ));
+                                    }
+                                  }),
+                      )
+                    ],
                   );
                 })
           ]),
@@ -274,7 +294,7 @@ mixin UserProfileMixin {
                     );
                   }
                   return TextButton(
-                    onPressed: () async {
+                    onPressed: () async { 
                       //: TODO Add password dialog
                       final Map<String, dynamic> params = {
                         "token": token,

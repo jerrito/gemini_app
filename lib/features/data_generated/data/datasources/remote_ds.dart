@@ -1,6 +1,7 @@
 import "dart:typed_data";
 
 import "package:firebase_auth/firebase_auth.dart";
+import "package:gemini/features/data_generated/data/models/data_info.dart";
 import 'package:gemini/features/data_generated/data/models/data_model.dart';
 import "dart:async";
 import "dart:convert";
@@ -13,7 +14,7 @@ abstract class DataGeneratedRemoteDatasource {
   Future<DataModel> addDataGenerated(Map<String, dynamic> params);
 
   // list all data generated
-  Future<List<DataModel>> listDataGenerated(Map<String, dynamic> params);
+  Future<DataInfoModel> listDataGenerated(Map<String, dynamic> params);
 
   // delete data generated
   Future<bool> deleteDataGenerated(Map<String, dynamic> params);
@@ -60,6 +61,7 @@ class DataGeneratedRemoteDatasourceImpl
       ),
     );
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return DataModel.fromJson(decodedResponse);
     } else {
@@ -68,7 +70,7 @@ class DataGeneratedRemoteDatasourceImpl
   }
 
   @override
-  Future<List<DataModel>> listDataGenerated(Map<String, dynamic> params) async {
+  Future<DataInfoModel> listDataGenerated(Map<String, dynamic> params) async {
     final String authoken =
         await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
@@ -85,8 +87,7 @@ class DataGeneratedRemoteDatasourceImpl
     final decodedResponse = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      return List<DataModel>.from(
-          decodedResponse.map((e) => DataModel.fromJson(e)));
+      return DataInfoModel.fromJson(decodedResponse);
     } else {
       throw Exception(ErrorModel.fromJson(decodedResponse).toMap());
     }
@@ -102,14 +103,10 @@ class DataGeneratedRemoteDatasourceImpl
       "Accept": "application/json",
       'Authorization': authoken
     });
-    headers.addAll(<String, String>{
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": params["token"]
-    });
 
-    int path = params["path"];
+    String id = params["path"];
     final response = await client.delete(
-      getUri(path: path.toString(), endpoint: Url.deleteDataUrl.endpoint),
+      getUri(path: id, endpoint: Url.deleteDataUrl.endpoint),
       headers: headers,
     );
     final decodedResponse = jsonDecode(response.body);
@@ -149,7 +146,7 @@ class DataGeneratedRemoteDatasourceImpl
         await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
     Map<String, String>? headers = {};
     headers.addAll(<String, String>{
-      "Content-Type": "application/json; charset=UTF-8",
+      "Content-Type": "application/json",
       "Accept": "application/json",
       'Authorization': authoken
     });
@@ -158,7 +155,9 @@ class DataGeneratedRemoteDatasourceImpl
         getUri(endpoint: Url.deleteMultipleDataUrl.endpoint),
         headers: headers,
         body: jsonEncode(body));
+    print(getUri(endpoint: Url.deleteMultipleDataUrl.endpoint));
     final decodedResponse = jsonDecode(response.body);
+    print(decodedResponse);
     if (response.statusCode == 200) {
       return decodedResponse["success"];
     } else {

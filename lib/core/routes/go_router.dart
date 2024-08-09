@@ -8,6 +8,7 @@ import 'package:gemini/features/connection_page.dart';
 import 'package:gemini/features/learning/presentation/pages/home.dart';
 import 'package:gemini/features/search_text/presentation/pages/search_page.dart';
 import 'package:gemini/features/search_text/presentation/pages/test.dart';
+import 'package:gemini/features/user/presentation/pages/change_number.dart';
 import 'package:gemini/features/user/presentation/pages/user_profile.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,6 +18,23 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
       name: "searchPage",
       builder: (context, state) => const SearchTextPage(),
       routes: [
+        GoRoute(
+            path: "number",
+            name: "number",
+            builder: (context, state) => PhoneNumberPage(
+                  isSignup: false,
+                  oldNumberString:
+                      state.uri.queryParameters["oldNumberString"].toString(),
+                ),
+            routes: [
+              GoRoute(
+                path: "change",
+                name: "changeNumber",
+                builder: (context, state) => ChangeNumber(
+                    oldPhoneNumber:
+                        state.uri.queryParameters["oldPhoneNumber"].toString()),
+              )
+            ]),
         GoRoute(
             path: "becomeATeacher",
             name: "becomeATeacher",
@@ -53,35 +71,33 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
     builder: (context, state) => const NoInternetPage(),
   ),
   GoRoute(
-      path: "/landing",
-      name: "landing",
-      builder: (context, state) => const LandingPage(),
-      routes: [
-        GoRoute(
-            path: "phone",
-            name: "phone",
-            builder: (context, state) => const PhoneNumberPage(
-                  isSignup: true,
+    path: "/landing",
+    name: "landing",
+    builder: (context, state) => const LandingPage(),
+    routes: [
+      GoRoute(
+          path: "phone",
+          name: "phone",
+          builder: (context, state) => PhoneNumberPage(
+                isSignup: bool.parse(
+                  state.uri.queryParameters["isSignup"].toString(),
                 ),
-            routes: [
-              GoRoute(
-                path: "signup",
-                name: "signup",
-                builder: (context, state) => SignupPage(
-                    phoneNumber:
-                        state.uri.queryParameters["phoneNumber"].toString()),
               ),
-            ]),
-        GoRoute(
-          path: "signin",
-          name: "signin",
-          builder: (context, state) => SigninPage(
-            phoneNumber: state.uri.queryParameters["phoneNumber"].toString(),
-          ),
-        ),
-      ]),
+          routes: [
+            GoRoute(
+              path: "signup",
+              name: "signup",
+              builder: (context, state) => SignupPage(
+                phoneNumber:
+                    state.uri.queryParameters["phoneNumber"].toString(),
+              ),
+            ),
+          ]),
+    ],
+  ),
   GoRoute(
-      path: "/learning",
-      name: "learning",
-      builder: (context, state) => const LearningHomePage())
+    path: "/learning",
+    name: "learning",
+    builder: (context, state) => const LearningHomePage(),
+  )
 ]);

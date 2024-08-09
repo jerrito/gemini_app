@@ -15,7 +15,7 @@ import 'package:string_validator/string_validator.dart';
 
 class SignupPage extends StatefulWidget {
   final String phoneNumber;
-  const SignupPage({super.key,required this.phoneNumber});
+  const SignupPage({super.key, required this.phoneNumber});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -47,20 +47,12 @@ class _SignupPageState extends State<SignupPage> {
               if (!context.mounted) return;
               showSnackbar(context: context, message: state.errorMessage);
             }
-            if (state is CacheTokenLoaded) {
-              context.goNamed("searchPage");
-            }
-            if (state is CacheTokenError) {
-              context.goNamed("connection");
-            }
+
             if (state is SignupLoaded) {
+              print("d");
               final data = state.response;
               userProvider?.user = data;
-              // final refreshTokenResponse = state.response.user!.uid;
-              // tokenProvider?.setRefreshToken = refreshTokenResponse;
-              // tokenProvider?.setToken = state.response.uid;
-              // final authorization = {"refreshToken": refreshTokenResponse};
-              // authBloc.add(CacheTokenEvent(authorization: authorization));
+              context.pushNamed("searchPage");
             }
           },
           builder: (context, state) {
@@ -76,8 +68,7 @@ class _SignupPageState extends State<SignupPage> {
                       "userName": nameController.text,
                       "email": emailController.text,
                       "password": passwordController.text,
-                      "phoneNumber":widget.phoneNumber
-
+                      "phoneNumber": widget.phoneNumber
                     };
                     authBloc.add(SignupEvent(params: params));
                   }

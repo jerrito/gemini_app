@@ -24,7 +24,7 @@ final class DataGeneratedError extends DataGeneratedState {
 }
 
 final class ListDataGeneratedLoaded extends DataGeneratedState {
-  final List<Data> listData;
+  final DataInfo listData;
 
   const ListDataGeneratedLoaded({required this.listData});
 }

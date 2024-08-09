@@ -316,8 +316,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Data? readDataDetails(Map<String, dynamic> params) {
     final dataDetails = Data(
         hasImage: params["hasImage"],
-        userId: params["userId"],
-        id: params["id"],
         dateTime: params["dateTime"],
         data: params["data"],
         title: params["title"],

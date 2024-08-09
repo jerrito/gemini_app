@@ -118,7 +118,6 @@ class AuthenticationRemoteDatasourceImpl
     Map<String, String>? headers = {};
     final String authoken =
         await firebaseAuth.currentUser?.getIdToken() ?? params["token"];
-    print(authoken);
     headers.addAll({
       "Content-Type": "application/json",
       "Accept": "application/json",

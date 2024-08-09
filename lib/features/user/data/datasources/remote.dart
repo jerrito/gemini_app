@@ -35,7 +35,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
     });
 
     final Map<String, dynamic> queryParams = params["queryParams"];
-    final response = await client.put(
+    final response = await client.patch(
       getUri(endpoint: Url.updateUser.endpoint, queryParams: queryParams),
       headers: headers,
     );
@@ -59,7 +59,7 @@ class UserRemoteDatasourceImpl implements UserRemoteDatasource {
       'Authorization': authoken
     });
     final Map<String, dynamic> body = {"data": params["dataImage"]};
-    final response = await client.put(
+    final response = await client.patch(
         getUri(endpoint: Url.updateProfilePicture.endpoint),
         body: jsonEncode(body),
         headers: headers);

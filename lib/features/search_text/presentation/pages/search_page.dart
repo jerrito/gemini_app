@@ -611,6 +611,7 @@ class _SearchTextPage extends State<SearchTextPage>
                                 "token": token,
                                 "list": ids
                               };
+                              print(ids);
                               dataGeneratedBloc.add(
                                   DeleteListDataGeneratedEvent(params: params));
                             }
@@ -672,11 +673,13 @@ class _SearchTextPage extends State<SearchTextPage>
                   }
                   if (state is ListDataGeneratedLoaded) {
                     final response = state.listData;
-                    for (var i in response) {
-                      allSelectIds.add(i.id);
+                    for (var i in response.dataIds) {
+                      allSelectIds.add(i);
                     }
+                    // print(allSelectIds);
                   }
                   if (state is ListDataGeneratedError) {
+                    print(state.errorMessage);
                     // if (state.errorMessage !=
                     //     "Exception: {message: No data found, error: null, errorCode: 102}") {
                     //   context.pop();
@@ -726,27 +729,25 @@ class _SearchTextPage extends State<SearchTextPage>
 
                   if (state is ListDataGeneratedLoaded) {
                     // ids.clear();
-                    final response = state.listData;
+                    final response = state.listData.data;
+                    final firestoreId = state.listData.dataIds;
                     return response.isEmpty
                         ? Lottie.asset(historyJson)
                         : Flexible(
                             child: ListView.builder(
-                              // controller: _scrollController,
                               shrinkWrap: response.length > 7 ? false : true,
                               itemCount: response.isEmpty ? 0 : response.length,
                               itemBuilder: (context, index) {
                                 final datas = response[index];
+                                final docIds = firestoreId[index];
                                 final params = {
                                   "token": token,
-                                  "textId": datas.id,
                                   "title": datas.title,
                                   "data": datas.data,
                                   "dataImage": datas.dataImage,
                                   "dateTime": datas.dateTime,
                                   "hasImage": datas.hasImage,
-                                  "path": datas.id,
-                                  "id": datas.id,
-                                  "userId": datas.userId
+                                  "path": docIds,
                                 };
                                 return Slidable(
                                     // Specify a key if the Slidable is dismissible.
@@ -806,10 +807,11 @@ class _SearchTextPage extends State<SearchTextPage>
                                     child: GeneratedDataTitle(
                                         onChanged: canDeleteData
                                             ? (value) {
-                                                ids.contains(datas.id)
-                                                    ? ids.remove(datas.id)
-                                                    : ids.add(datas.id);
+                                                ids.contains(docIds)
+                                                    ? ids.remove(docIds)
+                                                    : ids.add(docIds);
                                                 setState(() {});
+                                                // print(ids);
                                               }
                                             : (value) {
                                                 searchBloc.add(
@@ -818,7 +820,7 @@ class _SearchTextPage extends State<SearchTextPage>
                                                 );
                                                 context.pop();
                                               },
-                                        value: ids.contains(datas.id),
+                                        value: ids.contains(docIds),
                                         canDelete: canDeleteData,
                                         title: datas.title,
                                         imageUrl: datas.dataImage,
@@ -826,9 +828,9 @@ class _SearchTextPage extends State<SearchTextPage>
                                         onLongPress: () {
                                           if (!canDeleteData) {
                                             canDeleteData = !canDeleteData;
-                                            ids.contains(datas.id)
-                                                ? ids.remove(datas.id)
-                                                : ids.add(datas.id);
+                                            ids.contains(docIds)
+                                                ? ids.remove(docIds)
+                                                : ids.add(docIds);
                                             setState(() {});
                                           }
                                         },
@@ -854,6 +856,6 @@ class _SearchTextPage extends State<SearchTextPage>
   }
 
   List<DataAdd> datas = [];
-  List<int> ids = [];
-  List<int> allSelectIds = [];
+  List<String> ids = [];
+  List<String> allSelectIds = [];
 }
