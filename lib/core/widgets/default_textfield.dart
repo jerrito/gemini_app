@@ -139,7 +139,7 @@ class DefaultTextFieldForm extends StatefulWidget {
   final TextEditingController? controller;
   final String? hintText, initialValue, errorText, label;
   final double? height;
-  final bool? obscureText, isPassword;
+  final bool? obscureText, isPassword, enabled;
   final Widget? suffixIcon;
   final TextInputType? textInputType;
   final FocusNode? focusNode;
@@ -151,6 +151,7 @@ class DefaultTextFieldForm extends StatefulWidget {
     this.obscureText,
     this.isPassword,
     this.suffixIcon,
+    this.enabled = false,
     this.errorText,
     this.label,
     this.height,
@@ -175,6 +176,7 @@ class _DefaultTextFieldFormState extends State<DefaultTextFieldForm> {
         Text(widget.label ?? ""),
         Space().height(context, 0.006),
         TextFormField(
+          enabled: widget.enabled,
           validator: widget.validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           obscureText: widget.obscureText ?? false,

@@ -8,7 +8,7 @@ class GetUserData extends UseCases<User, Map<String, dynamic>> {
   GetUserData({required this.repository});
 
   @override
-  Future<Either<String, User>> call(Map<String, dynamic> params)async{
+  Future<Either<String, User>> call(Map<String, dynamic>? params)async{
     return await repository.getUser(params);
   }
 }

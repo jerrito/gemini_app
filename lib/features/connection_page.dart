@@ -4,6 +4,7 @@ import 'package:gemini/assets/animations/animations.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/size/sizes.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
+import 'package:gemini/features/search_text/presentation/widgets/show_snack.dart';
 import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/locator.dart';
 import 'package:gemini/features/authentication/presentation/bloc/auth_bloc.dart';
@@ -53,7 +54,7 @@ class _ConnectionPageState extends State<ConnectionPage>
     animatedController.forward();
 
     userBloc.add(
-      GetTokenEvent(),
+      GetUserEvent(),
     );
   }
 
@@ -92,18 +93,6 @@ class _ConnectionPageState extends State<ConnectionPage>
         body: BlocConsumer(
           bloc: userBloc,
           listener: (context, state) {
-            if (state is GetTokenLoaded) {
-              print(state.authorization["token"]);
-              token = state.authorization["token"];
-              final Map<String, dynamic> params = {"token": token};
-              setState(() {});
-              userBloc.add(
-                GetUserEvent(
-                  params: params,
-                ),
-              );
-            }
-
             if (state is RefreshTokenError) {
               if (state.errorMessage == "No internet connection") {
                 context.goNamed("noInternet");
@@ -134,6 +123,10 @@ class _ConnectionPageState extends State<ConnectionPage>
               }
             }
             if (state is GetTokenError) {
+              showSnackbar(
+                context: context,
+                message: state.errorMessage,
+              );
               context.goNamed("landing");
             }
           },

@@ -70,7 +70,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<String, User>> getUser(Map<String, dynamic> params) async {
+  Future<Either<String, User>> getUser(Map<String, dynamic>? params) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await userRemoteDatasource.getUser(params);
@@ -189,23 +189,13 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       Function(auth.FirebaseAuthException) onFailed) async {
     if (await networkInfo.isConnected) {
       try {
-        return Right(await auth.FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          timeout: const Duration(seconds: 120),
-          verificationCompleted: (auth.PhoneAuthCredential credential) async {
-            await onCompleted(credential);
-          },
-          verificationFailed: (auth.FirebaseAuthException e) async {
-            await onFailed(e);
-            // return Left(e.message);
-          },
-          codeSent: (String verificationId, int? resendToken) async {
-            await onCodeSent(verificationId, resendToken);
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            // Auto retrieval timeout
-          },
-        ));
+        final response = await userRemoteDatasource.verifyPhoneNumber(
+          phoneNumber,
+          onCodeSent,
+          onCompleted,
+          onFailed,
+        );
+        return Right(response);
       } catch (e) {
         onFailed(
             auth.FirebaseAuthException(message: e.toString(), code: 'UNKNOWN'));

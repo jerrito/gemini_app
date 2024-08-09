@@ -15,7 +15,7 @@ abstract class AuthenticationRepository {
   Future<Either<String, dynamic>> cacheUserData(Map<String, dynamic> params);
 
   //get User
-  Future<Either<String, User>> getUser(Map<String, dynamic> params);
+  Future<Either<String, User>> getUser(Map<String, dynamic>? params);
 
   //cache token
   Future<Either<String, dynamic>> cacheToken(

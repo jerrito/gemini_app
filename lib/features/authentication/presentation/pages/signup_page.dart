@@ -35,7 +35,7 @@ class _SignupPageState extends State<SignupPage> {
     userProvider = context.read<UserProvider>();
     tokenProvider = context.read<TokenProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text("Signup")),
+      appBar: AppBar(title: const Text("Signup",),),
       bottomSheet: Padding(
         padding: EdgeInsets.symmetric(
             horizontal: Sizes().height(context, 0.01),
@@ -49,7 +49,6 @@ class _SignupPageState extends State<SignupPage> {
             }
 
             if (state is SignupLoaded) {
-              print("d");
               final data = state.response;
               userProvider?.user = data;
               context.pushNamed("searchPage");
