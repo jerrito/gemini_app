@@ -197,36 +197,36 @@ class _SearchTextPage extends State<SearchTextPage>
             ),
             Space().width(context, 0.04)
           ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
-      floatingActionButton: GestureDetector(
-        onTap: () {
-          context.goNamed("becomeATeacher");
-        },
-        child: AnimatedOpacity(
-          duration: Durations.extralong2,
-          opacity: opacity,
-          onEnd: () async {
-            while (true) {
-              Future.delayed(Durations.extralong1, () {
-                setState(() {
-                  opacity = 0;
-                });
-              }).whenComplete(() {
-                Future.delayed(Durations.extralong1, () {
-                  setState(() {
-                    opacity = 1;
-                  });
-                });
-              });
-            }
-          },
-          child: Container(
-              width: double.infinity,
-              height: Sizes().height(context, 0.03),
-              decoration: const BoxDecoration(color: Colors.blueAccent),
-              child: const Text("Hello", textAlign: TextAlign.center)),
-        ),
-      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
+      // floatingActionButton: GestureDetector(
+      //   onTap: () {
+      //     context.goNamed("becomeATeacher");
+      //   },
+      //   child: AnimatedOpacity(
+      //     duration: Durations.extralong2,
+      //     opacity: opacity,
+      //     onEnd: () async {
+      //       while (true) {
+      //         Future.delayed(Durations.extralong1, () {
+      //           setState(() {
+      //             opacity = 0;
+      //           });
+      //         }).whenComplete(() {
+      //           Future.delayed(Durations.extralong1, () {
+      //             setState(() {
+      //               opacity = 1;
+      //             });
+      //           });
+      //         });
+      //       }
+      //     },
+      //     child: Container(
+      //         width: double.infinity,
+      //         height: Sizes().height(context, 0.03),
+      //         decoration: const BoxDecoration(color: Colors.blueAccent),
+      //         child: const Text("Hello", textAlign: TextAlign.center)),
+      //   ),
+      // ),
       bottomSheet: Form(
         key: form,
         child: Container(
@@ -422,6 +422,7 @@ class _SearchTextPage extends State<SearchTextPage>
                 question = controller.text;
                 controller.text = "";
                 isAvailable = false;
+                setState(() {});
                 final newId = await searchBloc.readData();
                 final data = state.data;
                 refinedData = searchBloc.replace(data);
@@ -438,8 +439,6 @@ class _SearchTextPage extends State<SearchTextPage>
               }
               if (state is GenerateContentLoaded) {
                 final data = state.data;
-                isAvailable = false;
-                setState(() {});
                 snapInfo.add(data.toString());
                 _scrollDown();
               }
@@ -499,18 +498,23 @@ class _SearchTextPage extends State<SearchTextPage>
                 return Column(
                   children: [
                     Expanded(
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        shrinkWrap: true,
-                        itemCount: data?.length,
-                        //  physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final das = data![index];
-                          return DataAdd(
-                              textEntity: das,
-                              searchBloc: searchBloc,
-                              isTextImage: das.hasImage);
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          print("dd");
                         },
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          shrinkWrap: true,
+                          itemCount: data?.length,
+                          //  physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            final das = data![index];
+                            return DataAdd(
+                                textEntity: das,
+                                searchBloc: searchBloc,
+                                isTextImage: das.hasImage);
+                          },
+                        ),
                       ),
                     ),
                     Space().height(context, 0.09)
@@ -705,7 +709,6 @@ class _SearchTextPage extends State<SearchTextPage>
                   if (state is ListDataGeneratedLoading ||
                       state is DeleteDataGeneratedLoading ||
                       state is DeleteListDataGeneratedLoading) {
-                    //  "dd");
                     return const HistoryShimmer();
                   }
                   if (state is ListDataGeneratedError) {
@@ -728,7 +731,6 @@ class _SearchTextPage extends State<SearchTextPage>
                   }
 
                   if (state is ListDataGeneratedLoaded) {
-                    // ids.clear();
                     final response = state.listData.data;
                     final firestoreId = state.listData.dataIds;
                     return response.isEmpty

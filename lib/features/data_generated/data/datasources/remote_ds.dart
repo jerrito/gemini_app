@@ -155,7 +155,7 @@ class DataGeneratedRemoteDatasourceImpl
         getUri(endpoint: Url.deleteMultipleDataUrl.endpoint),
         headers: headers,
         body: jsonEncode(body));
-    print(getUri(endpoint: Url.deleteMultipleDataUrl.endpoint));
+    print(authoken);
     final decodedResponse = jsonDecode(response.body);
     print(decodedResponse);
     if (response.statusCode == 200) {

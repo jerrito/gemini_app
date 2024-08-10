@@ -116,7 +116,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       await emit.onEach(streamContent.stream, onData: (data) {
         emit(GenerateContentLoading());
-        all.add(data.text!);
         emit(GenerateContentLoaded(data: data.text));
       }, onError: (error, _) {
         emit(

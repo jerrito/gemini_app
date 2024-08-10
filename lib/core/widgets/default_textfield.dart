@@ -151,7 +151,7 @@ class DefaultTextFieldForm extends StatefulWidget {
     this.obscureText,
     this.isPassword,
     this.suffixIcon,
-    this.enabled = false,
+    this.enabled = true,
     this.errorText,
     this.label,
     this.height,

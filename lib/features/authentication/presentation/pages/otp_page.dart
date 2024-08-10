@@ -126,8 +126,9 @@ class _OTPPageState extends State<OTPPage> {
                     ),
                   );
                 } else {
-                  context.pushNamed("changeNumber",
-                      queryParameters: {"phoneNumber": state.user.phoneNumber});
+                  context.pushNamed("changeNumber", queryParameters: {
+                    "oldPhoneNumber": state.user.phoneNumber
+                  });
                 }
               }
               if (state is GetUserLoaded) {

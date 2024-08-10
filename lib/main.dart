@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini/core/firebase_app_check.dart';
@@ -21,9 +22,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
- await FirebaseAppCheckHelper.initialiseAppCheck();
+  await FirebaseAppCheckHelper.initialiseAppCheck();
 
-  // print(await FirebaseAuth.instance.currentUser?.getIdToken());
+  print(await FirebaseAuth.instance.currentUser?.getIdToken());
 
   initDependencies();
   database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();

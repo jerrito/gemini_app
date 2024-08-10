@@ -326,7 +326,7 @@ class AuthenticationBloc
   }
   Either<String, bool> checkPhoneNumber(Map<String, dynamic> params) {
     if (params["start_number"] != params["phone_number"]) {
-      return const Left("Wrong old number");
+      return Left(params["message"] ?? "Wrong old number");
     } else {
       return const Right(true);
     }

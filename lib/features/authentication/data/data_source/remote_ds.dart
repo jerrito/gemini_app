@@ -265,6 +265,7 @@ class AuthenticationRemoteDatasourceImpl
       Function(FirebaseAuthException) onFailed) async {
     await FirebaseAuth.instance
         .verifyPhoneNumber(
+            phoneNumber: phoneNumber,
             timeout: const Duration(seconds: 120),
             verificationCompleted: onCompleted,
             verificationFailed: onFailed,

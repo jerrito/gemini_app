@@ -8,7 +8,7 @@ enum Url {
   becomeATeacherUrl(endpoint: "/api/admin/signup"),
   listDataUrl(endpoint: '/api/firestore/datas'),
   deleteDataUrl(endpoint: "/api/firestore/data/"),
-  deleteMultipleDataUrl(endpoint: "/api/firestore/data/list"),
+  deleteMultipleDataUrl(endpoint: "/api/firestore/delete/list"),
   getDataByIdUrl(endpoint: "/api/firestore/data/"),
   logoutUrl(endpoint: "/api/auth/logout"),
   refreshUrl(endpoint: "/api/auth/refresh"),
