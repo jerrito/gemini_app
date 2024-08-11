@@ -69,6 +69,7 @@ dependencies:
   pinput: ^5.0.0
   intl_phone_number_input: ^0.7.4
   fluttertoast: ^8.2.6
+  bloc_concurrency: ^0.2.5
 
 dev_dependencies:
   flutter_test:

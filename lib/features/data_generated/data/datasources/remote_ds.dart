@@ -61,7 +61,6 @@ class DataGeneratedRemoteDatasourceImpl
       ),
     );
     final decodedResponse = jsonDecode(response.body);
-    print(decodedResponse);
     if (response.statusCode == 200) {
       return DataModel.fromJson(decodedResponse);
     } else {

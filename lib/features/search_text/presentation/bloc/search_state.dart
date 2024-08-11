@@ -52,14 +52,12 @@ final class SearchTextAndImageError extends SearchState {
 final class GenerateContentLoading extends SearchState {}
 
 final class GenerateContentLoaded extends SearchState {
-  final dynamic data;
+  final String data;
   const GenerateContentLoaded({required this.data});
 }
 
 final class GenerateContentAllDone extends SearchState {
-  final dynamic data;
-
-  const GenerateContentAllDone({required this.data});
+  const GenerateContentAllDone();
 }
 
 final class GenerateContentError extends SearchState {

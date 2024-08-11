@@ -121,7 +121,7 @@ class AuthenticationRemoteDatasourceImpl
   Future<UserModel> getUser(Map<String, dynamic>? params) async {
     Map<String, String>? headers = {};
     final String authoken =
-        await firebaseAuth.currentUser?.getIdToken() ?? params?["token"];
+        await firebaseAuth.currentUser?.getIdToken(true) ?? params?["token"];
     headers.addAll({
       "Content-Type": "application/json",
       "Accept": "application/json",

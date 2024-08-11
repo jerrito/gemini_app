@@ -1,4 +1,4 @@
-
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:gemini/core/size/sizes.dart';
@@ -8,50 +8,61 @@ import 'package:gemini/features/search_text/presentation/widgets/buttons_below.d
 import 'package:share_plus/share_plus.dart';
 
 class ReadDataGeneratedWidget extends StatelessWidget {
-  final bool? isTextImage;
-  final String? data, title;
-  final String? dataImage;
+  final bool? isTextImage, isLocalImage;
+  final String? data, title, dataImage;
+  final Uint8List? byte;
   final SearchBloc searchBloc;
   const ReadDataGeneratedWidget(
       {super.key,
-      required this.searchBloc, this.data, this.title, this.dataImage, this.isTextImage});
+      required this.searchBloc,
+      this.data,
+      this.title,
+      this.dataImage,
+      this.byte,
+      this.isTextImage,
+      this.isLocalImage});
 
   @override
   Widget build(BuildContext context) {
-    final theme=Theme.of(context);
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              vertical: Sizes().height(context, .01),
-              horizontal: Sizes().width(context, .01)
+          (title?.isNotEmpty ?? false)
+              ? Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: Sizes().height(context, .01),
+                      horizontal: Sizes().width(context, .01)),
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(Sizes().height(context, 0.01)),
+                      color: theme.brightness == Brightness.dark
+                          ? const Color.fromRGBO(44, 43, 43, 0.694)
+                          : const Color.fromRGBO(241, 217, 217, 0.678)),
+                  child: Text(
+                    title ?? "",
+                    style: const TextStyle(
+                      fontSize: 17,
+                    ),
+                  ))
+              : const SizedBox(),
+          Space().height(context, 0.04),
+          if (isTextImage ?? false)
+            Container(
+              width: double.infinity, height: Sizes().height(context, 0.4),
+              decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.circular(Sizes().height(context, 0.01)),
+                  image: DecorationImage(
+                    image: (isLocalImage ?? false)
+                        ? Image.memory(byte!).image
+                        : Image.network(dataImage!).image,
+                    fit: BoxFit.cover,
+                  )),
+              //  child: Image.memory(textEntity.dataImage!,
+              //  fit:BoxFit.cover,
+              //  width:double.infinity,height:Sizes().height(context,0.3)),
             ),
-          
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Sizes().height(context, 0.01)),
-              color:theme.brightness==Brightness.dark?
-             const Color.fromRGBO(44, 43, 43, 0.694): 
-             const Color.fromRGBO(241, 217, 217, 0.678)
-            ),
-            child: Text(title ?? "",style:const TextStyle(
-               fontSize:17,),)),
-               Space().height(context, 0.04),
-          if (isTextImage  ?? false) 
-           Container(
-            width:double.infinity,height:Sizes().height(context,0.4),
-            decoration:BoxDecoration(
-              borderRadius:BorderRadius.circular(Sizes().height(context, 0.01)),
-              image: DecorationImage(
-                image: Image.network(dataImage!).image,
-                fit:BoxFit.cover,
-             
-              )
-            ),
-            //  child: Image.memory(textEntity.dataImage!,
-            //  fit:BoxFit.cover,
-            //  width:double.infinity,height:Sizes().height(context,0.3)),
-           ) ,
           Text(data ?? ""),
           ButtonsBelowResult(
               onCopy: () async {
@@ -62,10 +73,9 @@ class ReadDataGeneratedWidget extends StatelessWidget {
               },
               onRetry: null,
               onShare: () async {
-                await Share.share(
-                    ((title ?? "" ) + (data  ?? "")));
+                await Share.share(((title ?? "") + (data ?? "")));
               }),
-              Space().height(context, 0.1)
+          Space().height(context, 0.1)
         ],
       ),
     );

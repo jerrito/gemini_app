@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gemini/core/firebase_app_check.dart';
 import 'package:gemini/core/routes/go_router.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
+import 'package:gemini/features/search_text/presentation/provider/search_type_provider.dart';
 import 'package:gemini/features/teacher/presentation/providers/teacher.dart';
 import 'package:gemini/features/user/presentation/providers/user_provider.dart';
 import 'package:gemini/locator.dart';
@@ -23,8 +24,6 @@ void main() async {
   );
 
   await FirebaseAppCheckHelper.initialiseAppCheck();
-
-  print(await FirebaseAuth.instance.currentUser?.getIdToken());
 
   initDependencies();
   database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
@@ -46,6 +45,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => TeacherProvider()),
         ChangeNotifierProvider(create: (context) => TokenProvider()),
+        ChangeNotifierProvider(create: (context) => SearchTypeProvider())
       ],
       child: MaterialApp.router(
         routerConfig: goRouter,

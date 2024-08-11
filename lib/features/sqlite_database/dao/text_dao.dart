@@ -15,6 +15,9 @@ abstract class TextDao {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertData(TextEntity textEntity);
 
+  @Update(onConflict:OnConflictStrategy.replace)
+  Future<void> updateData(TextEntity textEntity);
+
   @delete
   Future<void> deleteAll(List<TextEntity> listTextEntities);
 }

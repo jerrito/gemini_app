@@ -126,6 +126,18 @@ class _$TextDao extends TextDao {
                       item.hasImage == null ? null : (item.hasImage! ? 1 : 0),
                   'dataImage': item.dataImage
                 }),
+        _textEntityUpdateAdapter = UpdateAdapter(
+            database,
+            'TextEntity',
+            ['textId'],
+            (TextEntity item) => <String, Object?>{
+                  'textId': item.textId,
+                  'title': item.title,
+                  'data': item.data,
+                  'hasImage':
+                      item.hasImage == null ? null : (item.hasImage! ? 1 : 0),
+                  'dataImage': item.dataImage
+                }),
         _textEntityDeletionAdapter = DeletionAdapter(
             database,
             'TextEntity',
@@ -147,6 +159,8 @@ class _$TextDao extends TextDao {
 
   final InsertionAdapter<TextEntity> _textEntityInsertionAdapter;
 
+  final UpdateAdapter<TextEntity> _textEntityUpdateAdapter;
+
   final DeletionAdapter<TextEntity> _textEntityDeletionAdapter;
 
   @override
@@ -164,6 +178,12 @@ class _$TextDao extends TextDao {
   @override
   Future<void> insertData(TextEntity textEntity) async {
     await _textEntityInsertionAdapter.insert(
+        textEntity, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> updateData(TextEntity textEntity) async {
+    await _textEntityUpdateAdapter.update(
         textEntity, OnConflictStrategy.replace);
   }
 

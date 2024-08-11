@@ -12,6 +12,7 @@ import 'package:gemini/core/widgets/bottom_sheet.dart';
 import 'package:gemini/features/authentication/domain/entities/user.dart';
 import 'package:gemini/features/authentication/presentation/providers/token.dart';
 import 'package:gemini/features/data_generated/presentation/bloc/data_generated_bloc.dart';
+import 'package:gemini/features/search_text/presentation/provider/search_type_provider.dart';
 import 'package:gemini/features/search_text/presentation/widgets/data_add.dart';
 import 'package:gemini/features/search_text/presentation/widgets/generated_data_title.dart';
 import 'package:gemini/features/search_text/presentation/widgets/icon_button.dart';
@@ -49,8 +50,9 @@ class _SearchTextPage extends State<SearchTextPage>
   late AnimationController animatedController;
 
   List<Uint8List> all = [], newAll = [];
-  List<String> imageExtensions = [], snapInfo = [];
+  List<String> imageExtensions = [], snapInfo = [], streamData = [];
   int imageLength = 0;
+  int? searchType;
   String info = "How can I help you today?",
       repeatQuestion = "",
       name = "",
@@ -134,6 +136,8 @@ class _SearchTextPage extends State<SearchTextPage>
   Widget build(BuildContext context) {
     token = context.read<TokenProvider>().token;
     user = context.watch<UserProvider>().user!;
+    final search = context.watch<SearchTypeProvider>();
+    searchType = context.watch<SearchTypeProvider>().checkIndex;
     profile = context.watch<UserProvider>().profile;
     return Scaffold(
       key: scaffoldKey,
@@ -239,11 +243,7 @@ class _SearchTextPage extends State<SearchTextPage>
                 if (value?.isEmpty ?? true) {
                   return "";
                 }
-                // if (isTextImage) {
-                //   if (all.isEmpty) {
-                //     return "image is required";
-                //   }
-                // }
+
                 return null;
               },
               onChanged: (value) {
@@ -364,10 +364,14 @@ class _SearchTextPage extends State<SearchTextPage>
                   showSnackbar(context: context, message: state.errorMessage);
                 }
                 if (state is DataGeneratedLoaded) {
-                  snapInfo.clear();
+                  if (isStream) {
+                    snapInfo.clear();
+                  }
                 }
                 if (state is DataGeneratedLoading) {
-                  searchBloc.add(ReadSQLDataEvent());
+                  if (isStream) {
+                    searchBloc.add(ReadSQLDataEvent());
+                  }
                 }
               },
             ),
@@ -419,28 +423,36 @@ class _SearchTextPage extends State<SearchTextPage>
                 // searchBloc.add(DataEvent(params: params));
               }
               if (state is GenerateContentAllDone) {
-                question = controller.text;
-                controller.text = "";
-                isAvailable = false;
-                setState(() {});
-                final newId = await searchBloc.readData();
-                final data = state.data;
-                refinedData = searchBloc.replace(data);
+                // final newId = await searchBloc.readData();
+                final refinedData = searchBloc.replace(snapInfo.join(""));
                 Map<String, dynamic> params = {
                   "token": token,
-                  "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
+                  // "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
                   "title": (question!.isNotEmpty ? question! : repeatQuestion),
                   "data": refinedData,
                   "hasImage": false,
                   "dataImage": null
                 };
-                await searchBloc.addData(params);
                 dataGeneratedBloc.add(DataEvent(params: params));
               }
               if (state is GenerateContentLoaded) {
                 final data = state.data;
-                snapInfo.add(data.toString());
+                snapInfo.add(data);
                 _scrollDown();
+              }
+              if (state is GenerateStreamLoading) {
+                question = controller.text;
+                controller.text = "";
+                isAvailable = false;
+                isStream = !isStream;
+                snapInfo.clear();
+                search.reset();
+                setState(() {});
+              }
+              if (state is SearchTextAndImageLoading) {
+                question = controller.text;
+                controller.text = "";
+                setState(() {});
               }
 
               if (state is GenerateContentError) {
@@ -455,9 +467,7 @@ class _SearchTextPage extends State<SearchTextPage>
             builder: (context, state) {
               if (state is SearchTextAndImageLoading ||
                   state is SearchTextLoading ||
-                  state is ChatLoading ||
-                  state is ReadDataLoading ||
-                  state is GenerateContentLoading) {
+                  state is ReadDataLoading) {
                 return Column(
                   children: [
                     Center(
@@ -470,23 +480,34 @@ class _SearchTextPage extends State<SearchTextPage>
               }
 
               if (state is GenerateContentLoaded) {
-                // final data = state.data;
-
                 return Column(
                   children: [
-                    // Text(question!.isNotEmpty ? question! : repeatQuestion),
                     Space().height(context, 0.01),
                     Flexible(
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        shrinkWrap: true,
-                        itemCount: snapInfo.length,
-                        // physics: const ScrollMotion(),
-                        itemBuilder: (context, index) {
-                          final da = snapInfo[index];
-                          final allRefined = searchBloc.replace(da);
-                          return Text(allRefined);
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          final dataRead = await searchBloc.readData();
+                          if (dataRead?.isNotEmpty ?? false) {
+                            if (dataRead!.length > searchType!) {
+                              final index = dataRead.length - searchType!;
+                              final text = dataRead[index - 1];
+                              if (text.hasImage ?? false) {}
+                              snapInfo.insert(0, text.data ?? "");
+                              search.increase();
+                            }
+                          }
                         },
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          shrinkWrap: true,
+                          itemCount: snapInfo.length,
+                          // physics: const ScrollMotion(),
+                          itemBuilder: (context, index) {
+                            final da = snapInfo[index];
+                            final refinedData = searchBloc.replace(da);
+                            return Text(refinedData);
+                          },
+                        ),
                       ),
                     ),
                     Space().height(context, 0.09)
@@ -498,23 +519,18 @@ class _SearchTextPage extends State<SearchTextPage>
                 return Column(
                   children: [
                     Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          print("dd");
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        itemCount: data?.length,
+                        //  physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final das = data![index];
+                          return DataAdd(
+                              textEntity: das,
+                              searchBloc: searchBloc,
+                              isTextImage: das.hasImage);
                         },
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          shrinkWrap: true,
-                          itemCount: data?.length,
-                          //  physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final das = data![index];
-                            return DataAdd(
-                                textEntity: das,
-                                searchBloc: searchBloc,
-                                isTextImage: das.hasImage);
-                          },
-                        ),
                       ),
                     ),
                     Space().height(context, 0.09)

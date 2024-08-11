@@ -18,6 +18,7 @@ import 'package:gemini/main.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import "package:google_generative_ai/google_generative_ai.dart" as ai;
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 part "search_event.dart";
 part 'search_state.dart';
 
@@ -106,25 +107,29 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     });
 
     on<GenerateContentDoneEvent>((event, emit) {
-      emit(GenerateContentAllDone(data: all.join("")));
-      all.clear();
+      emit(const GenerateContentAllDone());
+      emit(const GenerateContentLoaded(data: ""));
     });
 
     on<GenerateContentEvent>((event, emit) async {
       emit(GenerateStreamLoading());
+      final content = [ai.Content.text(event.params["text"])];
+
+      final response = model.generateContentStream(content, safetySettings: [
+        ai.SafetySetting(
+            ai.HarmCategory.dangerousContent, ai.HarmBlockThreshold.none)
+      ]);
       await generateStreams(event.params);
 
-      await emit.onEach(streamContent.stream, onData: (data) {
+      await emit.forEach(response, onData: (data) {
         emit(GenerateContentLoading());
-        emit(GenerateContentLoaded(data: data.text));
+        return GenerateContentLoaded(data: data.text ?? "");
       }, onError: (error, _) {
-        emit(
-          GenerateContentError(
-            errorMessage: error.toString(),
-          ),
+        return GenerateContentError(
+          errorMessage: error.toString(),
         );
-      });
-    });
+      }).whenComplete(() => print("object"));
+    }, transformer: restartable());
 
     on<GenerateStreamStopEvent>((event, emit) async {
       final content = [ai.Content.text(event.params["text"])];
@@ -138,13 +143,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           await for (final r in response) {
             emit(GenerateContentLoading());
             all.add(r.text!);
-            emit(
-              GenerateContentLoaded(
-                data: r.text,
-              ),
-            );
+            // emit(
+            // GenerateContentLoaded(
+            //   data: r.text.toLis,
+            // ),
+            // );
           }
-          emit(GenerateContentAllDone(data: all.join()));
+          // emit(GenerateContentAllDone(data: all.join()));
           all.clear();
         } catch (e) {
           emit(GenerateContentError(errorMessage: e.toString()));
@@ -236,19 +241,34 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   String replace(String data) {
-    return data.replaceAll(RegExp(r'[^\w\s]+'), '');
+    return data.replaceAll(RegExp(r'[/**]'), '');
   }
 
   Future<dynamic> generateStreams(Map<String, dynamic> params) async {
     final content = [ai.Content.text(params["text"])];
+    question = params["text"];
 
     final response = model.generateContentStream(content);
 
     return response.asBroadcastStream().listen((onData) {
       // onData.text);
-      streamContent.add(onData);
-    }, onDone: () {
+      // streamContent.add(onData);
+      all.add(onData.text ?? "");
+    }, onDone: () async {
+      final newId = await readData();
+      final refinedData = replace(all.join(""));
+      Map<String, dynamic> params = {
+        "token": token,
+        "textId": newId!.isNotEmpty ? newId.last.textId + 1 : 1,
+        "title": question,
+        "data": refinedData,
+        "hasImage": false,
+        "dataImage": null
+      };
+
+      await addData(params);
       add(GenerateContentDoneEvent());
+      all.clear();
     });
   }
 
