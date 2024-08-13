@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini/assets/images/images.dart';
 import 'package:gemini/core/widgets/default_bottom_sheet.dart';
-import 'package:gemini/features/authentication/presentation/pages/number_page.dart';
-import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:go_router/go_router.dart';
 
 class LandingPage extends StatefulWidget {

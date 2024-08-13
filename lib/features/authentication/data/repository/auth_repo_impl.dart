@@ -210,8 +210,12 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<Either<String, auth.User>> verifyOTP(
       auth.PhoneAuthCredential credential) async {
     if (await networkInfo.isConnected) {
-      final response = await userRemoteDatasource.verifyOTP(credential);
-      return Right(response);
+      try {
+        final response = await userRemoteDatasource.verifyOTP(credential);
+        return Right(response);
+      } catch (e) {
+        return Left(e.toString());
+      }
     } else {
       return Left(networkInfo.noNetworkMessage);
     }

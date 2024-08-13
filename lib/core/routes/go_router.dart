@@ -2,7 +2,6 @@ import 'package:gemini/features/authentication/presentation/pages/become_a_teach
 import 'package:gemini/features/authentication/presentation/pages/landing_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/no_internet_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/number_page.dart';
-import 'package:gemini/features/authentication/presentation/pages/signin_page.dart';
 import 'package:gemini/features/authentication/presentation/pages/signup_page.dart';
 import 'package:gemini/features/connection_page.dart';
 import 'package:gemini/features/learning/presentation/pages/home.dart';
@@ -22,7 +21,7 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
             path: "number",
             name: "number",
             builder: (context, state) => PhoneNumberPage(
-                  isSignup: false,
+                  isSignup: "false",
                   oldNumberString:
                       state.uri.queryParameters["oldNumberString"].toString(),
                 ),
@@ -79,9 +78,7 @@ final goRouter = GoRouter(initialLocation: "/", routes: [
           path: "phone",
           name: "phone",
           builder: (context, state) => PhoneNumberPage(
-                isSignup: bool.parse(
-                  state.uri.queryParameters["isSignup"].toString(),
-                ),
+                isSignup: state.uri.queryParameters["isSignup"],
               ),
           routes: [
             GoRoute(

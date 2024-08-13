@@ -73,6 +73,9 @@ class _ChangeNumber extends State<ChangeNumber> {
                   if (state is UpdateUserLoaded) {
                     userProvider.user = state.user;
                     context.goNamed("searchPage");
+                    showSnackbar(
+                        context: context,
+                        message: "Number successfully changed");
                   }
                   if (state is UpdateUserError) {
                     showSnackbar(

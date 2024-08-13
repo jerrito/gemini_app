@@ -76,4 +76,7 @@ dependencies {
        // When using the BoM, you don't specify versions in Firebase library dependencies
        implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
+         implementation "androidx.activity:activity:1.6.0-alpha05"
+
+
 }

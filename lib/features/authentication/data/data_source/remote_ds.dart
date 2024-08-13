@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:gemini/core/error/error_model.dart';
 import 'package:gemini/core/urls/urls.dart';
 import 'package:gemini/features/authentication/data/models/admin_model.dart';
@@ -131,6 +130,7 @@ class AuthenticationRemoteDatasourceImpl
     final response = await client.get(getUri(endpoint: Url.homeUrl.endpoint),
         headers: headers);
     final decodedResponse = jsonDecode(response.body);
+
     if (response.statusCode == 200) {
       return UserModel.fromJson(decodedResponse);
     } else {
@@ -249,10 +249,6 @@ class AuthenticationRemoteDatasourceImpl
   Future<User> verifyOTP(PhoneAuthCredential credential) async {
     final response =
         await FirebaseAuth.instance.signInWithCredential(credential);
-
-    if (kDebugMode) {
-      print(response.user?.uid);
-    }
 
     return response.user!;
   }

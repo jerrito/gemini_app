@@ -104,7 +104,7 @@ class _OTPPageState extends State<OTPPage> {
                 showSnackbar(
                   context: context,
                   message: state.errorMessage,
-                  isSuccessMessage: true,
+                  isSuccessMessage: false,
                 );
               }
               if (state is CacheTokenError) {
@@ -136,11 +136,13 @@ class _OTPPageState extends State<OTPPage> {
                   userProvider.user = state.user;
                   if (!context.mounted) return;
                   context.goNamed("searchPage");
-                  showSnackbar(
-                    isSuccessMessage: true,
-                    context: context,
-                    message: "Number already registered",
-                  );
+                  if (widget.otpRequest.isSignup) {
+                    showSnackbar(
+                      isSuccessMessage: true,
+                      context: context,
+                      message: "Number already registered",
+                    );
+                  }
                 } else {
                   if (widget.otpRequest.isSignup || state.user.email == null) {
                     if (!context.mounted) return;
@@ -252,7 +254,7 @@ class _OTPPageState extends State<OTPPage> {
             style: TextStyle(color: Colors.blue, fontSize: 16),
           ),
           child: Text(
-            "This code will expire in 00:${(time).toInt()}",
+            "This code will expire in 00:$time",
             style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
         )

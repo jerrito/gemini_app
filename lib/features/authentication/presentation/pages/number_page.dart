@@ -13,7 +13,7 @@ import 'package:gemini/locator.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class PhoneNumberPage extends StatefulWidget {
-  final bool isSignup;
+  final String? isSignup;
   final String? oldNumberString;
   const PhoneNumberPage({
     super.key,
@@ -31,12 +31,20 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
   final phoneNumberController = TextEditingController();
   PhoneNumber phone = PhoneNumber(isoCode: "GH", dialCode: "+233");
   String number = "";
+  bool? isSignup;
+  @override
+  void initState() {
+    print(widget.isSignup);
+    isSignup = bool.parse(widget.isSignup ?? "true", caseSensitive: false);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.isSignup == true
+            isSignup == true
                 ? "Verify Number"
                 : widget.oldNumberString != null
                     ? "Verify old number"
@@ -56,7 +64,7 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
                   MaterialPageRoute(builder: (context) {
                     return OTPPage(
                       otpRequest: OTPRequest(
-                          isSignup: widget.isSignup,
+                          isSignup: isSignup ?? true,
                           phoneNumber: number,
                           forceResendingToken: state.token,
                           verifyId: state.verifyId,

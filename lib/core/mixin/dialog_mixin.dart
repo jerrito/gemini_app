@@ -350,7 +350,7 @@ mixin UserProfileMixin {
 
 class _RowButtons extends StatelessWidget {
   final void Function()? onTap;
-  const _RowButtons({this.onTap});
+  const _RowButtons(this.onTap);
 
   @override
   Widget build(BuildContext context) {

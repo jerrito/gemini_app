@@ -69,10 +69,19 @@ class _SearchTextPage extends State<SearchTextPage>
   Uint8List? byte;
   TokenProvider? tokenProvider;
   late User user;
-  getTime() {
-    Timer.periodic(const Duration(seconds: 90), (timer) {
-      // timer.tick);
+  int time = 1;
+  String getTime() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        time++;
+      });
+      if (!isSpeechTextEnabled) {
+        time = 0;
+        setState(() {});
+        timer.cancel();
+      }
     });
+    return time.toString();
   }
 
   Future<List<TextEntity>?> remove() async {
@@ -176,11 +185,20 @@ class _SearchTextPage extends State<SearchTextPage>
                   setState(() {
                     isSpeechTextEnabled = !isSpeechTextEnabled;
                   });
+                  getTime();
                 }
                 if (state is StopSpeechTextLoaded) {
                   setState(() {
                     isSpeechTextEnabled = !isSpeechTextEnabled;
                   });
+                  if (controller.text.isNotEmpty) {
+                    Map<String, dynamic> params = {
+                      "text": controller.text,
+                    };
+                    searchBloc.add(
+                      GenerateContentEvent(params: params),
+                    );
+                  }
                 }
               },
               child: GestureDetector(
@@ -549,7 +567,7 @@ class _SearchTextPage extends State<SearchTextPage>
                 );
               }
               if (isSpeechTextEnabled) {
-                return const Column(
+                return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Center(
@@ -557,7 +575,7 @@ class _SearchTextPage extends State<SearchTextPage>
                         'Listening',
                       ),
                     ),
-                    Text("00:01"),
+                    Text("${time.toString()} seconds"),
                   ],
                 );
               } else {
@@ -599,9 +617,11 @@ class _SearchTextPage extends State<SearchTextPage>
                             (user.profile?.isNotEmpty ?? false))
                         ? CachedNetworkImageProvider(profile ?? user.profile!)
                         : null,
-                    child: Text(
-                      user.userName?.substring(0, 2) ?? "NA",
-                    ),
+                    child: (profile == null || (user.profile?.isEmpty ?? true))
+                        ? Text(
+                            user.userName?.substring(0, 2) ?? "NA",
+                          )
+                        : null,
                   ),
                   Space().height(context, 0.02),
                   Text(

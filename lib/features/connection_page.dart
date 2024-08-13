@@ -111,8 +111,14 @@ class _ConnectionPageState extends State<ConnectionPage>
             }
             if (state is GetUserLoaded) {
               final user = state.user;
-              userProvider?.user = user;
-              context.goNamed("searchPage");
+              print(user.email);
+              if (user.email == null) {
+                context.goNamed("signup",
+                    queryParameters: {"phoneNumber": user.phoneNumber});
+              } else {
+                userProvider?.user = user;
+                context.goNamed("searchPage");
+              }
             }
 
             if (state is GetUserError) {

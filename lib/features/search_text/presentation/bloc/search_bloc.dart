@@ -33,7 +33,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final NetworkInfo networkInfo;
 
   StreamController<SpeechRecognitionResult> words =
-      StreamController<SpeechRecognitionResult>();
+      StreamController<SpeechRecognitionResult>.broadcast();
   List<String> all = [];
   String question = "";
   String? token;
@@ -95,13 +95,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<ListenSpeechTextEvent>((event, emit) async {
       // emit(OnSpeechResultLoading());
 
-      listenToSpeechText();
+      await listenToSpeechText();
+      print("data.recogniz");
 
       await emit.forEach(words.stream, onData: (data) {
         emit(OnSpeechResultLoading());
-
+        print(data.recognizedWords);
+        print("data.recognizedWords");
         return OnSpeechResultLoaded(
           result: data.recognizedWords,
+        );
+      }, onError: (error, __) {
+        print(error.toString());
+        return OnSpeechResultError(
+          errorMessage: error.toString(),
         );
       });
     });
@@ -275,7 +282,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   /// Each time to start a speech recognition session
   Future<dynamic> listenToSpeechText() async {
     return await _speechToText.listen(
-      onResult: (result) => words.add(result),
+      onResult: (result) {
+        print(result.toString());
+        words.add(result);
+      },
       listenOptions: SpeechListenOptions(listenMode: ListenMode.search),
     );
   }
