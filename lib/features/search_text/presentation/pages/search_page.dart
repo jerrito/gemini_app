@@ -651,7 +651,6 @@ class _SearchTextPage extends State<SearchTextPage>
                                 "token": token,
                                 "list": ids
                               };
-                              print(ids);
                               dataGeneratedBloc.add(
                                   DeleteListDataGeneratedEvent(params: params));
                             }

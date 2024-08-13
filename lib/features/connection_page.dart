@@ -111,7 +111,7 @@ class _ConnectionPageState extends State<ConnectionPage>
             }
             if (state is GetUserLoaded) {
               final user = state.user;
-              print(user.email);
+              print(user.phoneNumber);
               if (user.email == null) {
                 context.goNamed("signup",
                     queryParameters: {"phoneNumber": user.phoneNumber});
