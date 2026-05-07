@@ -7,6 +7,8 @@ const bodyParser=require("body-parser");
 const authRouter=require("./routes/auth");
 const userModel=require("./models/user")
 const bcrypt=require("bcryptjs")
+const dotenv=require("dotenv");
+dotenv.config();
 
 
 const app=express();
@@ -33,9 +35,9 @@ app.use(authRouter);
 
 firebase.initializeApp(
   {
-    apiKey:"AIzaSyBwO1WSwiAJqN9Wcn0olgQPJUYXrNTy7Ps",
+    apiKey:process.env.API_KEY,
     authDomain:"127.0.0.1",
-    projectId:"woww-b2885",
+    projectId:process.env.apiKey,
   }
 )
 
