@@ -15,7 +15,7 @@ const app=express();
 
 const auth=require("./middlewares/auth")
 
-const databaseUrl="mongodb+srv://jerrito0240:kI02PBzyF2U1WL9A@cluster0.gldghvy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const databaseUrl=process.env.DATABASE_URL;
 
 
 
